@@ -2,6 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Day01
+import Day02
+import Day03
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, disabled, placeholder, required, rows, selected, value)
@@ -25,6 +27,8 @@ allDays : Dict.Dict DayNumber DayFunc
 allDays =
     Dict.fromList
         [ ( 1, Day01.run )
+        , ( 2, Day02.run )
+        , ( 3, Day03.run )
         ]
 
 

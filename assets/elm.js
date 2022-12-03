@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aw._ === region.aI._)
+	if (region.ay.aa === region.aK.aa)
 	{
-		return 'on line ' + region.aw._;
+		return 'on line ' + region.ay.aa;
 	}
-	return 'on lines ' + region.aw._ + ' through ' + region.aI._;
+	return 'on lines ' + region.ay.aa + ' through ' + region.aK.aa;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bH,
-		impl.b8,
-		impl.b3,
+		impl.bJ,
+		impl.ca,
+		impl.b5,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		F: func(record.F),
-		ax: record.ax,
-		au: record.au
+		az: record.az,
+		aw: record.aw
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.F;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ax;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.az;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.au) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aw) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bH,
-		impl.b8,
-		impl.b3,
+		impl.bJ,
+		impl.ca,
+		impl.b5,
 		function(sendToApp, initialModel) {
-			var view = impl.b9;
+			var view = impl.cb;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bH,
-		impl.b8,
-		impl.b3,
+		impl.bJ,
+		impl.ca,
+		impl.b5,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.av && impl.av(sendToApp)
-			var view = impl.b9;
+			var divertHrefToApp = impl.ax && impl.ax(sendToApp)
+			var view = impl.cb;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bq);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bs);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.b6) && (_VirtualDom_doc.title = title = doc.b6);
+				(title !== doc.b8) && (_VirtualDom_doc.title = title = doc.b8);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bW;
-	var onUrlRequest = impl.bX;
+	var onUrlChange = impl.bY;
+	var onUrlRequest = impl.bZ;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		av: function(sendToApp)
+		ax: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.a3 === next.a3
-							&& curr.aP === next.aP
-							&& curr.a0.a === next.a0.a
+							&& curr.a5 === next.a5
+							&& curr.aR === next.aR
+							&& curr.a2.a === next.a2.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bH: function(flags)
+		bJ: function(flags)
 		{
-			return A3(impl.bH, flags, _Browser_getUrl(), key);
+			return A3(impl.bJ, flags, _Browser_getUrl(), key);
 		},
-		b9: impl.b9,
-		b8: impl.b8,
-		b3: impl.b3
+		cb: impl.cb,
+		ca: impl.ca,
+		b5: impl.b5
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bE: 'hidden', bt: 'visibilitychange' }
+		? { bG: 'hidden', bv: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bE: 'mozHidden', bt: 'mozvisibilitychange' }
+		? { bG: 'mozHidden', bv: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bE: 'msHidden', bt: 'msvisibilitychange' }
+		? { bG: 'msHidden', bv: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bE: 'webkitHidden', bt: 'webkitvisibilitychange' }
-		: { bE: 'hidden', bt: 'visibilitychange' };
+		? { bG: 'webkitHidden', bv: 'webkitvisibilitychange' }
+		: { bG: 'hidden', bv: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		a8: _Browser_getScene(),
-		bg: {
-			bj: _Browser_window.pageXOffset,
-			bk: _Browser_window.pageYOffset,
-			bi: _Browser_doc.documentElement.clientWidth,
-			aO: _Browser_doc.documentElement.clientHeight
+		ba: _Browser_getScene(),
+		bi: {
+			bl: _Browser_window.pageXOffset,
+			bm: _Browser_window.pageYOffset,
+			bk: _Browser_doc.documentElement.clientWidth,
+			aQ: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		bi: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aO: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		bk: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aQ: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			a8: {
-				bi: node.scrollWidth,
-				aO: node.scrollHeight
+			ba: {
+				bk: node.scrollWidth,
+				aQ: node.scrollHeight
 			},
-			bg: {
-				bj: node.scrollLeft,
-				bk: node.scrollTop,
-				bi: node.clientWidth,
-				aO: node.clientHeight
+			bi: {
+				bl: node.scrollLeft,
+				bm: node.scrollTop,
+				bk: node.clientWidth,
+				aQ: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			a8: _Browser_getScene(),
-			bg: {
-				bj: x,
-				bk: y,
-				bi: _Browser_doc.documentElement.clientWidth,
-				aO: _Browser_doc.documentElement.clientHeight
+			ba: _Browser_getScene(),
+			bi: {
+				bl: x,
+				bm: y,
+				bk: _Browser_doc.documentElement.clientWidth,
+				aQ: _Browser_doc.documentElement.clientHeight
 			},
-			by: {
-				bj: x + rect.left,
-				bk: y + rect.top,
-				bi: rect.width,
-				aO: rect.height
+			bA: {
+				bl: x + rect.left,
+				bm: y + rect.top,
+				bk: rect.width,
+				aQ: rect.height
 			}
 		};
 	});
@@ -4376,7 +4376,7 @@ var $author$project$Main$Day = F2(
 	});
 var $author$project$Main$Model = F2(
 	function (puzzleInput, day) {
-		return {an: day, ah: puzzleInput};
+		return {ap: day, ai: puzzleInput};
 	});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$LT = 0;
@@ -4889,7 +4889,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aK: fragment, aP: host, a_: path, a0: port_, a3: protocol, a4: query};
+		return {aM: fragment, aR: host, a0: path, a2: port_, a5: protocol, a6: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5174,19 +5174,19 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$sandbox = function (impl) {
 	return _Browser_element(
 		{
-			bH: function (_v0) {
-				return _Utils_Tuple2(impl.bH, $elm$core$Platform$Cmd$none);
+			bJ: function (_v0) {
+				return _Utils_Tuple2(impl.bJ, $elm$core$Platform$Cmd$none);
 			},
-			b3: function (_v1) {
+			b5: function (_v1) {
 				return $elm$core$Platform$Sub$none;
 			},
-			b8: F2(
+			ca: F2(
 				function (msg, model) {
 					return _Utils_Tuple2(
-						A2(impl.b8, msg, model),
+						A2(impl.ca, msg, model),
 						$elm$core$Platform$Cmd$none);
 				}),
-			b9: impl.b9
+			cb: impl.cb
 		});
 };
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
@@ -5488,10 +5488,161 @@ var $author$project$Day01$run = function (content) {
 		A2($author$project$Day01$innerRun, content, 1),
 		A2($author$project$Day01$innerRun, content, 3));
 };
+var $author$project$Day02$Element = F2(
+	function (opponent, you) {
+		return {L: opponent, ao: you};
+	});
+var $author$project$Day02$Invalid = 3;
+var $author$project$Day02$Paper = 1;
+var $author$project$Day02$Rock = 0;
+var $author$project$Day02$Scissors = 2;
+var $author$project$Day02$parseElement = function (l) {
+	if (l.b && l.b.b) {
+		var char1 = l.a;
+		var _v1 = l.b;
+		var char2 = _v1.a;
+		var y = (char2 === 'X') ? 0 : ((char2 === 'Y') ? 1 : ((char2 === 'Z') ? 2 : 3));
+		var o = (char1 === 'A') ? 0 : ((char1 === 'B') ? 1 : ((char1 === 'C') ? 2 : 3));
+		return A2($author$project$Day02$Element, o, y);
+	} else {
+		return A2($author$project$Day02$Element, 3, 3);
+	}
+};
+var $author$project$Day02$scoreShape = function (s) {
+	switch (s) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
+		case 2:
+			return 3;
+		default:
+			return 0;
+	}
+};
+var $author$project$Day02$scoreWin = function (el) {
+	var _v0 = el.ao;
+	switch (_v0) {
+		case 0:
+			var _v1 = el.L;
+			switch (_v1) {
+				case 0:
+					return 3;
+				case 1:
+					return 0;
+				case 2:
+					return 6;
+				default:
+					return 0;
+			}
+		case 1:
+			var _v2 = el.L;
+			switch (_v2) {
+				case 0:
+					return 6;
+				case 1:
+					return 3;
+				case 2:
+					return 0;
+				default:
+					return 0;
+			}
+		case 2:
+			var _v3 = el.L;
+			switch (_v3) {
+				case 0:
+					return 0;
+				case 1:
+					return 6;
+				case 2:
+					return 3;
+				default:
+					return 0;
+			}
+		default:
+			return 0;
+	}
+};
+var $author$project$Day02$transformElement = function (el) {
+	var _v0 = el.ao;
+	switch (_v0) {
+		case 0:
+			var _v1 = el.L;
+			switch (_v1) {
+				case 0:
+					return A2($author$project$Day02$Element, 0, 2);
+				case 1:
+					return A2($author$project$Day02$Element, 1, 0);
+				case 2:
+					return A2($author$project$Day02$Element, 2, 1);
+				default:
+					return A2($author$project$Day02$Element, 3, 3);
+			}
+		case 1:
+			var _v2 = el.L;
+			switch (_v2) {
+				case 0:
+					return A2($author$project$Day02$Element, 0, 0);
+				case 1:
+					return A2($author$project$Day02$Element, 1, 1);
+				case 2:
+					return A2($author$project$Day02$Element, 2, 2);
+				default:
+					return A2($author$project$Day02$Element, 3, 3);
+			}
+		case 2:
+			var _v3 = el.L;
+			switch (_v3) {
+				case 0:
+					return A2($author$project$Day02$Element, 0, 1);
+				case 1:
+					return A2($author$project$Day02$Element, 1, 2);
+				case 2:
+					return A2($author$project$Day02$Element, 2, 0);
+				default:
+					return A2($author$project$Day02$Element, 3, 3);
+			}
+		default:
+			return A2($author$project$Day02$Element, 3, 3);
+	}
+};
+var $author$project$Day02$innerRun = F2(
+	function (content, toBeTransformed) {
+		var transformFn = toBeTransformed ? $author$project$Day02$transformElement : $elm$core$Basics$identity;
+		var fn = F2(
+			function (el, acc) {
+				return (acc + $author$project$Day02$scoreShape(el.ao)) + $author$project$Day02$scoreWin(el);
+			});
+		return $elm$core$String$fromInt(
+			A3(
+				$elm$core$List$foldl,
+				fn,
+				0,
+				A2(
+					$elm$core$List$map,
+					A2(
+						$elm$core$Basics$composeR,
+						$elm$core$String$split(' '),
+						A2(
+							$elm$core$Basics$composeR,
+							$elm$core$List$take(2),
+							A2($elm$core$Basics$composeR, $author$project$Day02$parseElement, transformFn))),
+					A2($elm$core$String$split, '\n', content))));
+	});
+var $author$project$Day02$run = function (content) {
+	return _Utils_Tuple2(
+		A2($author$project$Day02$innerRun, content, false),
+		A2($author$project$Day02$innerRun, content, true));
+};
+var $author$project$Day03$run = function (_v0) {
+	return _Utils_Tuple2('No solution', 'No solution');
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
-			_Utils_Tuple2(1, $author$project$Day01$run)
+			_Utils_Tuple2(1, $author$project$Day01$run),
+			_Utils_Tuple2(2, $author$project$Day02$run),
+			_Utils_Tuple2(3, $author$project$Day03$run)
 		]));
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -5530,7 +5681,7 @@ var $author$project$Main$update = F2(
 			var c = msg.a;
 			return _Utils_update(
 				model,
-				{ah: c});
+				{ai: c});
 		} else {
 			var d = msg.a;
 			var fn = A2(
@@ -5540,7 +5691,7 @@ var $author$project$Main$update = F2(
 			return _Utils_update(
 				model,
 				{
-					an: A2($author$project$Main$Day, d, fn)
+					ap: A2($author$project$Main$Day, d, fn)
 				});
 		}
 	});
@@ -5666,12 +5817,12 @@ var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	var result = function () {
-		var _v0 = model.an;
+		var _v0 = model.ap;
 		var i = _v0.a;
 		var fn = _v0.b;
 		return _Utils_Tuple2(
 			i,
-			fn(model.ah));
+			fn(model.ai));
 	}();
 	return A2(
 		$elm$html$Html$div,
@@ -5805,7 +5956,7 @@ var $author$project$Main$view = function (model) {
 															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Puzzle input'),
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput($author$project$Main$FormField),
-															$elm$html$Html$Attributes$value(model.ah)
+															$elm$html$Html$Attributes$value(model.ai)
 														]),
 													_List_Nil)
 												])),
@@ -5835,6 +5986,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{bH: $author$project$Main$init, b8: $author$project$Main$update, b9: $author$project$Main$view});
+	{bJ: $author$project$Main$init, ca: $author$project$Main$update, cb: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
