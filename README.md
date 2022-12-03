@@ -1,8 +1,10 @@
-# Advent Of Code 2022
+# Advent Of Code
+
+![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2022-6_*-success)
 
 ## Summary
 
-My path through the [Advent Of Code 2022](https://adventofcode.com/2022)
+My path through the current [Advent Of Code 2022](https://adventofcode.com/).
 
 ## Usage
 
