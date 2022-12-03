@@ -39,12 +39,12 @@ suite =
                 \_ ->
                     Day03.run inputDay03
                         |> Tuple.first
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "157"
             , test "the second part is correct" <|
                 \_ ->
                     Day03.run inputDay03
                         |> Tuple.second
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "70"
             ]
         ]
 
@@ -76,4 +76,4 @@ inputDay02 =
 
 inputDay03 : String
 inputDay03 =
-    ""
+    "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw"

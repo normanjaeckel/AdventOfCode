@@ -5634,16 +5634,23 @@ var $author$project$Day02$run = function (content) {
 		A2($author$project$Day02$innerRun, content, false),
 		A2($author$project$Day02$innerRun, content, true));
 };
-var $author$project$Day03$run = function (_v0) {
-	return _Utils_Tuple2('No solution', 'No solution');
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
-var $author$project$Main$allDays = $elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(1, $author$project$Day01$run),
-			_Utils_Tuple2(2, $author$project$Day02$run),
-			_Utils_Tuple2(3, $author$project$Day03$run)
-		]));
+var $elm$core$String$dropRight = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3($elm$core$String$slice, 0, -n, string);
+	});
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -5675,6 +5682,171 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === -2) {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$filter = F2(
+	function (isGood, dict) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, d) {
+					return A2(isGood, k, v) ? A3($elm$core$Dict$insert, k, v, d) : d;
+				}),
+			$elm$core$Dict$empty,
+			dict);
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Dict$intersect = F2(
+	function (t1, t2) {
+		return A2(
+			$elm$core$Dict$filter,
+			F2(
+				function (k, _v0) {
+					return A2($elm$core$Dict$member, k, t2);
+				}),
+			t1);
+	});
+var $elm$core$Set$intersect = F2(
+	function (_v0, _v1) {
+		var dict1 = _v0;
+		var dict2 = _v1;
+		return A2($elm$core$Dict$intersect, dict1, dict2);
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Day03$prio = function () {
+	var nums = A2($elm$core$List$range, 1, 52);
+	var alphas = A2($elm$core$String$split, '', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	return $elm$core$Dict$fromList(
+		A3($elm$core$List$map2, $elm$core$Tuple$pair, alphas, nums));
+}();
+var $author$project$Day03$fnPartA = function (line) {
+	var half = ($elm$core$String$length(line) / 2) | 0;
+	var left = $elm$core$Set$fromList(
+		A2(
+			$elm$core$String$split,
+			'',
+			A2($elm$core$String$dropRight, half, line)));
+	var right = $elm$core$Set$fromList(
+		A2(
+			$elm$core$String$split,
+			'',
+			A2($elm$core$String$dropLeft, half, line)));
+	return A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		A2(
+			$elm$core$Dict$get,
+			A2(
+				$elm$core$Maybe$withDefault,
+				'',
+				$elm$core$List$head(
+					$elm$core$Set$toList(
+						A2($elm$core$Set$intersect, left, right)))),
+			$author$project$Day03$prio));
+};
+var $author$project$Day03$innerRunPartA = function (content) {
+	return $elm$core$String$fromInt(
+		$elm$core$List$sum(
+			A2($elm$core$List$map, $author$project$Day03$fnPartA, content)));
+};
+var $author$project$Day03$parseGroup = F3(
+	function (first, second, third) {
+		var s = A2(
+			$elm$core$Basics$composeR,
+			$elm$core$String$split(''),
+			$elm$core$Set$fromList);
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A2(
+				$elm$core$Dict$get,
+				A2(
+					$elm$core$Maybe$withDefault,
+					'',
+					$elm$core$List$head(
+						$elm$core$Set$toList(
+							A2(
+								$elm$core$Set$intersect,
+								s(third),
+								A2(
+									$elm$core$Set$intersect,
+									s(first),
+									s(second)))))),
+				$author$project$Day03$prio));
+	});
+var $author$project$Day03$walk = function (all) {
+	if ((all.b && all.b.b) && all.b.b.b) {
+		var first = all.a;
+		var _v1 = all.b;
+		var second = _v1.a;
+		var _v2 = _v1.b;
+		var third = _v2.a;
+		var rest = _v2.b;
+		return A3($author$project$Day03$parseGroup, first, second, third) + $author$project$Day03$walk(rest);
+	} else {
+		return 0;
+	}
+};
+var $author$project$Day03$innerRunPartB = function (content) {
+	return $elm$core$String$fromInt(
+		$author$project$Day03$walk(content));
+};
+var $author$project$Day03$run = function (puzzleInput) {
+	var c = A2($elm$core$String$split, '\n', puzzleInput);
+	return _Utils_Tuple2(
+		$author$project$Day03$innerRunPartA(c),
+		$author$project$Day03$innerRunPartB(c));
+};
+var $author$project$Main$allDays = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(1, $author$project$Day01$run),
+			_Utils_Tuple2(2, $author$project$Day02$run),
+			_Utils_Tuple2(3, $author$project$Day03$run)
+		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (!msg.$) {
