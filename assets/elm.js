@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ax._ === region.aK._)
+	if (region.aw._ === region.aI._)
 	{
-		return 'on line ' + region.ax._;
+		return 'on line ' + region.aw._;
 	}
-	return 'on lines ' + region.ax._ + ' through ' + region.aK._;
+	return 'on lines ' + region.aw._ + ' through ' + region.aI._;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bJ,
-		impl.ca,
-		impl.b5,
+		impl.bH,
+		impl.b8,
+		impl.b3,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		F: func(record.F),
-		ay: record.ay,
-		av: record.av
+		ax: record.ax,
+		au: record.au
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.F;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ay;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ax;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.av) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.au) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bJ,
-		impl.ca,
-		impl.b5,
+		impl.bH,
+		impl.b8,
+		impl.b3,
 		function(sendToApp, initialModel) {
-			var view = impl.cb;
+			var view = impl.b9;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bJ,
-		impl.ca,
-		impl.b5,
+		impl.bH,
+		impl.b8,
+		impl.b3,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.aw && impl.aw(sendToApp)
-			var view = impl.cb;
+			var divertHrefToApp = impl.av && impl.av(sendToApp)
+			var view = impl.b9;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bs);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bq);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.b8) && (_VirtualDom_doc.title = title = doc.b8);
+				(title !== doc.b6) && (_VirtualDom_doc.title = title = doc.b6);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bY;
-	var onUrlRequest = impl.bZ;
+	var onUrlChange = impl.bW;
+	var onUrlRequest = impl.bX;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		aw: function(sendToApp)
+		av: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.a5 === next.a5
-							&& curr.aR === next.aR
-							&& curr.a2.a === next.a2.a
+							&& curr.a3 === next.a3
+							&& curr.aP === next.aP
+							&& curr.a0.a === next.a0.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bJ: function(flags)
+		bH: function(flags)
 		{
-			return A3(impl.bJ, flags, _Browser_getUrl(), key);
+			return A3(impl.bH, flags, _Browser_getUrl(), key);
 		},
-		cb: impl.cb,
-		ca: impl.ca,
-		b5: impl.b5
+		b9: impl.b9,
+		b8: impl.b8,
+		b3: impl.b3
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bG: 'hidden', bv: 'visibilitychange' }
+		? { bE: 'hidden', bt: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bG: 'mozHidden', bv: 'mozvisibilitychange' }
+		? { bE: 'mozHidden', bt: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bG: 'msHidden', bv: 'msvisibilitychange' }
+		? { bE: 'msHidden', bt: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bG: 'webkitHidden', bv: 'webkitvisibilitychange' }
-		: { bG: 'hidden', bv: 'visibilitychange' };
+		? { bE: 'webkitHidden', bt: 'webkitvisibilitychange' }
+		: { bE: 'hidden', bt: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ba: _Browser_getScene(),
-		bi: {
-			bl: _Browser_window.pageXOffset,
-			bm: _Browser_window.pageYOffset,
-			bk: _Browser_doc.documentElement.clientWidth,
-			aQ: _Browser_doc.documentElement.clientHeight
+		a8: _Browser_getScene(),
+		bg: {
+			bj: _Browser_window.pageXOffset,
+			bk: _Browser_window.pageYOffset,
+			bi: _Browser_doc.documentElement.clientWidth,
+			aO: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		bk: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aQ: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		bi: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aO: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ba: {
-				bk: node.scrollWidth,
-				aQ: node.scrollHeight
+			a8: {
+				bi: node.scrollWidth,
+				aO: node.scrollHeight
 			},
-			bi: {
-				bl: node.scrollLeft,
-				bm: node.scrollTop,
-				bk: node.clientWidth,
-				aQ: node.clientHeight
+			bg: {
+				bj: node.scrollLeft,
+				bk: node.scrollTop,
+				bi: node.clientWidth,
+				aO: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ba: _Browser_getScene(),
-			bi: {
-				bl: x,
-				bm: y,
-				bk: _Browser_doc.documentElement.clientWidth,
-				aQ: _Browser_doc.documentElement.clientHeight
+			a8: _Browser_getScene(),
+			bg: {
+				bj: x,
+				bk: y,
+				bi: _Browser_doc.documentElement.clientWidth,
+				aO: _Browser_doc.documentElement.clientHeight
 			},
-			bA: {
-				bl: x + rect.left,
-				bm: y + rect.top,
-				bk: rect.width,
-				aQ: rect.height
+			by: {
+				bj: x + rect.left,
+				bk: y + rect.top,
+				bi: rect.width,
+				aO: rect.height
 			}
 		};
 	});
@@ -4375,8 +4375,8 @@ var $author$project$Main$Day = F2(
 		return {$: 0, a: a, b: b};
 	});
 var $author$project$Main$Model = F2(
-	function (content, day) {
-		return {af: content, an: day};
+	function (puzzleInput, day) {
+		return {an: day, ah: puzzleInput};
 	});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$LT = 0;
@@ -4458,209 +4458,13 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = 2;
-var $elm$core$Basics$add = _Basics_add;
-var $elm$core$Basics$apR = F2(
-	function (x, f) {
-		return f(x);
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $elm$core$List$foldl = F3(
-	function (func, acc, list) {
-		foldl:
-		while (true) {
-			if (!list.b) {
-				return acc;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				var $temp$func = func,
-					$temp$acc = A2(func, x, acc),
-					$temp$list = xs;
-				func = $temp$func;
-				acc = $temp$acc;
-				list = $temp$list;
-				continue foldl;
-			}
-		}
-	});
-var $elm$core$Maybe$Just = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$core$Maybe$Nothing = {$: 1};
-var $elm$core$String$fromInt = _String_fromNumber;
-var $elm$core$Basics$gt = _Utils_gt;
-var $elm$core$List$reverse = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$List$cons, _List_Nil, list);
-};
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$Basics$max = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) > 0) ? x : y;
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$String$split = F2(
-	function (sep, string) {
-		return _List_fromArray(
-			A2(_String_split, sep, string));
-	});
-var $elm$core$String$toInt = _String_toInt;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $author$project$Day01$runA = function (content) {
-	return $elm$core$String$fromInt(
-		A2(
-			$elm$core$Maybe$withDefault,
-			0,
-			$elm$core$List$maximum(
-				A2(
-					$elm$core$List$map,
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$String$split('\n'),
-						A2(
-							$elm$core$Basics$composeR,
-							$elm$core$List$map(
-								A2(
-									$elm$core$Basics$composeR,
-									$elm$core$String$toInt,
-									$elm$core$Maybe$withDefault(0))),
-							A2($elm$core$List$foldl, $elm$core$Basics$add, 0))),
-					A2($elm$core$String$split, '\n\n', content)))));
-};
-var $author$project$Day01$TmpResult = F2(
-	function (sum, numElves) {
-		return {at: numElves, az: sum};
-	});
-var $elm$core$Basics$le = _Utils_le;
-var $elm$core$Basics$identity = function (x) {
-	return x;
-};
-var $elm$core$List$sortBy = _List_sortBy;
-var $elm$core$List$sort = function (xs) {
-	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
-};
-var $author$project$Day01$runB = function (content) {
-	return $elm$core$String$fromInt(
-		A3(
-			$elm$core$List$foldr,
-			F2(
-				function (value, tmpRes) {
-					return (tmpRes.at <= 2) ? A2($author$project$Day01$TmpResult, tmpRes.az + value, tmpRes.at + 1) : tmpRes;
-				}),
-			A2($author$project$Day01$TmpResult, 0, 0),
-			$elm$core$List$sort(
-				A2(
-					$elm$core$List$map,
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$String$split('\n'),
-						A2(
-							$elm$core$Basics$composeR,
-							$elm$core$List$map(
-								A2(
-									$elm$core$Basics$composeR,
-									$elm$core$String$toInt,
-									$elm$core$Maybe$withDefault(0))),
-							A2($elm$core$List$foldl, $elm$core$Basics$add, 0))),
-					A2($elm$core$String$split, '\n\n', content)))).az);
-};
-var $author$project$Day01$run = function (content) {
-	return _Utils_Tuple2(
-		$author$project$Day01$runA(content),
-		$author$project$Day01$runB(content));
+var $author$project$Main$notImplementedFn = function (_v0) {
+	return _Utils_Tuple2('Not implemented', 'Not implemented');
 };
 var $author$project$Main$init = A2(
 	$author$project$Main$Model,
 	'',
-	A2($author$project$Main$Day, 1, $author$project$Day01$run));
+	A2($author$project$Main$Day, 0, $author$project$Main$notImplementedFn));
 var $elm$core$Result$Err = function (a) {
 	return {$: 1, a: a};
 };
@@ -4683,10 +4487,16 @@ var $elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 2, a: a};
 };
 var $elm$core$Basics$False = 1;
+var $elm$core$Basics$add = _Basics_add;
+var $elm$core$Maybe$Just = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 1};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
 var $elm$json$Json$Encode$encode = _Json_encode;
+var $elm$core$String$fromInt = _String_fromNumber;
 var $elm$core$String$join = F2(
 	function (sep, chunks) {
 		return A2(
@@ -4694,12 +4504,36 @@ var $elm$core$String$join = F2(
 			sep,
 			_List_toArray(chunks));
 	});
+var $elm$core$String$split = F2(
+	function (sep, string) {
+		return _List_fromArray(
+			A2(_String_split, sep, string));
+	});
 var $elm$json$Json$Decode$indent = function (str) {
 	return A2(
 		$elm$core$String$join,
 		'\n    ',
 		A2($elm$core$String$split, '\n', str));
 };
+var $elm$core$List$foldl = F3(
+	function (func, acc, list) {
+		foldl:
+		while (true) {
+			if (!list.b) {
+				return acc;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var $temp$func = func,
+					$temp$acc = A2(func, x, acc),
+					$temp$list = xs;
+				func = $temp$func;
+				acc = $temp$acc;
+				list = $temp$list;
+				continue foldl;
+			}
+		}
+	});
 var $elm$core$List$length = function (xs) {
 	return A3(
 		$elm$core$List$foldl,
@@ -4711,6 +4545,7 @@ var $elm$core$List$length = function (xs) {
 		xs);
 };
 var $elm$core$List$map2 = _List_map2;
+var $elm$core$Basics$le = _Utils_le;
 var $elm$core$Basics$sub = _Basics_sub;
 var $elm$core$List$rangeHelp = F3(
 	function (lo, hi, list) {
@@ -4763,6 +4598,9 @@ var $elm$core$Char$isDigit = function (_char) {
 };
 var $elm$core$Char$isAlphaNum = function (_char) {
 	return $elm$core$Char$isLower(_char) || ($elm$core$Char$isUpper(_char) || $elm$core$Char$isDigit(_char));
+};
+var $elm$core$List$reverse = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$List$cons, _List_Nil, list);
 };
 var $elm$core$String$uncons = _String_uncons;
 var $elm$json$Json$Decode$errorOneOf = F2(
@@ -4892,9 +4730,18 @@ var $elm$core$Basics$apL = F2(
 	function (f, x) {
 		return f(x);
 	});
+var $elm$core$Basics$apR = F2(
+	function (x, f) {
+		return f(x);
+	});
 var $elm$core$Basics$eq = _Utils_equal;
 var $elm$core$Basics$floor = _Basics_floor;
 var $elm$core$Elm$JsArray$length = _JsArray_length;
+var $elm$core$Basics$gt = _Utils_gt;
+var $elm$core$Basics$max = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) > 0) ? x : y;
+	});
 var $elm$core$Basics$mul = _Basics_mul;
 var $elm$core$Array$SubTree = function (a) {
 	return {$: 0, a: a};
@@ -5034,12 +4881,15 @@ var $elm$browser$Browser$External = function (a) {
 var $elm$browser$Browser$Internal = function (a) {
 	return {$: 0, a: a};
 };
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
 var $elm$browser$Browser$Dom$NotFound = $elm$core$Basics$identity;
 var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aM: fragment, aR: host, a0: path, a2: port_, a5: protocol, a6: query};
+		return {aK: fragment, aP: host, a_: path, a0: port_, a3: protocol, a4: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5060,6 +4910,7 @@ var $elm$core$String$left = F2(
 	function (n, string) {
 		return (n < 1) ? '' : A3($elm$core$String$slice, 0, n, string);
 	});
+var $elm$core$String$toInt = _String_toInt;
 var $elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
 		if ($elm$core$String$isEmpty(str) || A2($elm$core$String$contains, '@', str)) {
@@ -5175,6 +5026,75 @@ var $elm$core$Basics$never = function (_v0) {
 var $elm$core$Task$Perform = $elm$core$Basics$identity;
 var $elm$core$Task$succeed = _Scheduler_succeed;
 var $elm$core$Task$init = $elm$core$Task$succeed(0);
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var $elm$core$Task$andThen = _Scheduler_andThen;
 var $elm$core$Task$map = F2(
 	function (func, taskA) {
@@ -5254,19 +5174,19 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$sandbox = function (impl) {
 	return _Browser_element(
 		{
-			bJ: function (_v0) {
-				return _Utils_Tuple2(impl.bJ, $elm$core$Platform$Cmd$none);
+			bH: function (_v0) {
+				return _Utils_Tuple2(impl.bH, $elm$core$Platform$Cmd$none);
 			},
-			b5: function (_v1) {
+			b3: function (_v1) {
 				return $elm$core$Platform$Sub$none;
 			},
-			ca: F2(
+			b8: F2(
 				function (msg, model) {
 					return _Utils_Tuple2(
-						A2(impl.ca, msg, model),
+						A2(impl.b8, msg, model),
 						$elm$core$Platform$Cmd$none);
 				}),
-			cb: impl.cb
+			b9: impl.b9
 		});
 };
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
@@ -5392,6 +5312,182 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Day01$innerRun = F2(
+	function (puzzleInput, count) {
+		return $elm$core$String$fromInt(
+			$elm$core$List$sum(
+				A2(
+					$elm$core$List$take,
+					count,
+					$elm$core$List$reverse(
+						$elm$core$List$sort(
+							A2(
+								$elm$core$List$map,
+								A2(
+									$elm$core$Basics$composeR,
+									$elm$core$String$split('\n'),
+									A2(
+										$elm$core$Basics$composeR,
+										$elm$core$List$map(
+											A2(
+												$elm$core$Basics$composeR,
+												$elm$core$String$toInt,
+												$elm$core$Maybe$withDefault(0))),
+										A2($elm$core$List$foldl, $elm$core$Basics$add, 0))),
+								A2($elm$core$String$split, '\n\n', puzzleInput)))))));
+	});
+var $author$project$Day01$run = function (content) {
+	return _Utils_Tuple2(
+		A2($author$project$Day01$innerRun, content, 1),
+		A2($author$project$Day01$innerRun, content, 3));
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -5428,16 +5524,13 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $author$project$Main$notImplementedFn = function (_v0) {
-	return _Utils_Tuple2('Not implemented', 'Not implemented');
-};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (!msg.$) {
 			var c = msg.a;
 			return _Utils_update(
 				model,
-				{af: c});
+				{ah: c});
 		} else {
 			var d = msg.a;
 			var fn = A2(
@@ -5508,13 +5601,19 @@ var $author$project$Main$classes = function (s) {
 		A2($elm$core$String$split, ' ', s));
 	return $elm$html$Html$Attributes$classList(cl);
 };
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -5552,14 +5651,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
@@ -5568,6 +5659,7 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
@@ -5579,7 +5671,7 @@ var $author$project$Main$view = function (model) {
 		var fn = _v0.b;
 		return _Utils_Tuple2(
 			i,
-			fn(model.af));
+			fn(model.ah));
 	}();
 	return A2(
 		$elm$html$Html$div,
@@ -5592,146 +5684,157 @@ var $author$project$Main$view = function (model) {
 				A2(
 				$elm$html$Html$main_,
 				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h1,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('pb-5')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Advent Of Code 2022')
-							])),
-						A2(
-						$elm$html$Html$form,
-						_List_fromArray(
-							[
-								$author$project$Main$classes('row mb-5')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-4')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$label,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-label'),
-												$elm$html$Html$Attributes$for('selectDay')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Select day')
-											])),
-										A2(
-										$elm$html$Html$select,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-select'),
-												$elm$html$Html$Attributes$id('selectDay'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Select day'),
-												$elm$html$Html$Events$onInput(
-												A2(
-													$elm$core$Basics$composeR,
-													$elm$core$String$toInt,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h1,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('pb-5')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Advent Of Code 2022')
+								])),
+							A2(
+							$elm$html$Html$form,
+							_List_fromArray(
+								[
+									$author$project$Main$classes('row mb-5')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('col-4')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$select,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('form-select'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Select day'),
+													$elm$html$Html$Events$onInput(
 													A2(
 														$elm$core$Basics$composeR,
-														$elm$core$Maybe$withDefault(0),
-														$author$project$Main$FormDay)))
-											]),
-										A2(
-											$elm$core$List$map,
-											function (i) {
-												return A2(
+														$elm$core$String$toInt,
+														A2(
+															$elm$core$Basics$composeR,
+															$elm$core$Maybe$withDefault(0),
+															$author$project$Main$FormDay)))
+												]),
+											A2(
+												$elm$core$List$cons,
+												A2(
 													$elm$html$Html$option,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(i))
+															$elm$html$Html$Attributes$selected(true),
+															$elm$html$Html$Attributes$disabled(true)
 														]),
 													_List_fromArray(
 														[
-															$elm$html$Html$text(
-															$elm$core$String$fromInt(i))
-														]));
-											},
-											A2($elm$core$List$range, 1, 24)))
-									]))
-							])),
-						A2(
-						$elm$html$Html$h2,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('mb-3')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'Result for day ' + $elm$core$String$fromInt(result.a))
-							])),
-						A2(
-						$elm$html$Html$form,
-						_List_fromArray(
-							[
-								$author$project$Main$classes('row mb-5')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$author$project$Main$classes('col-4')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$textarea,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$rows(5),
-												$elm$html$Html$Attributes$placeholder('Puzzle input'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Puzzle input'),
-												$elm$html$Html$Attributes$required(true),
-												$elm$html$Html$Events$onInput($author$project$Main$FormField),
-												$elm$html$Html$Attributes$value(model.af)
-											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(result.b.a)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-4')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(result.b.b)
-									]))
-							]))
-					]))
+															$elm$html$Html$text('Select day')
+														])),
+												A2(
+													$elm$core$List$map,
+													function (i) {
+														return A2(
+															$elm$html$Html$option,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$value(
+																	$elm$core$String$fromInt(i))
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text(
+																	$elm$core$String$fromInt(i))
+																]));
+													},
+													A2($elm$core$List$range, 1, 24))))
+										]))
+								]))
+						]),
+					(result.a > 0) ? _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h2,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('mb-3')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											'Result for day ' + $elm$core$String$fromInt(result.a))
+										])),
+									A2(
+									$elm$html$Html$form,
+									_List_fromArray(
+										[
+											$author$project$Main$classes('row mb-5')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$author$project$Main$classes('col-4')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$textarea,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-control'),
+															$elm$html$Html$Attributes$rows(5),
+															$elm$html$Html$Attributes$placeholder('Puzzle input'),
+															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Puzzle input'),
+															$elm$html$Html$Attributes$required(true),
+															$elm$html$Html$Events$onInput($author$project$Main$FormField),
+															$elm$html$Html$Attributes$value(model.ah)
+														]),
+													_List_Nil)
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('col-4')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(result.b.a)
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('col-4')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(result.b.b)
+												]))
+										]))
+								]))
+						]) : _List_Nil))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{bJ: $author$project$Main$init, ca: $author$project$Main$update, cb: $author$project$Main$view});
+	{bH: $author$project$Main$init, b8: $author$project$Main$update, b9: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

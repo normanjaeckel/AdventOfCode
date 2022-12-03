@@ -4,7 +4,7 @@ import Browser
 import Day01
 import Dict
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, for, id, placeholder, required, rows, value)
+import Html.Attributes exposing (attribute, class, disabled, placeholder, required, rows, selected, value)
 import Html.Events exposing (onInput)
 
 
@@ -29,7 +29,7 @@ allDays =
 
 
 type alias Model =
-    { content : String
+    { puzzleInput : String
     , day : Day
     }
 
@@ -48,7 +48,7 @@ type alias DayFunc =
 
 init : Model
 init =
-    Model "" (Day 1 Day01.run)
+    Model "" (Day 0 notImplementedFn)
 
 
 
@@ -64,7 +64,7 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         FormField c ->
-            { model | content = c }
+            { model | puzzleInput = c }
 
         FormDay d ->
             let
@@ -89,51 +89,55 @@ view model =
         result =
             case model.day of
                 Day i fn ->
-                    ( i, fn model.content )
+                    ( i, fn model.puzzleInput )
     in
     div [ classes "container p-3 pb-5" ]
         [ main_ []
-            [ h1 [ class "pb-5" ] [ text "Advent Of Code 2022" ]
-            , form [ classes "row mb-5" ]
+            ([ h1 [ class "pb-5" ] [ text "Advent Of Code 2022" ]
+             , form [ classes "row mb-5" ]
                 [ div [ class "col-4" ]
-                    [ label
-                        [ class "form-label"
-                        , for "selectDay"
-                        ]
-                        [ text "Select day" ]
-                    , select
+                    [ select
                         [ class "form-select"
-                        , id "selectDay"
                         , attribute "aria-label" "Select day"
                         , onInput (String.toInt >> Maybe.withDefault 0 >> FormDay)
                         ]
-                        (List.map
-                            (\i -> option [ value (String.fromInt i) ] [ text <| String.fromInt i ])
-                            (List.range 1 24)
+                        (option [ selected True, disabled True ] [ text "Select day" ]
+                            :: List.map
+                                (\i -> option [ value (String.fromInt i) ] [ text <| String.fromInt i ])
+                                (List.range 1 24)
                         )
                     ]
                 ]
-            , h2 [ class "mb-3" ] [ text <| "Result for day " ++ (Tuple.first result |> String.fromInt) ]
-            , form
-                [ classes "row mb-5" ]
-                [ div [ classes "col-4" ]
-                    [ textarea
-                        [ class "form-control"
-                        , rows 5
-                        , placeholder "Puzzle input"
-                        , attribute "aria-label" "Puzzle input"
-                        , required True
-                        , onInput FormField
-                        , value model.content
+             ]
+                ++ (if Tuple.first result > 0 then
+                        [ div []
+                            [ h2 [ class "mb-3" ] [ text <| "Result for day " ++ (Tuple.first result |> String.fromInt) ]
+                            , form
+                                [ classes "row mb-5" ]
+                                [ div [ classes "col-4" ]
+                                    [ textarea
+                                        [ class "form-control"
+                                        , rows 5
+                                        , placeholder "Puzzle input"
+                                        , attribute "aria-label" "Puzzle input"
+                                        , required True
+                                        , onInput FormField
+                                        , value model.puzzleInput
+                                        ]
+                                        []
+                                    ]
+                                , div [ class "col-4" ]
+                                    [ Tuple.second result |> Tuple.first |> text ]
+                                , div [ class "col-4" ]
+                                    [ Tuple.second result |> Tuple.second |> text ]
+                                ]
+                            ]
                         ]
+
+                    else
                         []
-                    ]
-                , div [ class "col-4" ]
-                    [ Tuple.second result |> Tuple.first |> text ]
-                , div [ class "col-4" ]
-                    [ Tuple.second result |> Tuple.second |> text ]
-                ]
-            ]
+                   )
+            )
         ]
 
 
