@@ -3,6 +3,7 @@ module DayTest exposing (suite)
 import Day01
 import Day02
 import Day03
+import Day04
 import Expect
 import Test exposing (..)
 
@@ -10,7 +11,7 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Puzzle for"
-        [ describe "day 1"
+        [ describe "day 01"
             [ test "the first part is correct" <|
                 \_ ->
                     Day01.run inputDay01
@@ -22,7 +23,7 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "45000"
             ]
-        , describe "day 2"
+        , describe "day 02"
             [ test "the first part is correct" <|
                 \_ ->
                     Day02.run inputDay02
@@ -34,7 +35,7 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "12"
             ]
-        , describe "day 3"
+        , describe "day 03"
             [ test "the first part is correct" <|
                 \_ ->
                     Day03.run inputDay03
@@ -45,6 +46,18 @@ suite =
                     Day03.run inputDay03
                         |> Tuple.second
                         |> Expect.equal "70"
+            ]
+        , describe "day 04"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day04.run inputDay04
+                        |> Tuple.first
+                        |> Expect.equal "2"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day04.run inputDay04
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
             ]
         ]
 
@@ -77,3 +90,8 @@ inputDay02 =
 inputDay03 : String
 inputDay03 =
     "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw"
+
+
+inputDay04 : String
+inputDay04 =
+    "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8\n"

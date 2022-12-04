@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ay.aa === region.aK.aa)
+	if (region.ad.ab === region._.ab)
 	{
-		return 'on line ' + region.ay.aa;
+		return 'on line ' + region.ad.ab;
 	}
-	return 'on lines ' + region.ay.aa + ' through ' + region.aK.aa;
+	return 'on lines ' + region.ad.ab + ' through ' + region._.ab;
 }
 
 
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		F: func(record.F),
-		az: record.az,
-		aw: record.aw
+		aA: record.aA,
+		ay: record.ay
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.F;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.az;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aA;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.aw) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ay) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.ca,
 		impl.b5,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ax && impl.ax(sendToApp)
+			var divertHrefToApp = impl.az && impl.az(sendToApp)
 			var view = impl.cb;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ax: function(sendToApp)
+		az: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4376,7 +4376,7 @@ var $author$project$Main$Day = F2(
 	});
 var $author$project$Main$Model = F2(
 	function (puzzleInput, day) {
-		return {ap: day, ai: puzzleInput};
+		return {ar: day, ak: puzzleInput};
 	});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$LT = 0;
@@ -5490,7 +5490,7 @@ var $author$project$Day01$run = function (content) {
 };
 var $author$project$Day02$Element = F2(
 	function (opponent, you) {
-		return {L: opponent, ao: you};
+		return {L: opponent, aq: you};
 	});
 var $author$project$Day02$Invalid = 3;
 var $author$project$Day02$Paper = 1;
@@ -5521,7 +5521,7 @@ var $author$project$Day02$scoreShape = function (s) {
 	}
 };
 var $author$project$Day02$scoreWin = function (el) {
-	var _v0 = el.ao;
+	var _v0 = el.aq;
 	switch (_v0) {
 		case 0:
 			var _v1 = el.L;
@@ -5564,7 +5564,7 @@ var $author$project$Day02$scoreWin = function (el) {
 	}
 };
 var $author$project$Day02$transformElement = function (el) {
-	var _v0 = el.ao;
+	var _v0 = el.aq;
 	switch (_v0) {
 		case 0:
 			var _v1 = el.L;
@@ -5611,7 +5611,7 @@ var $author$project$Day02$innerRun = F2(
 		var transformFn = toBeTransformed ? $author$project$Day02$transformElement : $elm$core$Basics$identity;
 		var fn = F2(
 			function (el, acc) {
-				return (acc + $author$project$Day02$scoreShape(el.ao)) + $author$project$Day02$scoreWin(el);
+				return (acc + $author$project$Day02$scoreShape(el.aq)) + $author$project$Day02$scoreWin(el);
 			});
 		return $elm$core$String$fromInt(
 			A3(
@@ -5840,12 +5840,120 @@ var $author$project$Day03$run = function (puzzleInput) {
 		$author$project$Day03$innerRunPartA(c),
 		$author$project$Day03$innerRunPartB(c));
 };
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$Day04$IDs = F2(
+	function (start, end) {
+		return {_: end, ad: start};
+	});
+var $author$project$Day04$toIDs = function (s) {
+	return $elm$core$Maybe$Just(
+		A2(
+			$author$project$Day04$IDs,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A2(
+					$elm$core$Maybe$andThen,
+					$elm$core$String$toInt,
+					$elm$core$List$head(
+						A2($elm$core$String$split, '-', s)))),
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A2(
+					$elm$core$Maybe$andThen,
+					$elm$core$String$toInt,
+					$elm$core$List$head(
+						A2(
+							$elm$core$List$drop,
+							1,
+							A2($elm$core$String$split, '-', s)))))));
+};
+var $author$project$Day04$parseLine = function (line) {
+	var second = A2(
+		$elm$core$Maybe$andThen,
+		$author$project$Day04$toIDs,
+		$elm$core$List$head(
+			A2(
+				$elm$core$List$drop,
+				1,
+				A2($elm$core$String$split, ',', line))));
+	var first = A2(
+		$elm$core$Maybe$andThen,
+		$author$project$Day04$toIDs,
+		$elm$core$List$head(
+			A2($elm$core$String$split, ',', line)));
+	var _v0 = _Utils_Tuple2(first, second);
+	if (_v0.a.$ === 1) {
+		if (_v0.b.$ === 1) {
+			var _v1 = _v0.a;
+			var _v2 = _v0.b;
+			return 0;
+		} else {
+			var _v3 = _v0.a;
+			return 0;
+		}
+	} else {
+		if (_v0.b.$ === 1) {
+			var _v4 = _v0.b;
+			return 0;
+		} else {
+			var f = _v0.a.a;
+			var s = _v0.b.a;
+			return ((_Utils_cmp(f.ad, s.ad) < 1) && (_Utils_cmp(f._, s._) > -1)) ? 1 : (((_Utils_cmp(s.ad, f.ad) < 1) && (_Utils_cmp(s._, f._) > -1)) ? 1 : 0);
+		}
+	}
+};
+var $author$project$Day04$runPartA = function (puzzleInput) {
+	return $elm$core$String$fromInt(
+		$elm$core$List$sum(
+			A2(
+				$elm$core$List$map,
+				$author$project$Day04$parseLine,
+				A2($elm$core$String$split, '\n', puzzleInput))));
+};
+var $author$project$Day04$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day04$runPartA(puzzleInput),
+		'No solution');
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
 			_Utils_Tuple2(1, $author$project$Day01$run),
 			_Utils_Tuple2(2, $author$project$Day02$run),
-			_Utils_Tuple2(3, $author$project$Day03$run)
+			_Utils_Tuple2(3, $author$project$Day03$run),
+			_Utils_Tuple2(4, $author$project$Day04$run)
 		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5853,7 +5961,7 @@ var $author$project$Main$update = F2(
 			var c = msg.a;
 			return _Utils_update(
 				model,
-				{ai: c});
+				{ak: c});
 		} else {
 			var d = msg.a;
 			var fn = A2(
@@ -5863,7 +5971,7 @@ var $author$project$Main$update = F2(
 			return _Utils_update(
 				model,
 				{
-					ap: A2($author$project$Main$Day, d, fn)
+					ar: A2($author$project$Main$Day, d, fn)
 				});
 		}
 	});
@@ -5989,12 +6097,12 @@ var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	var result = function () {
-		var _v0 = model.ap;
+		var _v0 = model.ar;
 		var i = _v0.a;
 		var fn = _v0.b;
 		return _Utils_Tuple2(
 			i,
-			fn(model.ai));
+			fn(model.ak));
 	}();
 	return A2(
 		$elm$html$Html$div,
@@ -6128,7 +6236,7 @@ var $author$project$Main$view = function (model) {
 															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Puzzle input'),
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput($author$project$Main$FormField),
-															$elm$html$Html$Attributes$value(model.ai)
+															$elm$html$Html$Attributes$value(model.ak)
 														]),
 													_List_Nil)
 												])),
