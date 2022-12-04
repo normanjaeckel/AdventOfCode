@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ad.ab === region._.ab)
+	if (region.x.ac === region.K.ac)
 	{
-		return 'on line ' + region.ad.ab;
+		return 'on line ' + region.x.ac;
 	}
-	return 'on lines ' + region.ad.ab + ' through ' + region._.ab;
+	return 'on lines ' + region.x.ac + ' through ' + region.K.ac;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		F: func(record.F),
+		G: func(record.G),
 		aA: record.aA,
 		ay: record.ay
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.F;
+		var message = !tag ? value : tag < 3 ? value.a : value.G;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aA;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5490,7 +5490,7 @@ var $author$project$Day01$run = function (content) {
 };
 var $author$project$Day02$Element = F2(
 	function (opponent, you) {
-		return {L: opponent, aq: you};
+		return {N: opponent, aq: you};
 	});
 var $author$project$Day02$Invalid = 3;
 var $author$project$Day02$Paper = 1;
@@ -5524,7 +5524,7 @@ var $author$project$Day02$scoreWin = function (el) {
 	var _v0 = el.aq;
 	switch (_v0) {
 		case 0:
-			var _v1 = el.L;
+			var _v1 = el.N;
 			switch (_v1) {
 				case 0:
 					return 3;
@@ -5536,7 +5536,7 @@ var $author$project$Day02$scoreWin = function (el) {
 					return 0;
 			}
 		case 1:
-			var _v2 = el.L;
+			var _v2 = el.N;
 			switch (_v2) {
 				case 0:
 					return 6;
@@ -5548,7 +5548,7 @@ var $author$project$Day02$scoreWin = function (el) {
 					return 0;
 			}
 		case 2:
-			var _v3 = el.L;
+			var _v3 = el.N;
 			switch (_v3) {
 				case 0:
 					return 0;
@@ -5567,7 +5567,7 @@ var $author$project$Day02$transformElement = function (el) {
 	var _v0 = el.aq;
 	switch (_v0) {
 		case 0:
-			var _v1 = el.L;
+			var _v1 = el.N;
 			switch (_v1) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 2);
@@ -5579,7 +5579,7 @@ var $author$project$Day02$transformElement = function (el) {
 					return A2($author$project$Day02$Element, 3, 3);
 			}
 		case 1:
-			var _v2 = el.L;
+			var _v2 = el.N;
 			switch (_v2) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 0);
@@ -5591,7 +5591,7 @@ var $author$project$Day02$transformElement = function (el) {
 					return A2($author$project$Day02$Element, 3, 3);
 			}
 		case 2:
-			var _v3 = el.L;
+			var _v3 = el.N;
 			switch (_v3) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 1);
@@ -5840,6 +5840,53 @@ var $author$project$Day03$run = function (puzzleInput) {
 		$author$project$Day03$innerRunPartA(c),
 		$author$project$Day03$innerRunPartB(c));
 };
+var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$Day04$checkPartOne = F2(
+	function (first, second) {
+		var _v0 = _Utils_Tuple2(first, second);
+		if (_v0.a.$ === 1) {
+			if (_v0.b.$ === 1) {
+				var _v1 = _v0.a;
+				var _v2 = _v0.b;
+				return 0;
+			} else {
+				var _v3 = _v0.a;
+				return 0;
+			}
+		} else {
+			if (_v0.b.$ === 1) {
+				var _v4 = _v0.b;
+				return 0;
+			} else {
+				var f = _v0.a.a;
+				var s = _v0.b.a;
+				return ((_Utils_cmp(f.x, s.x) < 1) && (_Utils_cmp(f.K, s.K) > -1)) ? 1 : (((_Utils_cmp(s.x, f.x) < 1) && (_Utils_cmp(s.K, f.K) > -1)) ? 1 : 0);
+			}
+		}
+	});
+var $author$project$Day04$checkPartTwo = F2(
+	function (first, second) {
+		var _v0 = _Utils_Tuple2(first, second);
+		if (_v0.a.$ === 1) {
+			if (_v0.b.$ === 1) {
+				var _v1 = _v0.a;
+				var _v2 = _v0.b;
+				return 0;
+			} else {
+				var _v3 = _v0.a;
+				return 0;
+			}
+		} else {
+			if (_v0.b.$ === 1) {
+				var _v4 = _v0.b;
+				return 0;
+			} else {
+				var f = _v0.a.a;
+				var s = _v0.b.a;
+				return ((_Utils_cmp(f.x, s.x) < 1) && (_Utils_cmp(s.x, f.K) < 1)) ? 1 : (((_Utils_cmp(s.x, f.x) < 1) && (_Utils_cmp(f.x, s.K) < 1)) ? 1 : 0);
+			}
+		}
+	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (!maybeValue.$) {
@@ -5870,10 +5917,9 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Day04$IDs = F2(
 	function (start, end) {
-		return {_: end, ad: start};
+		return {K: end, x: start};
 	});
 var $author$project$Day04$toIDs = function (s) {
 	return $elm$core$Maybe$Just(
@@ -5899,53 +5945,36 @@ var $author$project$Day04$toIDs = function (s) {
 							1,
 							A2($elm$core$String$split, '-', s)))))));
 };
-var $author$project$Day04$parseLine = function (line) {
-	var second = A2(
-		$elm$core$Maybe$andThen,
-		$author$project$Day04$toIDs,
-		$elm$core$List$head(
-			A2(
-				$elm$core$List$drop,
-				1,
-				A2($elm$core$String$split, ',', line))));
-	var first = A2(
-		$elm$core$Maybe$andThen,
-		$author$project$Day04$toIDs,
-		$elm$core$List$head(
-			A2($elm$core$String$split, ',', line)));
-	var _v0 = _Utils_Tuple2(first, second);
-	if (_v0.a.$ === 1) {
-		if (_v0.b.$ === 1) {
-			var _v1 = _v0.a;
-			var _v2 = _v0.b;
-			return 0;
-		} else {
-			var _v3 = _v0.a;
-			return 0;
-		}
-	} else {
-		if (_v0.b.$ === 1) {
-			var _v4 = _v0.b;
-			return 0;
-		} else {
-			var f = _v0.a.a;
-			var s = _v0.b.a;
-			return ((_Utils_cmp(f.ad, s.ad) < 1) && (_Utils_cmp(f._, s._) > -1)) ? 1 : (((_Utils_cmp(s.ad, f.ad) < 1) && (_Utils_cmp(s._, f._) > -1)) ? 1 : 0);
-		}
-	}
-};
-var $author$project$Day04$runPartA = function (puzzleInput) {
-	return $elm$core$String$fromInt(
-		$elm$core$List$sum(
-			A2(
-				$elm$core$List$map,
-				$author$project$Day04$parseLine,
-				A2($elm$core$String$split, '\n', puzzleInput))));
-};
+var $author$project$Day04$parseLine = F2(
+	function (fn, line) {
+		var second = A2(
+			$elm$core$Maybe$andThen,
+			$author$project$Day04$toIDs,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$drop,
+					1,
+					A2($elm$core$String$split, ',', line))));
+		var first = A2(
+			$elm$core$Maybe$andThen,
+			$author$project$Day04$toIDs,
+			$elm$core$List$head(
+				A2($elm$core$String$split, ',', line)));
+		return A2(fn, first, second);
+	});
+var $author$project$Day04$runPart = F2(
+	function (fn, puzzleInput) {
+		return $elm$core$String$fromInt(
+			$elm$core$List$sum(
+				A2(
+					$elm$core$List$map,
+					$author$project$Day04$parseLine(fn),
+					A2($elm$core$String$split, '\n', puzzleInput))));
+	});
 var $author$project$Day04$run = function (puzzleInput) {
 	return _Utils_Tuple2(
-		$author$project$Day04$runPartA(puzzleInput),
-		'No solution');
+		A2($author$project$Day04$runPart, $author$project$Day04$checkPartOne, puzzleInput),
+		A2($author$project$Day04$runPart, $author$project$Day04$checkPartTwo, puzzleInput));
 };
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
