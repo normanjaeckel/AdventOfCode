@@ -5,6 +5,10 @@ import Day01
 import Day02
 import Day03
 import Day04
+import Day05
+import Day06
+import Day07
+import Day08
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, disabled, placeholder, required, rows, selected, value)
@@ -31,6 +35,10 @@ allDays =
         , ( 2, Day02.run )
         , ( 3, Day03.run )
         , ( 4, Day04.run )
+        , ( 5, Day05.run )
+        , ( 6, Day06.run )
+        , ( 7, Day07.run )
+        , ( 8, Day08.run )
         ]
 
 

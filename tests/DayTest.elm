@@ -4,6 +4,10 @@ import Day01
 import Day02
 import Day03
 import Day04
+import Day05
+import Day06
+import Day07
+import Day08
 import Expect
 import Test exposing (..)
 
@@ -59,6 +63,54 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "4"
             ]
+        , describe "day 05"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day05.run inputDay05
+                        |> Tuple.first
+                        |> Expect.equal "No solution"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day05.run inputDay05
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
+            ]
+        , describe "day 06"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day06.run inputDay06
+                        |> Tuple.first
+                        |> Expect.equal "No solution"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day06.run inputDay06
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
+            ]
+        , describe "day 07"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day07.run inputDay07
+                        |> Tuple.first
+                        |> Expect.equal "No solution"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day07.run inputDay07
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
+            ]
+        , describe "day 08"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day08.run inputDay08
+                        |> Tuple.first
+                        |> Expect.equal "No solution"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day08.run inputDay08
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
+            ]
         ]
 
 
@@ -95,3 +147,23 @@ inputDay03 =
 inputDay04 : String
 inputDay04 =
     "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8\n"
+
+
+inputDay05 : String
+inputDay05 =
+    ""
+
+
+inputDay06 : String
+inputDay06 =
+    ""
+
+
+inputDay07 : String
+inputDay07 =
+    ""
+
+
+inputDay08 : String
+inputDay08 =
+    ""

@@ -5976,13 +5976,29 @@ var $author$project$Day04$run = function (puzzleInput) {
 		A2($author$project$Day04$runPart, $author$project$Day04$checkPartOne, puzzleInput),
 		A2($author$project$Day04$runPart, $author$project$Day04$checkPartTwo, puzzleInput));
 };
+var $author$project$Day05$run = function (_v0) {
+	return _Utils_Tuple2('No solution', 'No solution');
+};
+var $author$project$Day06$run = function (_v0) {
+	return _Utils_Tuple2('No solution', 'No solution');
+};
+var $author$project$Day07$run = function (_v0) {
+	return _Utils_Tuple2('No solution', 'No solution');
+};
+var $author$project$Day08$run = function (_v0) {
+	return _Utils_Tuple2('No solution', 'No solution');
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
 			_Utils_Tuple2(1, $author$project$Day01$run),
 			_Utils_Tuple2(2, $author$project$Day02$run),
 			_Utils_Tuple2(3, $author$project$Day03$run),
-			_Utils_Tuple2(4, $author$project$Day04$run)
+			_Utils_Tuple2(4, $author$project$Day04$run),
+			_Utils_Tuple2(5, $author$project$Day05$run),
+			_Utils_Tuple2(6, $author$project$Day06$run),
+			_Utils_Tuple2(7, $author$project$Day07$run),
+			_Utils_Tuple2(8, $author$project$Day08$run)
 		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {
