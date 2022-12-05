@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		K: func(record.K),
-		aG: record.aG,
-		aE: record.aE
+		aI: record.aI,
+		aG: record.aG
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.K;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aG;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aI;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.aE) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aG) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.cx,
 		impl.cs,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.aF && impl.aF(sendToApp)
+			var divertHrefToApp = impl.aH && impl.aH(sendToApp)
 			var view = impl.cy;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		aF: function(sendToApp)
+		aH: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.bl === next.bl
-							&& curr.a0 === next.a0
-							&& curr.bh.a === next.bh.a
+							&& curr.bm === next.bm
+							&& curr.a2 === next.a2
+							&& curr.bi.a === next.bi.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		bs: _Browser_getScene(),
+		bt: _Browser_getScene(),
 		bE: {
 			bH: _Browser_window.pageXOffset,
 			bI: _Browser_window.pageYOffset,
 			bG: _Browser_doc.documentElement.clientWidth,
-			a_: _Browser_doc.documentElement.clientHeight
+			a0: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4263,7 +4263,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		bG: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		a_: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a0: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			bs: {
+			bt: {
 				bG: node.scrollWidth,
-				a_: node.scrollHeight
+				a0: node.scrollHeight
 			},
 			bE: {
 				bH: node.scrollLeft,
 				bI: node.scrollTop,
 				bG: node.clientWidth,
-				a_: node.clientHeight
+				a0: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			bs: _Browser_getScene(),
+			bt: _Browser_getScene(),
 			bE: {
 				bH: x,
 				bI: y,
 				bG: _Browser_doc.documentElement.clientWidth,
-				a_: _Browser_doc.documentElement.clientHeight
+				a0: _Browser_doc.documentElement.clientHeight
 			},
 			bX: {
 				bH: x + rect.left,
 				bI: y + rect.top,
 				bG: rect.width,
-				a_: rect.height
+				a0: rect.height
 			}
 		};
 	});
@@ -5019,7 +5019,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aV: fragment, a0: host, bf: path, bh: port_, bl: protocol, bm: query};
+		return {aY: fragment, a2: host, bg: path, bi: port_, bm: protocol, bn: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -6135,7 +6135,7 @@ var $author$project$Day05$extractTop = function (crates) {
 					$elm$core$Maybe$withDefault('?')),
 				$elm$core$Dict$values(crates))));
 };
-var $author$project$Day05$applyStepsOnCrates = F2(
+var $author$project$Day05$applyStepsOnCratesA = F2(
 	function (steps, crates) {
 		var to = F2(
 			function (i, _v2) {
@@ -6175,14 +6175,55 @@ var $author$project$Day05$applyStepsOnCrates = F2(
 					function (_v0, accInner) {
 						return A2(
 							to,
-							step.bB,
-							A2(from, step.aW, accInner));
+							step.aL,
+							A2(from, step.aA, accInner));
 					});
 				return A3(
 					$elm$core$List$foldl,
 					fnInner,
 					acc1,
-					A2($elm$core$List$range, 1, step.a1));
+					A2($elm$core$List$range, 1, step.aC));
+			});
+		return $author$project$Day05$extractTop(
+			A3($elm$core$List$foldl, fn, crates, steps));
+	});
+var $author$project$Day05$applyStepsOnCratesB = F2(
+	function (steps, crates) {
+		var to = F2(
+			function (i, _v0) {
+				var chs = _v0.a;
+				var c = _v0.b;
+				return A3(
+					$elm$core$Dict$insert,
+					i,
+					_Utils_ap(
+						chs,
+						A2(
+							$elm$core$Maybe$withDefault,
+							_List_Nil,
+							A2($elm$core$Dict$get, i, c))),
+					c);
+			});
+		var from = F3(
+			function (i, howMany, c) {
+				var stack = A2(
+					$elm$core$Maybe$withDefault,
+					_List_Nil,
+					A2($elm$core$Dict$get, i, c));
+				return _Utils_Tuple2(
+					A2($elm$core$List$take, howMany, stack),
+					A3(
+						$elm$core$Dict$insert,
+						i,
+						A2($elm$core$List$drop, howMany, stack),
+						c));
+			});
+		var fn = F2(
+			function (step, acc) {
+				return A2(
+					to,
+					step.aL,
+					A3(from, step.aA, step.aC, acc));
 			});
 		return $author$project$Day05$extractTop(
 			A3($elm$core$List$foldl, fn, crates, steps));
@@ -6212,7 +6253,7 @@ var $elm$parser$Parser$Advanced$AddRight = F2(
 	});
 var $elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {aP: col, bT: contextStack, bi: problem, bq: row};
+		return {aS: col, bT: contextStack, bj: problem, br: row};
 	});
 var $elm$parser$Parser$Advanced$Empty = {$: 0};
 var $elm$parser$Parser$Advanced$fromState = F2(
@@ -6220,7 +6261,7 @@ var $elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			$elm$parser$Parser$Advanced$AddRight,
 			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.bq, s.aP, x, s.e));
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.br, s.aS, x, s.e));
 	});
 var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var $elm$parser$Parser$Advanced$chompIf = F2(
@@ -6234,11 +6275,11 @@ var $elm$parser$Parser$Advanced$chompIf = F2(
 				$elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{aP: 1, e: s.e, f: s.f, c: s.c + 1, bq: s.bq + 1, b: s.b}) : A3(
+				{aS: 1, e: s.e, f: s.f, c: s.c + 1, br: s.br + 1, b: s.b}) : A3(
 				$elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{aP: s.aP + 1, e: s.e, f: s.f, c: newOffset, bq: s.bq, b: s.b}));
+				{aS: s.aS + 1, e: s.e, f: s.f, c: newOffset, br: s.br, b: s.b}));
 		};
 	});
 var $elm$parser$Parser$chompIf = function (isGood) {
@@ -6340,7 +6381,7 @@ var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
 					$elm$parser$Parser$Advanced$Good,
 					_Utils_cmp(s0.c, offset) < 0,
 					0,
-					{aP: col, e: s0.e, f: s0.f, c: offset, bq: row, b: s0.b});
+					{aS: col, e: s0.e, f: s0.f, c: offset, br: row, b: s0.b});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -6372,7 +6413,7 @@ var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	});
 var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 	return function (s) {
-		return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.c, s.bq, s.aP, s);
+		return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.c, s.br, s.aS, s);
 	};
 };
 var $elm$parser$Parser$Advanced$spaces = $elm$parser$Parser$Advanced$chompWhile(
@@ -6400,7 +6441,7 @@ var $elm$parser$Parser$Advanced$token = function (_v0) {
 	var expecting = _v0.b;
 	var progress = !$elm$core$String$isEmpty(str);
 	return function (s) {
-		var _v1 = A5($elm$parser$Parser$Advanced$isSubString, str, s.c, s.bq, s.aP, s.b);
+		var _v1 = A5($elm$parser$Parser$Advanced$isSubString, str, s.c, s.br, s.aS, s.b);
 		var newOffset = _v1.a;
 		var newRow = _v1.b;
 		var newCol = _v1.c;
@@ -6411,7 +6452,7 @@ var $elm$parser$Parser$Advanced$token = function (_v0) {
 			$elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{aP: newCol, e: s.e, f: s.f, c: newOffset, bq: newRow, b: s.b});
+			{aS: newCol, e: s.e, f: s.f, c: newOffset, br: newRow, b: s.b});
 	};
 };
 var $elm$parser$Parser$Advanced$symbol = $elm$parser$Parser$Advanced$token;
@@ -6453,10 +6494,10 @@ var $author$project$Day05$cratesObjParser = A2(
 var $elm$core$String$fromList = _String_fromList;
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {aP: col, bi: problem, bq: row};
+		return {aS: col, bj: problem, br: row};
 	});
 var $elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3($elm$parser$Parser$DeadEnd, p.bq, p.aP, p.bi);
+	return A3($elm$parser$Parser$DeadEnd, p.br, p.aS, p.bj);
 };
 var $elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
@@ -6488,7 +6529,7 @@ var $elm$parser$Parser$Advanced$run = F2(
 	function (_v0, src) {
 		var parse = _v0;
 		var _v1 = parse(
-			{aP: 1, e: _List_Nil, f: 1, c: 0, bq: 1, b: src});
+			{aS: 1, e: _List_Nil, f: 1, c: 0, br: 1, b: src});
 		if (!_v1.$) {
 			var value = _v1.b;
 			return $elm$core$Result$Ok(value);
@@ -6608,14 +6649,14 @@ var $author$project$Day05$parseCrates = function (input) {
 };
 var $author$project$Day05$Step = F3(
 	function (howMany, from, to) {
-		return {aW: from, a1: howMany, bB: to};
+		return {aA: from, aC: howMany, aL: to};
 	});
 var $elm$parser$Parser$ExpectingInt = {$: 1};
 var $elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
 var $elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
 var $elm$parser$Parser$Advanced$bumpOffset = F2(
 	function (newOffset, s) {
-		return {aP: s.aP + (newOffset - s.c), e: s.e, f: s.f, c: newOffset, bq: s.bq, b: s.b};
+		return {aS: s.aS + (newOffset - s.c), e: s.e, f: s.f, c: newOffset, br: s.br, b: s.b};
 	});
 var $elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
 var $elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
@@ -6675,7 +6716,7 @@ var $elm$parser$Parser$Advanced$finalizeFloat = F6(
 			return A2(
 				$elm$parser$Parser$Advanced$Bad,
 				true,
-				A4($elm$parser$Parser$Advanced$fromInfo, s.bq, s.aP - (floatOffset + s.c), invalid, s.e));
+				A4($elm$parser$Parser$Advanced$fromInfo, s.br, s.aS - (floatOffset + s.c), invalid, s.e));
 		} else {
 			if (_Utils_eq(s.c, floatOffset)) {
 				return A2(
@@ -6722,36 +6763,36 @@ var $elm$parser$Parser$Advanced$number = function (c) {
 			return A3($elm$parser$Parser$Advanced$isAsciiCode, 120, zeroOffset, s.b) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
 				c.b5,
-				c.a$,
+				c.a1,
 				baseOffset,
 				A2($elm$parser$Parser$Advanced$consumeBase16, baseOffset, s.b),
 				s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 111, zeroOffset, s.b) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
 				c.b5,
-				c.be,
+				c.bf,
 				baseOffset,
 				A3($elm$parser$Parser$Advanced$consumeBase, 8, baseOffset, s.b),
 				s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 98, zeroOffset, s.b) ? A5(
 				$elm$parser$Parser$Advanced$finalizeInt,
 				c.b5,
-				c.aM,
+				c.aP,
 				baseOffset,
 				A3($elm$parser$Parser$Advanced$consumeBase, 2, baseOffset, s.b),
 				s) : A6(
 				$elm$parser$Parser$Advanced$finalizeFloat,
 				c.b5,
-				c.aT,
-				c.a4,
-				c.aU,
+				c.aW,
+				c.a5,
+				c.aX,
 				_Utils_Tuple2(zeroOffset, 0),
 				s)));
 		} else {
 			return A6(
 				$elm$parser$Parser$Advanced$finalizeFloat,
 				c.b5,
-				c.aT,
-				c.a4,
-				c.aU,
+				c.aW,
+				c.a5,
+				c.aX,
 				A3($elm$parser$Parser$Advanced$consumeBase, 10, s.c, s.b),
 				s);
 		}
@@ -6761,13 +6802,13 @@ var $elm$parser$Parser$Advanced$int = F2(
 	function (expecting, invalid) {
 		return $elm$parser$Parser$Advanced$number(
 			{
-				aM: $elm$core$Result$Err(invalid),
-				aT: expecting,
-				aU: $elm$core$Result$Err(invalid),
-				a$: $elm$core$Result$Err(invalid),
-				a4: $elm$core$Result$Ok($elm$core$Basics$identity),
+				aP: $elm$core$Result$Err(invalid),
+				aW: expecting,
+				aX: $elm$core$Result$Err(invalid),
+				a1: $elm$core$Result$Err(invalid),
+				a5: $elm$core$Result$Ok($elm$core$Basics$identity),
 				b5: invalid,
-				be: $elm$core$Result$Err(invalid)
+				bf: $elm$core$Result$Err(invalid)
 			});
 	});
 var $elm$parser$Parser$int = A2($elm$parser$Parser$Advanced$int, $elm$parser$Parser$ExpectingInt, $elm$parser$Parser$ExpectingInt);
@@ -6827,33 +6868,34 @@ var $author$project$Day05$parseSteps = function (input) {
 		$author$project$Day05$parseStepLine,
 		A2($elm$core$String$split, '\n', input));
 };
-var $author$project$Day05$runPartA = function (puzzleInput) {
-	var steps = A2(
-		$elm$core$Maybe$andThen,
-		A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, $author$project$Day05$parseSteps),
-		$elm$core$List$head(
-			A2(
-				$elm$core$List$drop,
-				1,
-				A2($elm$core$String$split, '\n\n', puzzleInput))));
-	var crates = A2(
-		$elm$core$Maybe$andThen,
-		A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, $author$project$Day05$parseCrates),
-		$elm$core$List$head(
-			A2($elm$core$String$split, '\n\n', puzzleInput)));
-	var _v0 = _Utils_Tuple2(crates, steps);
-	if ((!_v0.a.$) && (!_v0.b.$)) {
-		var c = _v0.a.a;
-		var s = _v0.b.a;
-		return A2($author$project$Day05$applyStepsOnCrates, s, c);
-	} else {
-		return 'Error';
-	}
-};
+var $author$project$Day05$runPartA = F2(
+	function (puzzleInput, applyFn) {
+		var steps = A2(
+			$elm$core$Maybe$andThen,
+			A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, $author$project$Day05$parseSteps),
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$drop,
+					1,
+					A2($elm$core$String$split, '\n\n', puzzleInput))));
+		var crates = A2(
+			$elm$core$Maybe$andThen,
+			A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, $author$project$Day05$parseCrates),
+			$elm$core$List$head(
+				A2($elm$core$String$split, '\n\n', puzzleInput)));
+		var _v0 = _Utils_Tuple2(crates, steps);
+		if ((!_v0.a.$) && (!_v0.b.$)) {
+			var c = _v0.a.a;
+			var s = _v0.b.a;
+			return A2(applyFn, s, c);
+		} else {
+			return 'Error';
+		}
+	});
 var $author$project$Day05$run = function (puzzleInput) {
 	return _Utils_Tuple2(
-		$author$project$Day05$runPartA(puzzleInput),
-		'No solution');
+		A2($author$project$Day05$runPartA, puzzleInput, $author$project$Day05$applyStepsOnCratesA),
+		A2($author$project$Day05$runPartA, puzzleInput, $author$project$Day05$applyStepsOnCratesB));
 };
 var $author$project$Day06$run = function (_v0) {
 	return _Utils_Tuple2('No solution', 'No solution');

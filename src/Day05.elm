@@ -6,11 +6,11 @@ import Parser exposing ((|.), (|=))
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput applyStepsOnCratesA, runPartA puzzleInput applyStepsOnCratesB )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+runPartA : String -> (List Step -> Crates -> String) -> String
+runPartA puzzleInput applyFn =
     let
         crates : Maybe Crates
         crates =
@@ -21,7 +21,7 @@ runPartA puzzleInput =
     in
     case ( crates, steps ) of
         ( Just c, Just s ) ->
-            applyStepsOnCrates s c
+            applyFn s c
 
         _ ->
             "Error"
@@ -178,8 +178,8 @@ parseStepLine l =
 -- Moving
 
 
-applyStepsOnCrates : List Step -> Crates -> String
-applyStepsOnCrates steps crates =
+applyStepsOnCratesA : List Step -> Crates -> String
+applyStepsOnCratesA steps crates =
     let
         from : Int -> Crates -> ( Char, Crates )
         from i c =
@@ -218,3 +218,32 @@ extractTop crates =
         |> List.map (List.head >> Maybe.withDefault '?')
         |> List.map String.fromChar
         |> String.join ""
+
+
+applyStepsOnCratesB : List Step -> Crates -> String
+applyStepsOnCratesB steps crates =
+    let
+        from : Int -> Int -> Crates -> ( List Char, Crates )
+        from i howMany c =
+            let
+                stack : List Char
+                stack =
+                    c
+                        |> Dict.get i
+                        |> Maybe.withDefault []
+            in
+            ( stack |> List.take howMany
+            , c |> Dict.insert i (stack |> List.drop howMany)
+            )
+
+        to : Int -> ( List Char, Crates ) -> Crates
+        to i ( chs, c ) =
+            c
+                |> Dict.insert i
+                    (chs ++ (c |> Dict.get i |> Maybe.withDefault []))
+
+        fn : Step -> Crates -> Crates
+        fn step acc =
+            to step.to (from step.from step.howMany acc)
+    in
+    steps |> List.foldl fn crates |> extractTop

@@ -73,7 +73,7 @@ suite =
                 \_ ->
                     Day05.run inputDay05
                         |> Tuple.second
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "MCD"
             ]
         , describe "day 06"
             [ test "the first part is correct" <|
