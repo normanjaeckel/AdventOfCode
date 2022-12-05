@@ -1,6 +1,6 @@
 # Advent Of Code
 
-![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2022-8_*-success)
+![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2022-9_*-success)
 
 ## Summary
 
