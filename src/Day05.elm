@@ -16,6 +16,7 @@ runPartA puzzleInput applyFn =
         crates =
             puzzleInput |> String.split "\n\n" |> List.head |> Maybe.andThen (Just << parseCrates)
 
+        steps : Maybe (List Step)
         steps =
             puzzleInput |> String.split "\n\n" |> List.drop 1 |> List.head |> Maybe.andThen (Just << parseSteps)
     in

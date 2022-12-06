@@ -76,16 +76,51 @@ suite =
                         |> Expect.equal "MCD"
             ]
         , describe "day 06"
-            [ test "the first part is correct" <|
+            [ test "the first part is correct A" <|
                 \_ ->
-                    Day06.run inputDay06
+                    Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
                         |> Tuple.first
-                        |> Expect.equal "No solution"
-            , test "the second part is correct" <|
+                        |> Expect.equal "5"
+            , test "the first part is correct B" <|
                 \_ ->
-                    Day06.run inputDay06
+                    Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
+                        |> Tuple.first
+                        |> Expect.equal "6"
+            , test "the first part is correct C" <|
+                \_ ->
+                    Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
+                        |> Tuple.first
+                        |> Expect.equal "10"
+            , test "the first part is correct D" <|
+                \_ ->
+                    Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
+                        |> Tuple.first
+                        |> Expect.equal "11"
+            , test "the second part is correct A" <|
+                \_ ->
+                    Day06.run "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
                         |> Tuple.second
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "19"
+            , test "the second part is correct B" <|
+                \_ ->
+                    Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
+                        |> Tuple.second
+                        |> Expect.equal "23"
+            , test "the second part is correct C" <|
+                \_ ->
+                    Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
+                        |> Tuple.second
+                        |> Expect.equal "23"
+            , test "the second part is correct D" <|
+                \_ ->
+                    Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
+                        |> Tuple.second
+                        |> Expect.equal "29"
+            , test "the second part is correct E" <|
+                \_ ->
+                    Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
+                        |> Tuple.second
+                        |> Expect.equal "26"
             ]
         , describe "day 07"
             [ test "the first part is correct" <|

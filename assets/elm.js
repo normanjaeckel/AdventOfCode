@@ -6897,8 +6897,73 @@ var $author$project$Day05$run = function (puzzleInput) {
 		A2($author$project$Day05$runPartA, puzzleInput, $author$project$Day05$applyStepsOnCratesA),
 		A2($author$project$Day05$runPartA, puzzleInput, $author$project$Day05$applyStepsOnCratesB));
 };
-var $author$project$Day06$run = function (_v0) {
-	return _Utils_Tuple2('No solution', 'No solution');
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === -2) {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$core$Set$size = function (_v0) {
+	var dict = _v0;
+	return $elm$core$Dict$size(dict);
+};
+var $author$project$Day06$runPartA = F2(
+	function (puzzleInput, count) {
+		var l = A2(
+			$elm$core$List$indexedMap,
+			$elm$core$Tuple$pair,
+			$elm$core$String$toList(puzzleInput));
+		var allUniqueIn = function (partList) {
+			return _Utils_eq(
+				$elm$core$Set$size(
+					$elm$core$Set$fromList(
+						A2($elm$core$List$map, $elm$core$Tuple$second, partList))),
+				count);
+		};
+		var fn = F2(
+			function (element, partList) {
+				return allUniqueIn(partList) ? partList : (_Utils_eq(
+					$elm$core$List$length(partList),
+					count) ? _Utils_ap(
+					A2($elm$core$List$drop, 1, partList),
+					_List_fromArray(
+						[element])) : _Utils_ap(
+					partList,
+					_List_fromArray(
+						[element])));
+			});
+		return $elm$core$String$fromInt(
+			1 + A2(
+				$elm$core$Maybe$withDefault,
+				_Utils_Tuple2(0, '?'),
+				$elm$core$List$head(
+					A2(
+						$elm$core$List$drop,
+						count - 1,
+						A3($elm$core$List$foldl, fn, _List_Nil, l)))).a);
+	});
+var $author$project$Day06$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		A2($author$project$Day06$runPartA, puzzleInput, 4),
+		A2($author$project$Day06$runPartA, puzzleInput, 14));
 };
 var $author$project$Day07$run = function (_v0) {
 	return _Utils_Tuple2('No solution', 'No solution');
@@ -6972,10 +7037,6 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$html$Html$Attributes$classList = function (classes) {
 	return $elm$html$Html$Attributes$class(
 		A2(
