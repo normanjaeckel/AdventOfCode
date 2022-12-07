@@ -127,7 +127,7 @@ suite =
                 \_ ->
                     Day07.run inputDay07
                         |> Tuple.first
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "95437"
             , test "the second part is correct" <|
                 \_ ->
                     Day07.run inputDay07
@@ -189,14 +189,9 @@ inputDay05 =
     "    [D]\n[N] [C]\n[Z] [M] [P]\n 1   2   3\n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2"
 
 
-inputDay06 : String
-inputDay06 =
-    ""
-
-
 inputDay07 : String
 inputDay07 =
-    ""
+    "$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k"
 
 
 inputDay08 : String

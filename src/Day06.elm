@@ -19,7 +19,7 @@ runPartA puzzleInput count =
 
         fn : ( Int, Char ) -> List ( Int, Char ) -> List ( Int, Char )
         fn element partList =
-            if allUniqueIn partList then
+            if puzzleSolved partList then
                 partList
 
             else if List.length partList == count then
@@ -28,8 +28,8 @@ runPartA puzzleInput count =
             else
                 partList ++ [ element ]
 
-        allUniqueIn : List ( Int, Char ) -> Bool
-        allUniqueIn partList =
+        puzzleSolved : List ( Int, Char ) -> Bool
+        puzzleSolved partList =
             (partList |> List.map Tuple.second |> Set.fromList |> Set.size) == count
     in
     l
