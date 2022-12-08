@@ -144,7 +144,7 @@ suite =
                 \_ ->
                     Day08.run inputDay08
                         |> Tuple.second
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "8"
             ]
         ]
 

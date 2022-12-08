@@ -5,11 +5,18 @@ import Browser.Events exposing (Visibility)
 
 run : String -> ( String, String )
 run forrest =
-    ( solvePartA forrest, "No solution" )
+    ( solvePartA forrest, solvePartB forrest )
 
 
 type alias Forrest =
-    List (List ( Int, Visibility ))
+    List (List Tree)
+
+
+type alias Tree =
+    { height : Int
+    , visibility : Visibility
+    , scenicScore : Int
+    }
 
 
 type Visibility
@@ -31,30 +38,57 @@ solvePartA forrest =
         |> String.fromInt
 
 
-transformLine : String -> List ( Int, Visibility )
+solvePartB : String -> String
+solvePartB forrest =
+    forrest
+        |> String.lines
+        |> List.map transformLine
+        |> scenicScoreFromLeft
+        |> scenicScoreFromRight
+        |> transpose
+        |> scenicScoreFromLeft
+        |> scenicScoreFromRight
+        |> maxScenicScore
+        |> String.fromInt
+
+
+transformLine : String -> List Tree
 transformLine line =
     let
-        transformTree : String -> ( Visibility, Int )
+        transformTree : String -> Tree
         transformTree s =
-            s
-                |> String.toInt
-                |> Maybe.withDefault 0
-                |> Tuple.pair Invisible
+            { height = s |> String.toInt |> Maybe.withDefault 0
+            , visibility = Invisible
+            , scenicScore = 1
+            }
     in
     line
         |> String.split ""
         |> List.map transformTree
-        |> List.map (\( a, b ) -> ( b, a ))
 
 
 visibilityFromLeft : Forrest -> Forrest
 visibilityFromLeft forrest =
-    forrest |> List.map (walkInLine -1)
+    forrest |> List.map (walkInLineA -1)
 
 
 visibilityFromRight : Forrest -> Forrest
 visibilityFromRight forrest =
-    forrest |> List.map (List.reverse >> walkInLine -1 >> List.reverse)
+    forrest |> List.map (List.reverse >> walkInLineA -1 >> List.reverse)
+
+
+walkInLineA : Int -> List Tree -> List Tree
+walkInLineA currentHeight line =
+    case line of
+        [] ->
+            line
+
+        tree :: rest ->
+            if tree.height > currentHeight then
+                { tree | visibility = Visible } :: walkInLineA tree.height rest
+
+            else
+                tree :: walkInLineA currentHeight rest
 
 
 transpose : List (List a) -> List (List a)
@@ -80,13 +114,13 @@ transpose l =
 countVisibils : Forrest -> Int
 countVisibils forrest =
     let
-        fn1 : List ( Int, Visibility ) -> Int -> Int
+        fn1 : List Tree -> Int -> Int
         fn1 line count =
             line |> List.foldl fn2 count
 
-        fn2 : ( Int, Visibility ) -> Int -> Int
+        fn2 : Tree -> Int -> Int
         fn2 tree count =
-            case tree |> Tuple.second of
+            case tree.visibility of
                 Visible ->
                     count + 1
 
@@ -96,19 +130,56 @@ countVisibils forrest =
     forrest |> List.foldl fn1 0
 
 
-walkInLine : Int -> List ( Int, Visibility ) -> List ( Int, Visibility )
-walkInLine currentHeight line =
+scenicScoreFromLeft : Forrest -> Forrest
+scenicScoreFromLeft forrest =
+    forrest |> List.map (walkInLineB [])
+
+
+scenicScoreFromRight : Forrest -> Forrest
+scenicScoreFromRight forrest =
+    forrest |> List.map (List.reverse >> walkInLineB [] >> List.reverse)
+
+
+walkInLineB : List Int -> List Tree -> List Tree
+walkInLineB lastTrees line =
     case line of
         [] ->
             line
 
         tree :: rest ->
-            let
-                treeHeight =
-                    Tuple.first tree
-            in
-            if treeHeight > currentHeight then
-                ( treeHeight, Visible ) :: walkInLine treeHeight rest
+            { tree | scenicScore = tree.scenicScore * haveALook tree.height lastTrees 0 } :: walkInLineB (tree.height :: lastTrees) rest
+
+
+haveALook : Int -> List Int -> Int -> Int
+haveALook height lastTrees count =
+    case lastTrees of
+        l :: rest ->
+            if height <= l then
+                count + 1
 
             else
-                tree :: walkInLine currentHeight rest
+                haveALook height rest (count + 1)
+
+        [] ->
+            count
+
+
+maxScenicScore : Forrest -> Int
+maxScenicScore forrest =
+    let
+        fn : List Tree -> Int -> Int
+        fn line count =
+            let
+                maxInThisLine =
+                    line
+                        |> List.map .scenicScore
+                        |> List.maximum
+                        |> Maybe.withDefault 0
+            in
+            if count < maxInThisLine then
+                maxInThisLine
+
+            else
+                count
+    in
+    forrest |> List.foldl fn 0
