@@ -7170,10 +7170,47 @@ var $author$project$Day07$runPartA = function (puzzleInput) {
 					$author$project$Day07$buildFilesystem(
 						$author$project$Day07$parseCommands(puzzleInput))))));
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Day07$getResult = function (d) {
+	var free = 70000000 - A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		A2($elm$core$Dict$get, '/', d));
+	return A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (e) {
+					return _Utils_cmp(e, 30000000 - free) > -1;
+				},
+				$elm$core$List$sort(
+					$elm$core$Dict$values(d)))));
+};
+var $author$project$Day07$runPartB = function (puzzleInput) {
+	return $elm$core$String$fromInt(
+		$author$project$Day07$getResult(
+			A2(
+				$author$project$Day07$countDirectories,
+				'/',
+				$author$project$Day07$buildFilesystem(
+					$author$project$Day07$parseCommands(puzzleInput)))));
+};
 var $author$project$Day07$run = function (puzzleInput) {
 	return _Utils_Tuple2(
 		$author$project$Day07$runPartA(puzzleInput),
-		'No solution');
+		$author$project$Day07$runPartB(puzzleInput));
 };
 var $author$project$Day08$run = function (_v0) {
 	return _Utils_Tuple2('No solution', 'No solution');
@@ -7233,17 +7270,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$html$Html$Attributes$classList = function (classes) {
 	return $elm$html$Html$Attributes$class(
 		A2(

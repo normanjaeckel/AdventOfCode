@@ -5,7 +5,7 @@ import Dict
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -16,6 +16,16 @@ runPartA puzzleInput =
         |> countDirectories "/"
         |> filterAtMost 100000
         |> List.sum
+        |> String.fromInt
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    puzzleInput
+        |> parseCommands
+        |> buildFilesystem
+        |> countDirectories "/"
+        |> getResult
         |> String.fromInt
 
 
@@ -149,3 +159,17 @@ countDirectories name dir =
 filterAtMost : Int -> Dict.Dict String Int -> List Int
 filterAtMost count d =
     d |> Dict.filter (\_ v -> v <= count) |> Dict.values
+
+
+getResult : Dict.Dict String Int -> Int
+getResult d =
+    let
+        free =
+            70000000 - (d |> Dict.get "/" |> Maybe.withDefault 0)
+    in
+    d
+        |> Dict.values
+        |> List.sort
+        |> List.filter (\e -> e >= (30000000 - free))
+        |> List.head
+        |> Maybe.withDefault 0
