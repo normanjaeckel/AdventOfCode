@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		K: func(record.K),
+		L: func(record.L),
 		aK: record.aK,
 		aI: record.aI
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var message = !tag ? value : tag < 3 ? value.a : value.L;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aK;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -6966,13 +6966,13 @@ var $author$project$Day06$run = function (puzzleInput) {
 		A2($author$project$Day06$runPartA, puzzleInput, 14));
 };
 var $author$project$Day07$Container = F2(
-	function (pwd, dir) {
-		return {ao: dir, M: pwd};
+	function (cwd, dir) {
+		return {J: cwd, ao: dir};
 	});
 var $author$project$Day07$Dir = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Day07$buildFilesystem = function (l) {
+var $author$project$Day07$buildFilesystem = function (commands) {
 	var goDown = F3(
 		function (pwd, dir, files) {
 			if (!pwd.b) {
@@ -7006,18 +7006,18 @@ var $author$project$Day07$buildFilesystem = function (l) {
 				var pattern = cmd.a;
 				return (pattern === '/') ? _Utils_update(
 					acc,
-					{M: _List_Nil}) : ((pattern === '..') ? _Utils_update(
+					{J: _List_Nil}) : ((pattern === '..') ? _Utils_update(
 					acc,
 					{
-						M: A2(
+						J: A2(
 							$elm$core$List$take,
-							$elm$core$List$length(acc.M) - 1,
-							acc.M)
+							$elm$core$List$length(acc.J) - 1,
+							acc.J)
 					}) : _Utils_update(
 					acc,
 					{
-						M: _Utils_ap(
-							acc.M,
+						J: _Utils_ap(
+							acc.J,
 							_List_fromArray(
 								[pattern]))
 					}));
@@ -7026,7 +7026,7 @@ var $author$project$Day07$buildFilesystem = function (l) {
 				return _Utils_update(
 					acc,
 					{
-						ao: A3(goDown, acc.M, acc.ao, files)
+						ao: A3(goDown, acc.J, acc.ao, files)
 					});
 			}
 		});
@@ -7034,7 +7034,7 @@ var $author$project$Day07$buildFilesystem = function (l) {
 		$elm$core$List$foldl,
 		fn,
 		A2($author$project$Day07$Container, _List_Nil, $elm$core$Dict$empty),
-		l).ao;
+		commands).ao;
 };
 var $elm$core$Dict$union = F2(
 	function (t1, t2) {
@@ -7056,7 +7056,7 @@ var $author$project$Day07$countDirectories = F2(
 						acc);
 				} else {
 					var d = innerType.a;
-					var innerDict = A2($author$project$Day07$countDirectories, innerName, d);
+					var innerDict = A2($author$project$Day07$countDirectories, name + ('/' + innerName), d);
 					return A2(
 						$elm$core$Dict$union,
 						innerDict,
@@ -7069,7 +7069,7 @@ var $author$project$Day07$countDirectories = F2(
 								A2($elm$core$Dict$get, name, acc)) + A2(
 								$elm$core$Maybe$withDefault,
 								0,
-								A2($elm$core$Dict$get, innerName, innerDict)),
+								A2($elm$core$Dict$get, name + ('/' + innerName), innerDict)),
 							acc));
 				}
 			});

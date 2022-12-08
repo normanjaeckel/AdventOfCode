@@ -72,29 +72,29 @@ parseCommands puzzleInput =
 
 
 type alias Container =
-    { pwd : List String
+    { cwd : List String
     , dir : Directory
     }
 
 
 buildFilesystem : List Command -> Directory
-buildFilesystem l =
+buildFilesystem commands =
     let
         fn : Command -> Container -> Container
         fn cmd acc =
             case cmd of
                 CD pattern ->
                     if pattern == "/" then
-                        { acc | pwd = [] }
+                        { acc | cwd = [] }
 
                     else if pattern == ".." then
-                        { acc | pwd = acc.pwd |> List.take (List.length acc.pwd - 1) }
+                        { acc | cwd = acc.cwd |> List.take (List.length acc.cwd - 1) }
 
                     else
-                        { acc | pwd = acc.pwd ++ [ pattern ] }
+                        { acc | cwd = acc.cwd ++ [ pattern ] }
 
                 LS files ->
-                    { acc | dir = goDown acc.pwd acc.dir files }
+                    { acc | dir = goDown acc.cwd acc.dir files }
 
         goDown : List String -> Directory -> Directory -> Directory
         goDown pwd dir files =
@@ -117,7 +117,7 @@ buildFilesystem l =
                             a
                             (Dir <| goDown restPwd innerDict files)
     in
-    l
+    commands
         |> List.foldl fn (Container [] Dict.empty)
         |> .dir
 
@@ -134,12 +134,12 @@ countDirectories name dir =
                 Dir d ->
                     let
                         innerDict =
-                            countDirectories innerName d
+                            countDirectories (name ++ "/" ++ innerName) d
                     in
                     acc
                         |> Dict.insert name
                             ((acc |> Dict.get name |> Maybe.withDefault 0)
-                                + (innerDict |> Dict.get innerName |> Maybe.withDefault 0)
+                                + (innerDict |> Dict.get (name ++ "/" ++ innerName) |> Maybe.withDefault 0)
                             )
                         |> Dict.union innerDict
     in
