@@ -7212,8 +7212,135 @@ var $author$project$Day07$run = function (puzzleInput) {
 		$author$project$Day07$runPartA(puzzleInput),
 		$author$project$Day07$runPartB(puzzleInput));
 };
-var $author$project$Day08$run = function (_v0) {
-	return _Utils_Tuple2('No solution', 'No solution');
+var $author$project$Day08$countVisibils = function (forrest) {
+	var fn2 = F2(
+		function (tree, count) {
+			var _v0 = tree.b;
+			if (!_v0) {
+				return count + 1;
+			} else {
+				return count;
+			}
+		});
+	var fn1 = F2(
+		function (line, count) {
+			return A3($elm$core$List$foldl, fn2, count, line);
+		});
+	return A3($elm$core$List$foldl, fn1, 0, forrest);
+};
+var $elm$core$String$lines = _String_lines;
+var $author$project$Day08$Invisible = 1;
+var $author$project$Day08$transformLine = function (line) {
+	var transformTree = function (s) {
+		return A2(
+			$elm$core$Tuple$pair,
+			1,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$String$toInt(s)));
+	};
+	return A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var a = _v0.a;
+			var b = _v0.b;
+			return _Utils_Tuple2(b, a);
+		},
+		A2(
+			$elm$core$List$map,
+			transformTree,
+			A2($elm$core$String$split, '', line)));
+};
+var $elm$core$List$tail = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(xs);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Day08$transpose = function (l) {
+	transpose:
+	while (true) {
+		if (l.b) {
+			if (l.a.b) {
+				var _v1 = l.a;
+				var x = _v1.a;
+				var xs = _v1.b;
+				var xxs = l.b;
+				var tails = A2($elm$core$List$filterMap, $elm$core$List$tail, xxs);
+				var heads = A2($elm$core$List$filterMap, $elm$core$List$head, xxs);
+				return A2(
+					$elm$core$List$cons,
+					A2($elm$core$List$cons, x, heads),
+					$author$project$Day08$transpose(
+						A2($elm$core$List$cons, xs, tails)));
+			} else {
+				var xxs = l.b;
+				var $temp$l = xxs;
+				l = $temp$l;
+				continue transpose;
+			}
+		} else {
+			return _List_Nil;
+		}
+	}
+};
+var $author$project$Day08$Visible = 0;
+var $author$project$Day08$walkInLine = F2(
+	function (currentHeight, line) {
+		if (!line.b) {
+			return line;
+		} else {
+			var tree = line.a;
+			var rest = line.b;
+			var treeHeight = tree.a;
+			return (_Utils_cmp(treeHeight, currentHeight) > 0) ? A2(
+				$elm$core$List$cons,
+				_Utils_Tuple2(treeHeight, 0),
+				A2($author$project$Day08$walkInLine, treeHeight, rest)) : A2(
+				$elm$core$List$cons,
+				tree,
+				A2($author$project$Day08$walkInLine, currentHeight, rest));
+		}
+	});
+var $author$project$Day08$visibilityFromLeft = function (forrest) {
+	return A2(
+		$elm$core$List$map,
+		$author$project$Day08$walkInLine(-1),
+		forrest);
+};
+var $author$project$Day08$visibilityFromRight = function (forrest) {
+	return A2(
+		$elm$core$List$map,
+		A2(
+			$elm$core$Basics$composeR,
+			$elm$core$List$reverse,
+			A2(
+				$elm$core$Basics$composeR,
+				$author$project$Day08$walkInLine(-1),
+				$elm$core$List$reverse)),
+		forrest);
+};
+var $author$project$Day08$solvePartA = function (forrest) {
+	return $elm$core$String$fromInt(
+		$author$project$Day08$countVisibils(
+			$author$project$Day08$visibilityFromRight(
+				$author$project$Day08$visibilityFromLeft(
+					$author$project$Day08$transpose(
+						$author$project$Day08$visibilityFromRight(
+							$author$project$Day08$visibilityFromLeft(
+								A2(
+									$elm$core$List$map,
+									$author$project$Day08$transformLine,
+									$elm$core$String$lines(forrest)))))))));
+};
+var $author$project$Day08$run = function (forrest) {
+	return _Utils_Tuple2(
+		$author$project$Day08$solvePartA(forrest),
+		'No solution');
 };
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
