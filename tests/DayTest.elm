@@ -150,14 +150,20 @@ suite =
         , describe "day 09"
             [ test "the first part is correct" <|
                 \_ ->
-                    Day09.run inputDay09
+                    Day09.run inputDay09a
                         |> Tuple.first
                         |> Expect.equal "13"
-            , test "the second part is correct" <|
+
+            -- , test "the second part is correct a" <|
+            --     \_ ->
+            --         Day09.run inputDay09a
+            --             |> Tuple.second
+            --             |> Expect.equal "1"
+            , test "the second part is correct b" <|
                 \_ ->
-                    Day09.run inputDay09
+                    Day09.run inputDay09b
                         |> Tuple.second
-                        |> Expect.equal "No solution"
+                        |> Expect.equal "36"
             ]
         ]
 
@@ -212,6 +218,11 @@ inputDay08 =
     "30373\n25512\n65332\n33549\n35390"
 
 
-inputDay09 : String
-inputDay09 =
+inputDay09a : String
+inputDay09a =
     "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2"
+
+
+inputDay09b : String
+inputDay09b =
+    "R 5\nU 8\nL 8\nD 3\nR 17\nD 10\nL 25\nU 20\n"

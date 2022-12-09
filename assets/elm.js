@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.A.ah === region.O.ah)
+	if (region.B.ai === region.P.ai)
 	{
-		return 'on line ' + region.A.ah;
+		return 'on line ' + region.B.ai;
 	}
-	return 'on lines ' + region.A.ah + ' through ' + region.O.ah;
+	return 'on lines ' + region.B.ai + ' through ' + region.P.ai;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		K: func(record.K),
+		L: func(record.L),
 		aO: record.aO,
 		aM: record.aM
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var message = !tag ? value : tag < 3 ? value.a : value.L;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aO;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4252,7 +4252,7 @@ function _Browser_getViewport()
 			bM: _Browser_window.pageXOffset,
 			bN: _Browser_window.pageYOffset,
 			bL: _Browser_doc.documentElement.clientWidth,
-			Y: _Browser_doc.documentElement.clientHeight
+			Z: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4263,7 +4263,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		bL: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		Z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4288,13 +4288,13 @@ function _Browser_getViewportOf(id)
 		return {
 			by: {
 				bL: node.scrollWidth,
-				Y: node.scrollHeight
+				Z: node.scrollHeight
 			},
 			bJ: {
 				bM: node.scrollLeft,
 				bN: node.scrollTop,
 				bL: node.clientWidth,
-				Y: node.clientHeight
+				Z: node.clientHeight
 			}
 		};
 	});
@@ -4329,13 +4329,13 @@ function _Browser_getElement(id)
 				bM: x,
 				bN: y,
 				bL: _Browser_doc.documentElement.clientWidth,
-				Y: _Browser_doc.documentElement.clientHeight
+				Z: _Browser_doc.documentElement.clientHeight
 			},
 			b0: {
 				bM: x + rect.left,
 				bN: y + rect.top,
 				bL: rect.width,
-				Y: rect.height
+				Z: rect.height
 			}
 		};
 	});
@@ -4924,22 +4924,22 @@ var $elm$core$Array$builderToArray = F2(
 		if (!builder.k) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder._),
+				$elm$core$Elm$JsArray$length(builder.m),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder._);
+				builder.m);
 		} else {
 			var treeLen = builder.k * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.m) : builder.m;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.n) : builder.n;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.k);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder._) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.m) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder._);
+				builder.m);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4952,7 +4952,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{m: nodeList, k: (len / $elm$core$Array$branchFactor) | 0, _: tail});
+					{n: nodeList, k: (len / $elm$core$Array$branchFactor) | 0, m: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5620,7 +5620,7 @@ var $author$project$Day01$run = function (content) {
 };
 var $author$project$Day02$Element = F2(
 	function (opponent, you) {
-		return {R: opponent, aB: you};
+		return {S: opponent, aB: you};
 	});
 var $author$project$Day02$Invalid = 3;
 var $author$project$Day02$Paper = 1;
@@ -5654,7 +5654,7 @@ var $author$project$Day02$scoreWin = function (el) {
 	var _v0 = el.aB;
 	switch (_v0) {
 		case 0:
-			var _v1 = el.R;
+			var _v1 = el.S;
 			switch (_v1) {
 				case 0:
 					return 3;
@@ -5666,7 +5666,7 @@ var $author$project$Day02$scoreWin = function (el) {
 					return 0;
 			}
 		case 1:
-			var _v2 = el.R;
+			var _v2 = el.S;
 			switch (_v2) {
 				case 0:
 					return 6;
@@ -5678,7 +5678,7 @@ var $author$project$Day02$scoreWin = function (el) {
 					return 0;
 			}
 		case 2:
-			var _v3 = el.R;
+			var _v3 = el.S;
 			switch (_v3) {
 				case 0:
 					return 0;
@@ -5697,7 +5697,7 @@ var $author$project$Day02$transformElement = function (el) {
 	var _v0 = el.aB;
 	switch (_v0) {
 		case 0:
-			var _v1 = el.R;
+			var _v1 = el.S;
 			switch (_v1) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 2);
@@ -5709,7 +5709,7 @@ var $author$project$Day02$transformElement = function (el) {
 					return A2($author$project$Day02$Element, 3, 3);
 			}
 		case 1:
-			var _v2 = el.R;
+			var _v2 = el.S;
 			switch (_v2) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 0);
@@ -5721,7 +5721,7 @@ var $author$project$Day02$transformElement = function (el) {
 					return A2($author$project$Day02$Element, 3, 3);
 			}
 		case 2:
-			var _v3 = el.R;
+			var _v3 = el.S;
 			switch (_v3) {
 				case 0:
 					return A2($author$project$Day02$Element, 0, 1);
@@ -5990,7 +5990,7 @@ var $author$project$Day04$checkPartOne = F2(
 			} else {
 				var f = _v0.a.a;
 				var s = _v0.b.a;
-				return ((_Utils_cmp(f.A, s.A) < 1) && (_Utils_cmp(f.O, s.O) > -1)) ? 1 : (((_Utils_cmp(s.A, f.A) < 1) && (_Utils_cmp(s.O, f.O) > -1)) ? 1 : 0);
+				return ((_Utils_cmp(f.B, s.B) < 1) && (_Utils_cmp(f.P, s.P) > -1)) ? 1 : (((_Utils_cmp(s.B, f.B) < 1) && (_Utils_cmp(s.P, f.P) > -1)) ? 1 : 0);
 			}
 		}
 	});
@@ -6013,7 +6013,7 @@ var $author$project$Day04$checkPartTwo = F2(
 			} else {
 				var f = _v0.a.a;
 				var s = _v0.b.a;
-				return ((_Utils_cmp(f.A, s.A) < 1) && (_Utils_cmp(s.A, f.O) < 1)) ? 1 : (((_Utils_cmp(s.A, f.A) < 1) && (_Utils_cmp(f.A, s.O) < 1)) ? 1 : 0);
+				return ((_Utils_cmp(f.B, s.B) < 1) && (_Utils_cmp(s.B, f.P) < 1)) ? 1 : (((_Utils_cmp(s.B, f.B) < 1) && (_Utils_cmp(f.B, s.P) < 1)) ? 1 : 0);
 			}
 		}
 	});
@@ -6049,7 +6049,7 @@ var $elm$core$List$drop = F2(
 	});
 var $author$project$Day04$IDs = F2(
 	function (start, end) {
-		return {O: end, A: start};
+		return {P: end, B: start};
 	});
 var $author$project$Day04$toIDs = function (s) {
 	return $elm$core$Maybe$Just(
@@ -6235,7 +6235,7 @@ var $elm$core$Basics$composeL = F3(
 	});
 var $author$project$Day05$ParseHelper = F3(
 	function (chars, allChars, count) {
-		return {ao: allChars, aC: chars, aD: count};
+		return {ap: allChars, aC: chars, aD: count};
 	});
 var $elm$parser$Parser$UnexpectedChar = {$: 11};
 var $elm$parser$Parser$Advanced$Bad = F2(
@@ -6576,13 +6576,13 @@ var $author$project$Day05$parseCratesLine = function (input) {
 					ph.aC,
 					_List_fromArray(
 						[ch])),
-				ph.ao,
+				ph.ap,
 				ph.aD + 1) : A3(
 				$author$project$Day05$ParseHelper,
 				_List_fromArray(
 					[ch]),
 				_Utils_ap(
-					ph.ao,
+					ph.ap,
 					_List_fromArray(
 						[ph.aC])),
 				2);
@@ -6594,7 +6594,7 @@ var $author$project$Day05$parseCratesLine = function (input) {
 			$elm$core$List$foldl,
 			fn1,
 			A3($author$project$Day05$ParseHelper, _List_Nil, _List_Nil, 1),
-			$elm$core$String$toList(' ' + (input + ' '))).ao);
+			$elm$core$String$toList(' ' + (input + ' '))).ap);
 	return $elm$core$Dict$fromList(
 		A3(
 			$elm$core$List$map2,
@@ -6967,7 +6967,7 @@ var $author$project$Day06$run = function (puzzleInput) {
 };
 var $author$project$Day07$Container = F2(
 	function (cwd, dir) {
-		return {I: cwd, ap: dir};
+		return {J: cwd, aq: dir};
 	});
 var $author$project$Day07$Dir = function (a) {
 	return {$: 0, a: a};
@@ -7006,18 +7006,18 @@ var $author$project$Day07$buildFilesystem = function (commands) {
 				var pattern = cmd.a;
 				return (pattern === '/') ? _Utils_update(
 					acc,
-					{I: _List_Nil}) : ((pattern === '..') ? _Utils_update(
+					{J: _List_Nil}) : ((pattern === '..') ? _Utils_update(
 					acc,
 					{
-						I: A2(
+						J: A2(
 							$elm$core$List$take,
-							$elm$core$List$length(acc.I) - 1,
-							acc.I)
+							$elm$core$List$length(acc.J) - 1,
+							acc.J)
 					}) : _Utils_update(
 					acc,
 					{
-						I: _Utils_ap(
-							acc.I,
+						J: _Utils_ap(
+							acc.J,
 							_List_fromArray(
 								[pattern]))
 					}));
@@ -7026,7 +7026,7 @@ var $author$project$Day07$buildFilesystem = function (commands) {
 				return _Utils_update(
 					acc,
 					{
-						ap: A3(goDown, acc.I, acc.ap, files)
+						aq: A3(goDown, acc.J, acc.aq, files)
 					});
 			}
 		});
@@ -7034,7 +7034,7 @@ var $author$project$Day07$buildFilesystem = function (commands) {
 		$elm$core$List$foldl,
 		fn,
 		A2($author$project$Day07$Container, _List_Nil, $elm$core$Dict$empty),
-		commands).ap;
+		commands).aq;
 };
 var $elm$core$Dict$union = F2(
 	function (t1, t2) {
@@ -7215,7 +7215,7 @@ var $author$project$Day07$run = function (puzzleInput) {
 var $author$project$Day08$countVisibils = function (forrest) {
 	var fn2 = F2(
 		function (tree, count) {
-			var _v0 = tree.az;
+			var _v0 = tree.aA;
 			if (!_v0) {
 				return count + 1;
 			} else {
@@ -7233,12 +7233,12 @@ var $author$project$Day08$Invisible = 1;
 var $author$project$Day08$transformLine = function (line) {
 	var transformTree = function (s) {
 		return {
-			Y: A2(
+			Z: A2(
 				$elm$core$Maybe$withDefault,
 				0,
 				$elm$core$String$toInt(s)),
-			aj: 1,
-			az: 1
+			ak: 1,
+			aA: 1
 		};
 	};
 	return A2(
@@ -7290,12 +7290,12 @@ var $author$project$Day08$walkInLineA = F2(
 		} else {
 			var tree = line.a;
 			var rest = line.b;
-			return (_Utils_cmp(tree.Y, currentHeight) > 0) ? A2(
+			return (_Utils_cmp(tree.Z, currentHeight) > 0) ? A2(
 				$elm$core$List$cons,
 				_Utils_update(
 					tree,
-					{az: 0}),
-				A2($author$project$Day08$walkInLineA, tree.Y, rest)) : A2(
+					{aA: 0}),
+				A2($author$project$Day08$walkInLineA, tree.Z, rest)) : A2(
 				$elm$core$List$cons,
 				tree,
 				A2($author$project$Day08$walkInLineA, currentHeight, rest));
@@ -7352,7 +7352,7 @@ var $author$project$Day08$maxScenicScore = function (forrest) {
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.aj;
+							return $.ak;
 						},
 						line)));
 			return (_Utils_cmp(count, maxInThisLine) < 0) ? maxInThisLine : count;
@@ -7394,11 +7394,11 @@ var $author$project$Day08$walkInLineB = F2(
 				_Utils_update(
 					tree,
 					{
-						aj: tree.aj * A3($author$project$Day08$haveALook, tree.Y, lastTrees, 0)
+						ak: tree.ak * A3($author$project$Day08$haveALook, tree.Z, lastTrees, 0)
 					}),
 				A2(
 					$author$project$Day08$walkInLineB,
-					A2($elm$core$List$cons, tree.Y, lastTrees),
+					A2($elm$core$List$cons, tree.Z, lastTrees),
 					rest));
 		}
 	});
@@ -7459,6 +7459,28 @@ var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
 	});
+var $author$project$Day09$diagonalMove = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.a;
+		var y1 = _v0.b;
+		var x2 = _v1.a;
+		var y2 = _v1.b;
+		return _Utils_Tuple2(
+			(_Utils_cmp(x2, x1) > 0) ? (x1 + 1) : (x1 - 1),
+			(_Utils_cmp(y2, y1) > 0) ? (y1 + 1) : (y1 - 1));
+	});
+var $author$project$Day09$directMove = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.a;
+		var y1 = _v0.b;
+		var x2 = _v1.a;
+		var y2 = _v1.b;
+		return _Utils_eq(x1, x2) ? _Utils_Tuple2(
+			x1,
+			(_Utils_cmp(y2, y1) > 0) ? (y1 + 1) : (y1 - 1)) : _Utils_Tuple2(
+			(_Utils_cmp(x2, x1) > 0) ? (x1 + 1) : (x1 - 1),
+			y1);
+	});
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -7478,14 +7500,53 @@ var $author$project$Day09$isInLineWith = F2(
 		var y2 = _v1.b;
 		return _Utils_eq(x1, x2) || _Utils_eq(y1, y2);
 	});
-var $author$project$Day09$singleMove = F3(
-	function (moveFunc, _v0, grid) {
-		var newHead = moveFunc(grid.ar);
-		var newTail = A2($author$project$Day09$isAdjacentTo, newHead, grid._) ? grid._ : (A2($author$project$Day09$isInLineWith, newHead, grid._) ? moveFunc(grid._) : grid.ar);
-		var newVisited = A2($elm$core$Set$insert, newTail, grid.aA);
+var $author$project$Day09$innerMove = F3(
+	function (moveFunc, id, rope) {
+		var _v0 = A2($elm$core$Dict$get, id, rope);
+		if (_v0.$ === 1) {
+			return rope;
+		} else {
+			var element = _v0.a;
+			var _v1 = A2($elm$core$Dict$get, id - 1, rope);
+			if (_v1.$ === 1) {
+				return A3(
+					$elm$core$Dict$insert,
+					id,
+					moveFunc(element),
+					rope);
+			} else {
+				var parent = _v1.a;
+				return A2($author$project$Day09$isAdjacentTo, parent, element) ? rope : (A2($author$project$Day09$isInLineWith, parent, element) ? A3(
+					$elm$core$Dict$insert,
+					id,
+					A2($author$project$Day09$directMove, element, parent),
+					rope) : A3(
+					$elm$core$Dict$insert,
+					id,
+					A2($author$project$Day09$diagonalMove, element, parent),
+					rope));
+			}
+		}
+	});
+var $author$project$Day09$singleMove = F4(
+	function (length, moveFunc, _v0, grid) {
+		var newRope = A3(
+			$elm$core$List$foldl,
+			$author$project$Day09$innerMove(moveFunc),
+			grid.au,
+			A2($elm$core$List$range, 0, length - 1));
+		var newVisited = function () {
+			var _v1 = A2($elm$core$Dict$get, length - 1, newRope);
+			if (!_v1.$) {
+				var pos = _v1.a;
+				return A2($elm$core$Set$insert, pos, grid.ab);
+			} else {
+				return grid.ab;
+			}
+		}();
 		return _Utils_update(
 			grid,
-			{ar: newHead, _: newTail, aA: newVisited});
+			{au: newRope, ab: newVisited});
 	});
 var $author$project$Day09$toDown = function (_v0) {
 	var x = _v0.a;
@@ -7507,35 +7568,35 @@ var $author$project$Day09$toUp = function (_v0) {
 	var y = _v0.b;
 	return _Utils_Tuple2(x, y + 1);
 };
-var $author$project$Day09$move = F2(
-	function (m, grid) {
+var $author$project$Day09$move = F3(
+	function (length, m, grid) {
 		switch (m.$) {
 			case 0:
 				var i = m.a;
 				return A3(
 					$elm$core$List$foldl,
-					$author$project$Day09$singleMove($author$project$Day09$toRight),
+					A2($author$project$Day09$singleMove, length, $author$project$Day09$toRight),
 					grid,
 					A2($elm$core$List$repeat, i, 0));
 			case 1:
 				var i = m.a;
 				return A3(
 					$elm$core$List$foldl,
-					$author$project$Day09$singleMove($author$project$Day09$toLeft),
+					A2($author$project$Day09$singleMove, length, $author$project$Day09$toLeft),
 					grid,
 					A2($elm$core$List$repeat, i, 0));
 			case 2:
 				var i = m.a;
 				return A3(
 					$elm$core$List$foldl,
-					$author$project$Day09$singleMove($author$project$Day09$toUp),
+					A2($author$project$Day09$singleMove, length, $author$project$Day09$toUp),
 					grid,
 					A2($elm$core$List$repeat, i, 0));
 			default:
 				var i = m.a;
 				return A3(
 					$elm$core$List$foldl,
-					$author$project$Day09$singleMove($author$project$Day09$toDown),
+					A2($author$project$Day09$singleMove, length, $author$project$Day09$toDown),
 					grid,
 					A2($elm$core$List$repeat, i, 0));
 		}
@@ -7592,28 +7653,36 @@ var $author$project$Day09$parseMoves = function (puzzleInput) {
 		},
 		$elm$core$String$lines(puzzleInput));
 };
-var $author$project$Day09$Grid = F3(
-	function (visited, head, tail) {
-		return {ar: head, _: tail, aA: visited};
-	});
-var $author$project$Day09$startGrid = A3(
-	$author$project$Day09$Grid,
-	$elm$core$Set$empty,
-	_Utils_Tuple2(0, 0),
-	_Utils_Tuple2(0, 0));
-var $author$project$Day09$runPartA = function (puzzleInput) {
-	return $elm$core$String$fromInt(
-		$elm$core$Set$size(
-			A3(
-				$elm$core$List$foldl,
-				$author$project$Day09$move,
-				$author$project$Day09$startGrid,
-				$author$project$Day09$parseMoves(puzzleInput)).aA));
+var $author$project$Day09$startGrid = function (length) {
+	var newRope = $elm$core$Dict$fromList(
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var a = _v0.a;
+				var b = _v0.b;
+				return _Utils_Tuple2(b, a);
+			},
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$pair(
+					_Utils_Tuple2(0, 0)),
+				A2($elm$core$List$range, 0, length - 1))));
+	return {au: newRope, ab: $elm$core$Set$empty};
 };
+var $author$project$Day09$runInner = F2(
+	function (puzzleInput, length) {
+		return $elm$core$String$fromInt(
+			$elm$core$Set$size(
+				A3(
+					$elm$core$List$foldl,
+					$author$project$Day09$move(length),
+					$author$project$Day09$startGrid(length),
+					$author$project$Day09$parseMoves(puzzleInput)).ab));
+	});
 var $author$project$Day09$run = function (puzzleInput) {
 	return _Utils_Tuple2(
-		$author$project$Day09$runPartA(puzzleInput),
-		'No solution');
+		A2($author$project$Day09$runInner, puzzleInput, 2),
+		A2($author$project$Day09$runInner, puzzleInput, 10));
 };
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
