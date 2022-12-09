@@ -8,6 +8,7 @@ import Day05
 import Day06
 import Day07
 import Day08
+import Day09
 import Expect
 import Test exposing (..)
 
@@ -146,6 +147,18 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "8"
             ]
+        , describe "day 09"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day09.run inputDay09
+                        |> Tuple.first
+                        |> Expect.equal "13"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day09.run inputDay09
+                        |> Tuple.second
+                        |> Expect.equal "No solution"
+            ]
         ]
 
 
@@ -197,3 +210,8 @@ inputDay07 =
 inputDay08 : String
 inputDay08 =
     "30373\n25512\n65332\n33549\n35390"
+
+
+inputDay09 : String
+inputDay09 =
+    "R 4\nU 4\nL 3\nD 1\nR 4\nD 1\nL 5\nR 2"
