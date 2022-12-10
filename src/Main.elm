@@ -10,6 +10,7 @@ import Day06
 import Day07
 import Day08
 import Day09
+import Day10
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, disabled, placeholder, required, rows, selected, value)
@@ -41,6 +42,7 @@ allDays =
         , ( 7, Day07.run )
         , ( 8, Day08.run )
         , ( 9, Day09.run )
+        , ( 10, Day10.run )
         ]
 
 
@@ -144,7 +146,7 @@ view model =
                                     ]
                                 , div [ class "col-4" ]
                                     [ Tuple.second result |> Tuple.first |> text ]
-                                , div [ class "col-4" ]
+                                , div [ classes "col-4 font-monospace" ]
                                     [ Tuple.second result |> Tuple.second |> text ]
                                 ]
                             ]

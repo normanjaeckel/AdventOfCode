@@ -4500,6 +4500,43 @@ var _Parser_findSubString = F5(function(smallString, offset, row, col, bigString
 
 	return _Utils_Tuple3(newOffset, row, col);
 });
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $author$project$Main$Day = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -7684,6 +7721,360 @@ var $author$project$Day09$run = function (puzzleInput) {
 		A2($author$project$Day09$runInner, puzzleInput, 2),
 		A2($author$project$Day09$runInner, puzzleInput, 10));
 };
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $author$project$Day10$signalStrengthNumber = _List_fromArray(
+	[20, 60, 100, 140, 180, 220]);
+var $author$project$Day10$getSignalStrength = function (a) {
+	return $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (n) {
+				return A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					A2($elm$core$Array$get, n - 1, a)) * n;
+			},
+			$author$project$Day10$signalStrengthNumber));
+};
+var $author$project$Day10$Addx = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Day10$Noop = {$: 0};
+var $elm$parser$Parser$Advanced$Append = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $elm$parser$Parser$Advanced$oneOfHelp = F3(
+	function (s0, bag, parsers) {
+		oneOfHelp:
+		while (true) {
+			if (!parsers.b) {
+				return A2($elm$parser$Parser$Advanced$Bad, false, bag);
+			} else {
+				var parse = parsers.a;
+				var remainingParsers = parsers.b;
+				var _v1 = parse(s0);
+				if (!_v1.$) {
+					var step = _v1;
+					return step;
+				} else {
+					var step = _v1;
+					var p = step.a;
+					var x = step.b;
+					if (p) {
+						return step;
+					} else {
+						var $temp$s0 = s0,
+							$temp$bag = A2($elm$parser$Parser$Advanced$Append, bag, x),
+							$temp$parsers = remainingParsers;
+						s0 = $temp$s0;
+						bag = $temp$bag;
+						parsers = $temp$parsers;
+						continue oneOfHelp;
+					}
+				}
+			}
+		}
+	});
+var $elm$parser$Parser$Advanced$oneOf = function (parsers) {
+	return function (s) {
+		return A3($elm$parser$Parser$Advanced$oneOfHelp, s, $elm$parser$Parser$Advanced$Empty, parsers);
+	};
+};
+var $elm$parser$Parser$oneOf = $elm$parser$Parser$Advanced$oneOf;
+var $elm$core$Result$toMaybe = function (result) {
+	if (!result.$) {
+		var v = result.a;
+		return $elm$core$Maybe$Just(v);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Day10$parseCommand = function (line) {
+	var p = A2(
+		$elm$parser$Parser$keeper,
+		$elm$parser$Parser$succeed($elm$core$Basics$identity),
+		$elm$parser$Parser$oneOf(
+			_List_fromArray(
+				[
+					A2(
+					$elm$parser$Parser$ignorer,
+					A2(
+						$elm$parser$Parser$ignorer,
+						$elm$parser$Parser$succeed($author$project$Day10$Noop),
+						$elm$parser$Parser$token('noop')),
+					$elm$parser$Parser$end),
+					A2(
+					$elm$parser$Parser$keeper,
+					A2(
+						$elm$parser$Parser$ignorer,
+						A2(
+							$elm$parser$Parser$ignorer,
+							$elm$parser$Parser$succeed($author$project$Day10$Addx),
+							$elm$parser$Parser$token('addx')),
+						$elm$parser$Parser$spaces),
+					A2(
+						$elm$parser$Parser$ignorer,
+						$elm$parser$Parser$oneOf(
+							_List_fromArray(
+								[
+									A2(
+									$elm$parser$Parser$keeper,
+									A2(
+										$elm$parser$Parser$ignorer,
+										$elm$parser$Parser$succeed($elm$core$Basics$negate),
+										$elm$parser$Parser$symbol('-')),
+									$elm$parser$Parser$int),
+									$elm$parser$Parser$int
+								])),
+						$elm$parser$Parser$end))
+				])));
+	return $elm$core$Result$toMaybe(
+		A2($elm$parser$Parser$run, p, line));
+};
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{n: nodeList, k: nodeListSize, m: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$core$Elm$JsArray$push = _JsArray_push;
+var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$insertTailInTree = F4(
+	function (shift, index, tail, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		if (_Utils_cmp(
+			pos,
+			$elm$core$Elm$JsArray$length(tree)) > -1) {
+			if (shift === 5) {
+				return A2(
+					$elm$core$Elm$JsArray$push,
+					$elm$core$Array$Leaf(tail),
+					tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, $elm$core$Elm$JsArray$empty));
+				return A2($elm$core$Elm$JsArray$push, newSub, tree);
+			}
+		} else {
+			var value = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!value.$) {
+				var subTree = value.a;
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, subTree));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4(
+						$elm$core$Array$insertTailInTree,
+						shift - $elm$core$Array$shiftStep,
+						index,
+						tail,
+						$elm$core$Elm$JsArray$singleton(value)));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			}
+		}
+	});
+var $elm$core$Array$unsafeReplaceTail = F2(
+	function (newTail, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var originalTailLen = $elm$core$Elm$JsArray$length(tail);
+		var newTailLen = $elm$core$Elm$JsArray$length(newTail);
+		var newArrayLen = len + (newTailLen - originalTailLen);
+		if (_Utils_eq(newTailLen, $elm$core$Array$branchFactor)) {
+			var overflow = _Utils_cmp(newArrayLen >>> $elm$core$Array$shiftStep, 1 << startShift) > 0;
+			if (overflow) {
+				var newShift = startShift + $elm$core$Array$shiftStep;
+				var newTree = A4(
+					$elm$core$Array$insertTailInTree,
+					newShift,
+					len,
+					newTail,
+					$elm$core$Elm$JsArray$singleton(
+						$elm$core$Array$SubTree(tree)));
+				return A4($elm$core$Array$Array_elm_builtin, newArrayLen, newShift, newTree, $elm$core$Elm$JsArray$empty);
+			} else {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					newArrayLen,
+					startShift,
+					A4($elm$core$Array$insertTailInTree, startShift, len, newTail, tree),
+					$elm$core$Elm$JsArray$empty);
+			}
+		} else {
+			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
+		}
+	});
+var $elm$core$Array$push = F2(
+	function (a, array) {
+		var tail = array.d;
+		return A2(
+			$elm$core$Array$unsafeReplaceTail,
+			A2($elm$core$Elm$JsArray$push, a, tail),
+			array);
+	});
+var $author$project$Day10$processCommands = function (l) {
+	var fn = F2(
+		function (cmd, a) {
+			var parent = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A2(
+					$elm$core$Array$get,
+					$elm$core$Array$length(a) - 1,
+					a));
+			if (!cmd.$) {
+				return A2($elm$core$Array$push, parent, a);
+			} else {
+				var i = cmd.a;
+				return A2(
+					$elm$core$Array$push,
+					parent + i,
+					A2($elm$core$Array$push, parent, a));
+			}
+		});
+	return A3(
+		$elm$core$List$foldl,
+		fn,
+		$elm$core$Array$fromList(
+			_List_fromArray(
+				[1])),
+		l);
+};
+var $author$project$Day10$runPartA = function (puzzleInput) {
+	return $elm$core$String$fromInt(
+		$author$project$Day10$getSignalStrength(
+			$author$project$Day10$processCommands(
+				A2(
+					$elm$core$List$filterMap,
+					$author$project$Day10$parseCommand,
+					$elm$core$String$lines(puzzleInput)))));
+};
+var $author$project$Day10$addNewlines = function (l) {
+	var fn = F2(
+		function (n, ll) {
+			return _Utils_ap(
+				A2($elm$core$List$take, n, ll),
+				A2(
+					$elm$core$List$cons,
+					'\n',
+					A2($elm$core$List$drop, n, ll)));
+		});
+	return A3(
+		$elm$core$List$foldl,
+		fn,
+		l,
+		_List_fromArray(
+			[40, 81, 122, 163, 204]));
+};
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $author$project$Day10$parseScreen = function (a) {
+	return $elm$core$String$concat(
+		$author$project$Day10$addNewlines(
+			A2(
+				$elm$core$List$map,
+				function (n) {
+					var xFromN = n - (((n / 40) | 0) * 40);
+					var sprite = A2(
+						$elm$core$Maybe$withDefault,
+						0,
+						A2($elm$core$Array$get, n, a));
+					return ($elm$core$Basics$abs(sprite - xFromN) <= 1) ? '#' : '.';
+				},
+				A2($elm$core$List$range, 0, 239))));
+};
+var $author$project$Day10$runPartB = function (puzzleInput) {
+	return $author$project$Day10$parseScreen(
+		$author$project$Day10$processCommands(
+			A2(
+				$elm$core$List$filterMap,
+				$author$project$Day10$parseCommand,
+				$elm$core$String$lines(puzzleInput))));
+};
+var $author$project$Day10$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day10$runPartA(puzzleInput),
+		$author$project$Day10$runPartB(puzzleInput));
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -7695,7 +8086,8 @@ var $author$project$Main$allDays = $elm$core$Dict$fromList(
 			_Utils_Tuple2(6, $author$project$Day06$run),
 			_Utils_Tuple2(7, $author$project$Day07$run),
 			_Utils_Tuple2(8, $author$project$Day08$run),
-			_Utils_Tuple2(9, $author$project$Day09$run)
+			_Utils_Tuple2(9, $author$project$Day09$run),
+			_Utils_Tuple2(10, $author$project$Day10$run)
 		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -7981,7 +8373,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$div,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('col-4')
+													$author$project$Main$classes('col-4 font-monospace')
 												]),
 											_List_fromArray(
 												[
