@@ -14,7 +14,7 @@ runPartA puzzleInput =
     case puzzleInput |> parseInput of
         Ok monkeys ->
             monkeys
-                |> Debug.log "after 0 rounds"
+                --|> Debug.log "after 0 rounds"
                 |> playRounds 1
                 |> Debug.log "after 1 rounds"
                 |> productOfInspectionOfMostActiveMonkeys
@@ -44,6 +44,11 @@ type alias Monkey =
     , targetIfFalse : MonkeyID
     , hasInspected : Int
     }
+
+
+fakeMonkey : Monkey
+fakeMonkey =
+    Monkey [] (Addition Self Self) 0 0 0 0
 
 
 type Operation
@@ -162,14 +167,18 @@ playRound : () -> Monkeys -> Monkeys
 playRound _ monkeys =
     let
         fn : ( MonkeyID, Monkey ) -> Monkeys -> Monkeys
-        fn ( monkeyId, monkey ) all =
+        fn ( monkeyId, _ ) all =
+            let
+                monkey : Monkey
+                monkey =
+                    all |> Dict.get monkeyId |> Maybe.withDefault fakeMonkey
+            in
             monkey.items
                 |> List.foldl (fn2 monkey) all
                 |> Dict.insert monkeyId { monkey | items = [], hasInspected = monkey.hasInspected + List.length monkey.items }
 
         fn2 : Monkey -> Int -> Monkeys -> Monkeys
         fn2 monkey item all =
-            -- Bug here: Monkey is not the new one during this round.
             let
                 newItem =
                     (item |> processOperation monkey.operation) // 3
