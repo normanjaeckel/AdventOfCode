@@ -14,9 +14,13 @@ runPartA : String -> String
 runPartA puzzleInput =
     case puzzleInput |> Parser.run gridParser of
         Ok grid ->
-            grid
-                |> searchShortestPath
-                |> String.fromInt
+            if grid |> Dict.isEmpty then
+                "empty grid"
+
+            else
+                grid
+                    |> searchShortestPath
+                    |> String.fromInt
 
         Err _ ->
             "Error"
@@ -42,13 +46,13 @@ type Square
 
 gridParser : Parser.Parser Grid
 gridParser =
-    Parser.loop Dict.empty areaParserHelper
+    Parser.loop Dict.empty gridParserHelper
 
 
-areaParserHelper : Grid -> Parser.Parser (Parser.Step Grid Grid)
-areaParserHelper area =
+gridParserHelper : Grid -> Parser.Parser (Parser.Step Grid Grid)
+gridParserHelper grid =
     Parser.oneOf
-        [ Parser.succeed (\p s -> area |> Dict.insert p s |> Parser.Loop)
+        [ Parser.succeed (\p s -> grid |> Dict.insert p s |> Parser.Loop)
             |= Parser.getPosition
             |= Parser.oneOf
                 [ Parser.succeed Start
@@ -59,29 +63,25 @@ areaParserHelper area =
                     |= heightParser
                 ]
             |. Parser.spaces
-        , (Parser.succeed ()
-            |. Parser.end
-          )
-            |> Parser.map (\_ -> Parser.Done area)
+        , (Parser.succeed () |. Parser.end) |> Parser.map (\_ -> Parser.Done grid)
         ]
 
 
 heightParser : Parser.Parser Int
 heightParser =
     let
-        fn : String -> Int
+        fn : String -> Parser.Parser Int
         fn s =
-            s
-                |> String.toList
-                |> List.head
-                |> Maybe.withDefault 'a'
-                |> Char.toCode
+            case s |> String.toList |> List.head of
+                Nothing ->
+                    Parser.problem "invalid case which can not appear"
 
-        --|> (+) -96
+                Just ch ->
+                    Parser.succeed (ch |> Char.toCode)
     in
     Parser.chompIf Char.isLower
         |> Parser.getChompedString
-        |> Parser.map fn
+        |> Parser.andThen fn
 
 
 
@@ -90,15 +90,18 @@ heightParser =
 
 searchShortestPath : Grid -> Int
 searchShortestPath grid =
-    [ grid |> getStartPosition ] |> Set.fromList |> walk grid Set.empty
+    grid
+        |> getStartPosition
+        |> Set.singleton
+        |> walk grid Set.empty
 
 
 getStartPosition : Grid -> Position
 getStartPosition grid =
     grid
         |> Dict.filter
-            (\_ s ->
-                case s of
+            (\_ squ ->
+                case squ of
                     Start ->
                         True
 
@@ -112,37 +115,32 @@ getStartPosition grid =
 
 
 walk : Grid -> Set.Set Position -> Set.Set Position -> Int
-walk grid visited pos =
-    if pos |> foundEnd grid then
+walk grid visited positions =
+    if positions |> foundEnd grid then
         0
 
     else
         let
             newVisited =
-                Set.union visited pos
+                Set.union visited positions
         in
-        (pos |> nextLayer grid newVisited |> walk grid newVisited) + 1
+        (positions |> nextLayer grid newVisited |> walk grid newVisited) + 1
 
 
 nextLayer : Grid -> Set.Set Position -> Set.Set Position -> Set.Set Position
 nextLayer grid visited current =
     let
         fn : Position -> Set.Set Position -> Set.Set Position
-        fn pos all =
-            let
-                squ : Square
-                squ =
-                    grid |> Dict.get pos |> Maybe.withDefault End
-            in
-            case squ of
-                End ->
+        fn position all =
+            case grid |> Dict.get position of
+                Just (OnTheWay h) ->
+                    Set.diff (Set.union all (position |> getNeighbours grid h)) visited
+
+                Just Start ->
+                    Set.diff (Set.union all (position |> getNeighbours grid (Char.toCode 'a'))) visited
+
+                _ ->
                     Set.empty
-
-                OnTheWay h ->
-                    Set.diff (Set.union all (pos |> getNeighbours grid h)) visited
-
-                Start ->
-                    Set.diff (Set.union all (pos |> getNeighbours grid (Char.toCode 'a'))) visited
     in
     current |> Set.foldl fn Set.empty
 
@@ -151,29 +149,29 @@ getNeighbours : Grid -> Int -> Position -> Set.Set Position
 getNeighbours grid height ( x, y ) =
     let
         filterFn pos =
-            case grid |> Dict.get pos |> Maybe.withDefault Start of
-                Start ->
-                    False
-
-                End ->
+            case grid |> Dict.get pos of
+                Just End ->
                     (height + 1) >= Char.toCode 'z'
 
-                OnTheWay i ->
+                Just (OnTheWay i) ->
                     (height + 1) >= i
+
+                _ ->
+                    False
     in
-    [ ( x - 1, y ), ( x + 1, y ), ( x, y - 1 ), ( x, y + 2 ) ]
+    [ ( x - 1, y ), ( x + 1, y ), ( x, y - 1 ), ( x, y + 1 ) ]
         |> List.filter filterFn
         |> Set.fromList
 
 
 foundEnd : Grid -> Set.Set Position -> Bool
-foundEnd grid pos =
-    pos
+foundEnd grid positions =
+    positions
         |> Set.toList
         |> List.any
-            (\p ->
-                case grid |> Dict.get p |> Maybe.withDefault Start of
-                    End ->
+            (\pos ->
+                case grid |> Dict.get pos of
+                    Just End ->
                         True
 
                     _ ->
