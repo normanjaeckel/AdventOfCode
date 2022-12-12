@@ -1,17 +1,23 @@
 module Day12 exposing (run)
 
 import Dict
+import Html exposing (p)
 import Parser exposing ((|.), (|=))
 import Set
 
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( solvePuzzle puzzleInput PartA, solvePuzzle puzzleInput PartB )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+type PuzzlePart
+    = PartA
+    | PartB
+
+
+solvePuzzle : String -> PuzzlePart -> String
+solvePuzzle puzzleInput part =
     case puzzleInput |> Parser.run gridParser of
         Ok grid ->
             if grid |> Dict.isEmpty then
@@ -19,7 +25,7 @@ runPartA puzzleInput =
 
             else
                 grid
-                    |> searchShortestPath
+                    |> searchShortestPath part
                     |> String.fromInt
 
         Err _ ->
@@ -88,30 +94,43 @@ heightParser =
 -- Search
 
 
-searchShortestPath : Grid -> Int
-searchShortestPath grid =
+searchShortestPath : PuzzlePart -> Grid -> Int
+searchShortestPath part grid =
     grid
-        |> getStartPosition
-        |> Set.singleton
+        |> getStartPositions part
         |> walk grid Set.empty
 
 
-getStartPosition : Grid -> Position
-getStartPosition grid =
-    grid
-        |> Dict.filter
-            (\_ squ ->
-                case squ of
-                    Start ->
-                        True
+getStartPositions : PuzzlePart -> Grid -> Set.Set Position
+getStartPositions part grid =
+    let
+        filterFn =
+            case part of
+                PartA ->
+                    \_ squ ->
+                        case squ of
+                            Start ->
+                                True
 
-                    _ ->
-                        False
-            )
-        |> Dict.toList
-        |> List.head
-        |> Maybe.withDefault ( ( 0, 0 ), Start )
-        |> Tuple.first
+                            _ ->
+                                False
+
+                PartB ->
+                    \_ squ ->
+                        case squ of
+                            Start ->
+                                True
+
+                            OnTheWay h ->
+                                h == Char.toCode 'a'
+
+                            End ->
+                                False
+    in
+    grid
+        |> Dict.filter filterFn
+        |> Dict.keys
+        |> Set.fromList
 
 
 walk : Grid -> Set.Set Position -> Set.Set Position -> Int

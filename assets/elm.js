@@ -8725,6 +8725,8 @@ var $author$project$Day11$run = function (puzzleInput) {
 			$author$project$Day11$PuzzlePartA(3)),
 		A3($author$project$Day11$runPuzzle, puzzleInput, 10000, $author$project$Day11$PuzzlePartB));
 };
+var $author$project$Day12$PartA = 0;
+var $author$project$Day12$PartB = 1;
 var $elm$parser$Parser$Done = function (a) {
 	return {$: 1, a: a};
 };
@@ -8853,33 +8855,39 @@ var $elm$core$Dict$isEmpty = function (dict) {
 		return false;
 	}
 };
-var $author$project$Day12$getStartPosition = function (grid) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		_Utils_Tuple2(
-			_Utils_Tuple2(0, 0),
-			$author$project$Day12$Start),
-		$elm$core$List$head(
-			$elm$core$Dict$toList(
-				A2(
-					$elm$core$Dict$filter,
-					F2(
-						function (_v0, squ) {
-							if (!squ.$) {
+var $author$project$Day12$getStartPositions = F2(
+	function (part, grid) {
+		var filterFn = function () {
+			if (!part) {
+				return F2(
+					function (_v1, squ) {
+						if (!squ.$) {
+							return true;
+						} else {
+							return false;
+						}
+					});
+			} else {
+				return F2(
+					function (_v3, squ) {
+						switch (squ.$) {
+							case 0:
 								return true;
-							} else {
+							case 2:
+								var h = squ.a;
+								return _Utils_eq(
+									h,
+									$elm$core$Char$toCode('a'));
+							default:
 								return false;
-							}
-						}),
-					grid)))).a;
-};
-var $elm$core$Dict$singleton = F2(
-	function (key, value) {
-		return A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+						}
+					});
+			}
+		}();
+		return $elm$core$Set$fromList(
+			$elm$core$Dict$keys(
+				A2($elm$core$Dict$filter, filterFn, grid)));
 	});
-var $elm$core$Set$singleton = function (key) {
-	return A2($elm$core$Dict$singleton, key, 0);
-};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -9407,28 +9415,29 @@ var $author$project$Day12$walk = F3(
 				A3($author$project$Day12$nextLayer, grid, newVisited, positions)) + 1;
 		}
 	});
-var $author$project$Day12$searchShortestPath = function (grid) {
-	return A3(
-		$author$project$Day12$walk,
-		grid,
-		$elm$core$Set$empty,
-		$elm$core$Set$singleton(
-			$author$project$Day12$getStartPosition(grid)));
-};
-var $author$project$Day12$runPartA = function (puzzleInput) {
-	var _v0 = A2($elm$parser$Parser$run, $author$project$Day12$gridParser, puzzleInput);
-	if (!_v0.$) {
-		var grid = _v0.a;
-		return $elm$core$Dict$isEmpty(grid) ? 'empty grid' : $elm$core$String$fromInt(
-			$author$project$Day12$searchShortestPath(grid));
-	} else {
-		return 'Error';
-	}
-};
+var $author$project$Day12$searchShortestPath = F2(
+	function (part, grid) {
+		return A3(
+			$author$project$Day12$walk,
+			grid,
+			$elm$core$Set$empty,
+			A2($author$project$Day12$getStartPositions, part, grid));
+	});
+var $author$project$Day12$solvePuzzle = F2(
+	function (puzzleInput, part) {
+		var _v0 = A2($elm$parser$Parser$run, $author$project$Day12$gridParser, puzzleInput);
+		if (!_v0.$) {
+			var grid = _v0.a;
+			return $elm$core$Dict$isEmpty(grid) ? 'empty grid' : $elm$core$String$fromInt(
+				A2($author$project$Day12$searchShortestPath, part, grid));
+		} else {
+			return 'Error';
+		}
+	});
 var $author$project$Day12$run = function (puzzleInput) {
 	return _Utils_Tuple2(
-		$author$project$Day12$runPartA(puzzleInput),
-		'No solution');
+		A2($author$project$Day12$solvePuzzle, puzzleInput, 0),
+		A2($author$project$Day12$solvePuzzle, puzzleInput, 1));
 };
 var $author$project$Day13$runPartA = function (puzzleInput) {
 	return puzzleInput;
