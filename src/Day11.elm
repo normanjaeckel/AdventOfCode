@@ -169,13 +169,14 @@ playRounds count puzzlePart monkeys =
 playRound : PuzzlePart -> () -> Monkeys -> Monkeys
 playRound puzzlePart _ monkeys =
     let
-        oskarHelpMeHere =
+        oskarHelpMeHere : Int -> Int
+        oskarHelpMeHere item =
             case puzzlePart of
                 PuzzlePartA i ->
-                    i
+                    item // i
 
                 PuzzlePartB ->
-                    monkeys |> Dict.values |> List.map .testDiv |> List.foldl (\a b -> a * b) 1
+                    item |> modBy (monkeys |> Dict.values |> List.map .testDiv |> List.foldl (\a b -> a * b) 1)
 
         fn1 : MonkeyID -> Monkeys -> Monkeys
         fn1 monkeyId all =
@@ -192,7 +193,7 @@ playRound puzzlePart _ monkeys =
         fn2 monkey item all =
             let
                 newItem =
-                    (item |> processOperation monkey.operation) // oskarHelpMeHere
+                    (item |> processOperation monkey.operation) |> oskarHelpMeHere
             in
             if newItem |> runDivTest monkey.testDiv then
                 newItem |> throwToMonkey monkey.targetIfTrue all
