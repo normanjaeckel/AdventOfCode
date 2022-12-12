@@ -6,17 +6,20 @@ import Parser exposing ((|.), (|=), DeadEnd)
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPuzzle puzzleInput 20 (PuzzlePartA 3), runPuzzle puzzleInput 10000 PuzzlePartB )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+type PuzzlePart
+    = PuzzlePartA Int
+    | PuzzlePartB
+
+
+runPuzzle : String -> Int -> PuzzlePart -> String
+runPuzzle puzzleInput rounds puzzlePart =
     case puzzleInput |> parseInput of
         Ok monkeys ->
             monkeys
-                --|> Debug.log "after 0 rounds"
-                |> playRounds 1
-                |> Debug.log "after 1 rounds"
+                |> playRounds rounds puzzlePart
                 |> productOfInspectionOfMostActiveMonkeys
                 |> String.fromInt
 
@@ -158,16 +161,24 @@ parseOperation =
 -- Playing
 
 
-playRounds : Int -> Monkeys -> Monkeys
-playRounds count monkeys =
-    List.repeat count () |> List.foldl playRound monkeys
+playRounds : Int -> PuzzlePart -> Monkeys -> Monkeys
+playRounds count puzzlePart monkeys =
+    List.repeat count () |> List.foldl (playRound puzzlePart) monkeys
 
 
-playRound : () -> Monkeys -> Monkeys
-playRound _ monkeys =
+playRound : PuzzlePart -> () -> Monkeys -> Monkeys
+playRound puzzlePart _ monkeys =
     let
-        fn : ( MonkeyID, Monkey ) -> Monkeys -> Monkeys
-        fn ( monkeyId, _ ) all =
+        oskarHelpMeHere =
+            case puzzlePart of
+                PuzzlePartA i ->
+                    i
+
+                PuzzlePartB ->
+                    monkeys |> Dict.values |> List.map .testDiv |> List.foldl (\a b -> a * b) 1
+
+        fn1 : MonkeyID -> Monkeys -> Monkeys
+        fn1 monkeyId all =
             let
                 monkey : Monkey
                 monkey =
@@ -181,15 +192,15 @@ playRound _ monkeys =
         fn2 monkey item all =
             let
                 newItem =
-                    (item |> processOperation monkey.operation) // 3
+                    (item |> processOperation monkey.operation) // oskarHelpMeHere
             in
             if newItem |> runDivTest monkey.testDiv then
-                item |> throwToMonkey monkey.targetIfTrue all
+                newItem |> throwToMonkey monkey.targetIfTrue all
 
             else
-                item |> throwToMonkey monkey.targetIfFalse all
+                newItem |> throwToMonkey monkey.targetIfFalse all
     in
-    monkeys |> Dict.toList |> List.foldl fn monkeys
+    monkeys |> Dict.keys |> List.foldl fn1 monkeys
 
 
 processOperation : Operation -> Int -> Int
@@ -233,5 +244,11 @@ throwToMonkey monkeyId monkeys item =
 
 
 productOfInspectionOfMostActiveMonkeys : Monkeys -> Int
-productOfInspectionOfMostActiveMonkeys _ =
-    0
+productOfInspectionOfMostActiveMonkeys monkeys =
+    monkeys
+        |> Dict.values
+        |> List.map .hasInspected
+        |> List.sort
+        |> List.reverse
+        |> List.take 2
+        |> List.foldl (\a b -> a * b) 1
