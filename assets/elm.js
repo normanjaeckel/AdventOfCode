@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.B.am === region.R.am)
+	if (region.C.am === region.R.am)
 	{
-		return 'on line ' + region.B.am;
+		return 'on line ' + region.C.am;
 	}
-	return 'on lines ' + region.B.am + ' through ' + region.R.am;
+	return 'on lines ' + region.C.am + ' through ' + region.R.am;
 }
 
 
@@ -6027,7 +6027,7 @@ var $author$project$Day04$checkPartOne = F2(
 			} else {
 				var f = _v0.a.a;
 				var s = _v0.b.a;
-				return ((_Utils_cmp(f.B, s.B) < 1) && (_Utils_cmp(f.R, s.R) > -1)) ? 1 : (((_Utils_cmp(s.B, f.B) < 1) && (_Utils_cmp(s.R, f.R) > -1)) ? 1 : 0);
+				return ((_Utils_cmp(f.C, s.C) < 1) && (_Utils_cmp(f.R, s.R) > -1)) ? 1 : (((_Utils_cmp(s.C, f.C) < 1) && (_Utils_cmp(s.R, f.R) > -1)) ? 1 : 0);
 			}
 		}
 	});
@@ -6050,7 +6050,7 @@ var $author$project$Day04$checkPartTwo = F2(
 			} else {
 				var f = _v0.a.a;
 				var s = _v0.b.a;
-				return ((_Utils_cmp(f.B, s.B) < 1) && (_Utils_cmp(s.B, f.R) < 1)) ? 1 : (((_Utils_cmp(s.B, f.B) < 1) && (_Utils_cmp(f.B, s.R) < 1)) ? 1 : 0);
+				return ((_Utils_cmp(f.C, s.C) < 1) && (_Utils_cmp(s.C, f.R) < 1)) ? 1 : (((_Utils_cmp(s.C, f.C) < 1) && (_Utils_cmp(f.C, s.R) < 1)) ? 1 : 0);
 			}
 		}
 	});
@@ -6086,7 +6086,7 @@ var $elm$core$List$drop = F2(
 	});
 var $author$project$Day04$IDs = F2(
 	function (start, end) {
-		return {R: end, B: start};
+		return {R: end, C: start};
 	});
 var $author$project$Day04$toIDs = function (s) {
 	return $elm$core$Maybe$Just(
@@ -8362,7 +8362,7 @@ var $elm$parser$Parser$Advanced$sequenceEnd = F5(
 var $elm$parser$Parser$Advanced$sequence = function (i) {
 	return A2(
 		$elm$parser$Parser$Advanced$skip,
-		$elm$parser$Parser$Advanced$token(i.B),
+		$elm$parser$Parser$Advanced$token(i.C),
 		A2(
 			$elm$parser$Parser$Advanced$skip,
 			i.cD,
@@ -8394,12 +8394,12 @@ var $elm$parser$Parser$sequence = function (i) {
 			cf: i.cf,
 			cC: $elm$parser$Parser$toToken(i.cC),
 			cD: i.cD,
-			B: $elm$parser$Parser$toToken(i.B),
+			C: $elm$parser$Parser$toToken(i.C),
 			cI: $elm$parser$Parser$toAdvancedTrailing(i.cI)
 		});
 };
 var $author$project$Day11$parseItemList = $elm$parser$Parser$sequence(
-	{R: '', cf: $elm$parser$Parser$int, cC: ',', cD: $elm$parser$Parser$spaces, B: '', cI: 0});
+	{R: '', cf: $elm$parser$Parser$int, cC: ',', cD: $elm$parser$Parser$spaces, C: '', cI: 0});
 var $author$project$Day11$Addition = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -9439,27 +9439,24 @@ var $author$project$Day12$run = function (puzzleInput) {
 		A2($author$project$Day12$solvePuzzle, puzzleInput, 0),
 		A2($author$project$Day12$solvePuzzle, puzzleInput, 1));
 };
-var $author$project$Day13$Correct = 0;
-var $author$project$Day13$Incorrect = 1;
 var $author$project$Day13$Multi = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$Day13$Single = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Day13$Undecided = 2;
 var $author$project$Day13$inRightOrder = function (pair) {
 	inRightOrder:
 	while (true) {
-		var _v0 = pair.H;
+		var _v0 = pair.D;
 		if (!_v0.b) {
-			return (!$elm$core$List$length(pair.F)) ? 2 : 0;
+			return (!$elm$core$List$length(pair.B)) ? 1 : 0;
 		} else {
 			var l1 = _v0.a;
 			var restLeft = _v0.b;
-			var _v1 = pair.F;
+			var _v1 = pair.B;
 			if (!_v1.b) {
-				return 1;
+				return 2;
 			} else {
 				var r1 = _v1.a;
 				var restRight = _v1.b;
@@ -9472,9 +9469,9 @@ var $author$project$Day13$inRightOrder = function (pair) {
 							return 0;
 						} else {
 							if (_Utils_cmp(a, b) > 0) {
-								return 1;
+								return 2;
 							} else {
-								var $temp$pair = {H: restLeft, F: restRight};
+								var $temp$pair = {D: restLeft, B: restRight};
 								pair = $temp$pair;
 								continue inRightOrder;
 							}
@@ -9482,7 +9479,7 @@ var $author$project$Day13$inRightOrder = function (pair) {
 					} else {
 						var a = _v2.a.a;
 						var $temp$pair = {
-							H: A2(
+							D: A2(
 								$elm$core$List$cons,
 								$author$project$Day13$Multi(
 									_List_fromArray(
@@ -9490,7 +9487,7 @@ var $author$project$Day13$inRightOrder = function (pair) {
 											$author$project$Day13$Single(a)
 										])),
 								restLeft),
-							F: pair.F
+							B: pair.B
 						};
 						pair = $temp$pair;
 						continue inRightOrder;
@@ -9499,8 +9496,8 @@ var $author$project$Day13$inRightOrder = function (pair) {
 					if (!_v2.b.$) {
 						var b = _v2.b.a;
 						var $temp$pair = {
-							H: pair.H,
-							F: A2(
+							D: pair.D,
+							B: A2(
 								$elm$core$List$cons,
 								$author$project$Day13$Multi(
 									_List_fromArray(
@@ -9515,14 +9512,14 @@ var $author$project$Day13$inRightOrder = function (pair) {
 						var a = _v2.a.a;
 						var b = _v2.b.a;
 						var _v3 = $author$project$Day13$inRightOrder(
-							{H: a, F: b});
+							{D: a, B: b});
 						switch (_v3) {
 							case 0:
 								return 0;
-							case 1:
-								return 1;
+							case 2:
+								return 2;
 							default:
-								var $temp$pair = {H: restLeft, F: restRight};
+								var $temp$pair = {D: restLeft, B: restRight};
 								pair = $temp$pair;
 								continue inRightOrder;
 						}
@@ -9562,7 +9559,7 @@ function $author$project$Day13$cyclic$parserListElement() {
 			cf: $author$project$Day13$cyclic$parserElement(),
 			cC: ',',
 			cD: $elm$parser$Parser$spaces,
-			B: '[',
+			C: '[',
 			cI: 0
 		});
 }
@@ -9605,7 +9602,7 @@ var $author$project$Day13$parsePairs = function (s) {
 			$elm$core$Maybe$map2,
 			F2(
 				function (l, r) {
-					return {H: l, F: r};
+					return {D: l, B: r};
 				}),
 			$author$project$Day13$parseList(left),
 			$author$project$Day13$parseList(right));
@@ -9641,10 +9638,64 @@ var $author$project$Day13$runPartA = function (puzzleInput) {
 							$author$project$Day13$parsePairs,
 							A2($elm$core$String$split, '\n\n', puzzleInput)))))));
 };
+var $author$project$Day13$dividerPacketA = '[[2]]';
+var $author$project$Day13$dividerPacketATransformed = _List_fromArray(
+	[
+		$author$project$Day13$Multi(
+		_List_fromArray(
+			[
+				$author$project$Day13$Single(2)
+			]))
+	]);
+var $author$project$Day13$dividerPacketB = '[[6]]';
+var $author$project$Day13$dividerPacketBTransformed = _List_fromArray(
+	[
+		$author$project$Day13$Multi(
+		_List_fromArray(
+			[
+				$author$project$Day13$Single(6)
+			]))
+	]);
+var $elm$core$List$sortWith = _List_sortWith;
+var $author$project$Day13$runPartB = function (puzzleInput) {
+	return $elm$core$String$fromInt(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, res) {
+					var i = _v0.a;
+					var e = _v0.b;
+					return (_Utils_eq(e, $author$project$Day13$dividerPacketATransformed) || _Utils_eq(e, $author$project$Day13$dividerPacketBTransformed)) ? (i * res) : res;
+				}),
+			1,
+			A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (i, p) {
+						return _Utils_Tuple2(i + 1, p);
+					}),
+				A2(
+					$elm$core$List$sortWith,
+					F2(
+						function (a, b) {
+							return $author$project$Day13$inRightOrder(
+								{D: a, B: b});
+						}),
+					A2(
+						$elm$core$List$filterMap,
+						$author$project$Day13$parseList,
+						A2(
+							$elm$core$List$cons,
+							$author$project$Day13$dividerPacketA,
+							A2(
+								$elm$core$List$cons,
+								$author$project$Day13$dividerPacketB,
+								A2($elm$core$String$split, '\n', puzzleInput))))))));
+};
 var $author$project$Day13$run = function (puzzleInput) {
 	return _Utils_Tuple2(
 		$author$project$Day13$runPartA(puzzleInput),
-		'No solution');
+		$author$project$Day13$runPartB(puzzleInput));
 };
 var $author$project$Day14$runPartA = function (puzzleInput) {
 	return puzzleInput;

@@ -5,7 +5,7 @@ import Parser
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -17,7 +17,7 @@ runPartA puzzleInput =
         |> List.filter
             (\( _, p ) ->
                 case inRightOrder p of
-                    Correct ->
+                    LT ->
                         True
 
                     _ ->
@@ -77,35 +77,29 @@ parserElement =
         ]
 
 
-type PacketOrder
-    = Correct
-    | Incorrect
-    | Undecided
-
-
-inRightOrder : Pair -> PacketOrder
+inRightOrder : Pair -> Order
 inRightOrder pair =
     case pair.left of
         [] ->
             if List.length pair.right == 0 then
-                Undecided
+                EQ
 
             else
-                Correct
+                LT
 
         l1 :: restLeft ->
             case pair.right of
                 [] ->
-                    Incorrect
+                    GT
 
                 r1 :: restRight ->
                     case ( l1, r1 ) of
                         ( Single a, Single b ) ->
                             if a < b then
-                                Correct
+                                LT
 
                             else if a > b then
-                                Incorrect
+                                GT
 
                             else
                                 inRightOrder { left = restLeft, right = restRight }
@@ -118,11 +112,53 @@ inRightOrder pair =
 
                         ( Multi a, Multi b ) ->
                             case inRightOrder { left = a, right = b } of
-                                Correct ->
-                                    Correct
+                                LT ->
+                                    LT
 
-                                Incorrect ->
-                                    Incorrect
+                                GT ->
+                                    GT
 
-                                Undecided ->
+                                EQ ->
                                     inRightOrder { left = restLeft, right = restRight }
+
+
+dividerPacketA : String
+dividerPacketA =
+    "[[2]]"
+
+
+dividerPacketATransformed : List Element
+dividerPacketATransformed =
+    [ Multi [ Single 2 ] ]
+
+
+dividerPacketB : String
+dividerPacketB =
+    "[[6]]"
+
+
+dividerPacketBTransformed : List Element
+dividerPacketBTransformed =
+    [ Multi [ Single 6 ] ]
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    dividerPacketA
+        :: (dividerPacketB :: (puzzleInput |> String.split "\n"))
+        |> List.filterMap parseList
+        |> List.sortWith
+            (\a b ->
+                inRightOrder { left = a, right = b }
+            )
+        |> List.indexedMap (\i p -> ( i + 1, p ))
+        |> List.foldl
+            (\( i, e ) res ->
+                if e == dividerPacketATransformed || e == dividerPacketBTransformed then
+                    i * res
+
+                else
+                    res
+            )
+            1
+        |> String.fromInt
