@@ -2721,7 +2721,7 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 	return {
 		N: func(record.N),
 		aW: record.aW,
-		aU: record.aU
+		aT: record.aT
 	}
 });
 
@@ -2993,7 +2993,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aW;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.aU) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aT) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -4543,7 +4543,7 @@ var $author$project$Main$Day = F2(
 	});
 var $author$project$Main$Model = F2(
 	function (puzzleInput, day) {
-		return {aL: day, ay: puzzleInput};
+		return {aK: day, ay: puzzleInput};
 	});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$LT = 0;
@@ -6213,13 +6213,13 @@ var $author$project$Day05$applyStepsOnCratesA = F2(
 						return A2(
 							to,
 							step.a$,
-							A2(from, step.aN, accInner));
+							A2(from, step.aM, accInner));
 					});
 				return A3(
 					$elm$core$List$foldl,
 					fnInner,
 					acc1,
-					A2($elm$core$List$range, 1, step.aP));
+					A2($elm$core$List$range, 1, step.aO));
 			});
 		return $author$project$Day05$extractTop(
 			A3($elm$core$List$foldl, fn, crates, steps));
@@ -6260,7 +6260,7 @@ var $author$project$Day05$applyStepsOnCratesB = F2(
 				return A2(
 					to,
 					step.a$,
-					A3(from, step.aN, step.aP, acc));
+					A3(from, step.aM, step.aO, acc));
 			});
 		return $author$project$Day05$extractTop(
 			A3($elm$core$List$foldl, fn, crates, steps));
@@ -6686,7 +6686,7 @@ var $author$project$Day05$parseCrates = function (input) {
 };
 var $author$project$Day05$Step = F3(
 	function (howMany, from, to) {
-		return {aN: from, aP: howMany, a$: to};
+		return {aM: from, aO: howMany, a$: to};
 	});
 var $elm$parser$Parser$ExpectingInt = {$: 1};
 var $elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
@@ -8486,7 +8486,7 @@ var $author$project$Day11$monkeyParser = A2(
 										function (monkeyId, items, operation, testDiv, targetIfTrue, targetIfFalse) {
 											return _Utils_Tuple2(
 												monkeyId,
-												{ak: 0, U: items, aT: operation, aY: targetIfFalse, aZ: targetIfTrue, aD: testDiv});
+												{ak: 0, U: items, aS: operation, aY: targetIfFalse, aZ: targetIfTrue, aD: testDiv});
 										})),
 								$elm$parser$Parser$token('Monkey')),
 							$elm$parser$Parser$spaces),
@@ -8561,7 +8561,7 @@ var $author$project$Day11$parseInput = function (input) {
 };
 var $author$project$Day11$Monkey = F6(
 	function (items, operation, testDiv, targetIfTrue, targetIfFalse, hasInspected) {
-		return {ak: hasInspected, U: items, aT: operation, aY: targetIfFalse, aZ: targetIfTrue, aD: testDiv};
+		return {ak: hasInspected, U: items, aS: operation, aY: targetIfFalse, aZ: targetIfTrue, aD: testDiv};
 	});
 var $author$project$Day11$fakeMonkey = A6(
 	$author$project$Day11$Monkey,
@@ -8646,7 +8646,7 @@ var $author$project$Day11$playRound = F3(
 		var fn2 = F3(
 			function (monkey, item, all) {
 				var newItem = oskarHelpMeHere(
-					A2($author$project$Day11$processOperation, monkey.aT, item));
+					A2($author$project$Day11$processOperation, monkey.aS, item));
 				return A2($author$project$Day11$runDivTest, monkey.aD, newItem) ? A3($author$project$Day11$throwToMonkey, monkey.aZ, all, newItem) : A3($author$project$Day11$throwToMonkey, monkey.aY, all, newItem);
 			});
 		var fn1 = F2(
@@ -9714,14 +9714,10 @@ var $author$project$Day14$sandUntil = F4(
 				if (!puzzlePart) {
 					return points;
 				} else {
-					return A3(
-						$author$project$Day14$walk,
-						puzzlePart,
-						lowest,
-						A2(
-							$elm$core$Set$insert,
-							_Utils_Tuple2(x, y),
-							points));
+					return A2(
+						$elm$core$Set$insert,
+						_Utils_Tuple2(x, y),
+						points);
 				}
 			} else {
 				if (!A2(
@@ -9772,14 +9768,10 @@ var $author$project$Day14$sandUntil = F4(
 									_Utils_Tuple2(x, y),
 									points);
 							} else {
-								return A3(
-									$author$project$Day14$walk,
-									puzzlePart,
-									lowest,
-									A2(
-										$elm$core$Set$insert,
-										_Utils_Tuple2(x, y),
-										points));
+								return A2(
+									$elm$core$Set$insert,
+									_Utils_Tuple2(x, y),
+									points);
 							}
 						}
 					}
@@ -9789,12 +9781,38 @@ var $author$project$Day14$sandUntil = F4(
 	});
 var $author$project$Day14$walk = F3(
 	function (puzzlePart, lowest, points) {
-		return A4(
-			$author$project$Day14$sandUntil,
-			puzzlePart,
-			lowest,
-			points,
-			_Utils_Tuple2(500, 0));
+		walk:
+		while (true) {
+			var newPoints = A4(
+				$author$project$Day14$sandUntil,
+				puzzlePart,
+				lowest,
+				points,
+				_Utils_Tuple2(500, 0));
+			var condition = function () {
+				if (!puzzlePart) {
+					return _Utils_eq(
+						$elm$core$Set$size(newPoints),
+						$elm$core$Set$size(points));
+				} else {
+					return A2(
+						$elm$core$Set$member,
+						_Utils_Tuple2(500, 0),
+						newPoints);
+				}
+			}();
+			if (condition) {
+				return newPoints;
+			} else {
+				var $temp$puzzlePart = puzzlePart,
+					$temp$lowest = lowest,
+					$temp$points = newPoints;
+				puzzlePart = $temp$puzzlePart;
+				lowest = $temp$lowest;
+				points = $temp$points;
+				continue walk;
+			}
+		}
 	});
 var $author$project$Day14$dropSand = F2(
 	function (puzzlePart, rocks) {
@@ -9806,10 +9824,7 @@ var $author$project$Day14$dropSand = F2(
 					$elm$core$List$sort(
 						A2(
 							$elm$core$List$map,
-							function (_v0) {
-								var y = _v0.b;
-								return y;
-							},
+							$elm$core$Tuple$second,
 							$elm$core$Set$toList(rocks))))));
 		return $elm$core$Set$size(
 			A3($author$project$Day14$walk, puzzlePart, lowestRock, rocks)) - $elm$core$Set$size(rocks);
@@ -9889,9 +9904,9 @@ var $author$project$Day14$toRockPoints = function (rockPaths) {
 	var pointFunc = F2(
 		function (point, acc) {
 			return {
-				aK: $elm$core$Maybe$Just(point),
+				aU: $elm$core$Maybe$Just(point),
 				ao: function () {
-					var _v0 = acc.aK;
+					var _v0 = acc.aU;
 					if (_v0.$ === 1) {
 						return A2($elm$core$Set$insert, point, acc.ao);
 					} else {
@@ -9909,7 +9924,7 @@ var $author$project$Day14$toRockPoints = function (rockPaths) {
 			return A3(
 				$elm$core$List$foldl,
 				pointFunc,
-				{aK: $elm$core$Maybe$Nothing, ao: acc},
+				{aU: $elm$core$Maybe$Nothing, ao: acc},
 				path).ao;
 		});
 	return A3($elm$core$List$foldl, pathFunc, $elm$core$Set$empty, rockPaths);
@@ -9967,7 +9982,7 @@ var $author$project$Main$update = F2(
 			return _Utils_update(
 				model,
 				{
-					aL: A2($author$project$Main$Day, d, fn)
+					aK: A2($author$project$Main$Day, d, fn)
 				});
 		}
 	});
@@ -10078,7 +10093,7 @@ var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	var result = function () {
-		var _v0 = model.aL;
+		var _v0 = model.aK;
 		var i = _v0.a;
 		var fn = _v0.b;
 		return _Utils_Tuple2(

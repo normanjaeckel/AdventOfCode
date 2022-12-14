@@ -70,14 +70,14 @@ toRockPoints rockPaths =
         pathFunc : RockPath -> Set.Set Position -> Set.Set Position
         pathFunc path acc =
             path
-                |> List.foldl pointFunc { res = acc, current = Nothing }
+                |> List.foldl pointFunc { res = acc, previous = Nothing }
                 |> .res
 
-        pointFunc : Position -> { res : Set.Set Position, current : Maybe Position } -> { res : Set.Set Position, current : Maybe Position }
+        pointFunc : Position -> { res : Set.Set Position, previous : Maybe Position } -> { res : Set.Set Position, previous : Maybe Position }
         pointFunc point acc =
-            { current = Just point
+            { previous = Just point
             , res =
-                case acc.current of
+                case acc.previous of
                     Nothing ->
                         acc.res |> Set.insert point
 
@@ -121,7 +121,7 @@ dropSand puzzlePart rocks =
         lowestRock =
             rocks
                 |> Set.toList
-                |> List.map (\( _, y ) -> y)
+                |> List.map Tuple.second
                 |> List.sort
                 |> List.reverse
                 |> List.head
@@ -132,7 +132,23 @@ dropSand puzzlePart rocks =
 
 walk : PuzzlePart -> Int -> Set.Set Position -> Set.Set Position
 walk puzzlePart lowest points =
-    sandUntil puzzlePart lowest points ( 500, 0 )
+    let
+        newPoints =
+            sandUntil puzzlePart lowest points ( 500, 0 )
+
+        condition =
+            case puzzlePart of
+                PuzzlePartA ->
+                    Set.size newPoints == Set.size points
+
+                PuzzlePartB ->
+                    newPoints |> Set.member ( 500, 0 )
+    in
+    if condition then
+        newPoints
+
+    else
+        walk puzzlePart lowest newPoints
 
 
 sandUntil : PuzzlePart -> Int -> Set.Set Position -> Position -> Set.Set Position
@@ -143,7 +159,7 @@ sandUntil puzzlePart lowest points ( x, y ) =
                 points
 
             PuzzlePartB ->
-                points |> Set.insert ( x, y ) |> walk puzzlePart lowest
+                points |> Set.insert ( x, y )
 
     else if points |> Set.member ( x, y + 1 ) |> not then
         sandUntil puzzlePart lowest points ( x, y + 1 )
@@ -158,4 +174,4 @@ sandUntil puzzlePart lowest points ( x, y ) =
         points |> Set.insert ( x, y )
 
     else
-        points |> Set.insert ( x, y ) |> walk puzzlePart lowest
+        points |> Set.insert ( x, y )
