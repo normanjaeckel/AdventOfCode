@@ -9697,27 +9697,42 @@ var $author$project$Day13$run = function (puzzleInput) {
 		$author$project$Day13$runPartA(puzzleInput),
 		$author$project$Day13$runPartB(puzzleInput));
 };
+var $author$project$Day14$PuzzlePartA = 0;
+var $author$project$Day14$PuzzlePartB = 1;
 var $elm$core$Set$member = F2(
 	function (key, _v0) {
 		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $author$project$Day14$sandUntil = F3(
-	function (lowest, points, _v0) {
+var $author$project$Day14$sandUntil = F4(
+	function (puzzlePart, lowest, points, _v0) {
 		sandUntil:
 		while (true) {
 			var x = _v0.a;
 			var y = _v0.b;
 			if (_Utils_cmp(y, lowest) > 0) {
-				return points;
+				if (!puzzlePart) {
+					return points;
+				} else {
+					return A3(
+						$author$project$Day14$walk,
+						puzzlePart,
+						lowest,
+						A2(
+							$elm$core$Set$insert,
+							_Utils_Tuple2(x, y),
+							points));
+				}
 			} else {
 				if (!A2(
 					$elm$core$Set$member,
 					_Utils_Tuple2(x, y + 1),
 					points)) {
-					var $temp$lowest = lowest,
+					var $temp$puzzlePart = puzzlePart,
+						$temp$lowest = lowest,
 						$temp$points = points,
 						$temp$_v0 = _Utils_Tuple2(x, y + 1);
+					puzzlePart = $temp$puzzlePart;
 					lowest = $temp$lowest;
 					points = $temp$points;
 					_v0 = $temp$_v0;
@@ -9727,9 +9742,11 @@ var $author$project$Day14$sandUntil = F3(
 						$elm$core$Set$member,
 						_Utils_Tuple2(x - 1, y + 1),
 						points)) {
-						var $temp$lowest = lowest,
+						var $temp$puzzlePart = puzzlePart,
+							$temp$lowest = lowest,
 							$temp$points = points,
 							$temp$_v0 = _Utils_Tuple2(x - 1, y + 1);
+						puzzlePart = $temp$puzzlePart;
 						lowest = $temp$lowest;
 						points = $temp$points;
 						_v0 = $temp$_v0;
@@ -9739,52 +9756,64 @@ var $author$project$Day14$sandUntil = F3(
 							$elm$core$Set$member,
 							_Utils_Tuple2(x + 1, y + 1),
 							points)) {
-							var $temp$lowest = lowest,
+							var $temp$puzzlePart = puzzlePart,
+								$temp$lowest = lowest,
 								$temp$points = points,
 								$temp$_v0 = _Utils_Tuple2(x + 1, y + 1);
+							puzzlePart = $temp$puzzlePart;
 							lowest = $temp$lowest;
 							points = $temp$points;
 							_v0 = $temp$_v0;
 							continue sandUntil;
 						} else {
-							return A2(
-								$author$project$Day14$walk,
-								lowest,
-								A2(
+							if (!y) {
+								return A2(
 									$elm$core$Set$insert,
 									_Utils_Tuple2(x, y),
-									points));
+									points);
+							} else {
+								return A3(
+									$author$project$Day14$walk,
+									puzzlePart,
+									lowest,
+									A2(
+										$elm$core$Set$insert,
+										_Utils_Tuple2(x, y),
+										points));
+							}
 						}
 					}
 				}
 			}
 		}
 	});
-var $author$project$Day14$walk = F2(
-	function (lowest, points) {
-		return A3(
+var $author$project$Day14$walk = F3(
+	function (puzzlePart, lowest, points) {
+		return A4(
 			$author$project$Day14$sandUntil,
+			puzzlePart,
 			lowest,
 			points,
 			_Utils_Tuple2(500, 0));
 	});
-var $author$project$Day14$dropSand = function (rocks) {
-	var lowestRock = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$head(
-			$elm$core$List$reverse(
-				$elm$core$List$sort(
-					A2(
-						$elm$core$List$map,
-						function (_v0) {
-							var y = _v0.b;
-							return y;
-						},
-						$elm$core$Set$toList(rocks))))));
-	return $elm$core$Set$size(
-		A2($author$project$Day14$walk, lowestRock, rocks)) - $elm$core$Set$size(rocks);
-};
+var $author$project$Day14$dropSand = F2(
+	function (puzzlePart, rocks) {
+		var lowestRock = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$head(
+				$elm$core$List$reverse(
+					$elm$core$List$sort(
+						A2(
+							$elm$core$List$map,
+							function (_v0) {
+								var y = _v0.b;
+								return y;
+							},
+							$elm$core$Set$toList(rocks))))));
+		return $elm$core$Set$size(
+			A3($author$project$Day14$walk, puzzlePart, lowestRock, rocks)) - $elm$core$Set$size(rocks);
+	});
 var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
 var $author$project$Day14$rockPathParser = $elm$parser$Parser$sequence(
 	{
@@ -9885,21 +9914,24 @@ var $author$project$Day14$toRockPoints = function (rockPaths) {
 		});
 	return A3($elm$core$List$foldl, pathFunc, $elm$core$Set$empty, rockPaths);
 };
-var $author$project$Day14$runPartA = function (puzzleInput) {
-	var _v0 = A2($elm$parser$Parser$run, $author$project$Day14$puzzleInputParser, puzzleInput);
-	if (!_v0.$) {
-		var rockPaths = _v0.a;
-		return $elm$core$String$fromInt(
-			$author$project$Day14$dropSand(
-				$author$project$Day14$toRockPoints(rockPaths)));
-	} else {
-		return 'Error';
-	}
-};
+var $author$project$Day14$runPart = F2(
+	function (puzzleInput, puzzlePart) {
+		var _v0 = A2($elm$parser$Parser$run, $author$project$Day14$puzzleInputParser, puzzleInput);
+		if (!_v0.$) {
+			var rockPaths = _v0.a;
+			return $elm$core$String$fromInt(
+				A2(
+					$author$project$Day14$dropSand,
+					puzzlePart,
+					$author$project$Day14$toRockPoints(rockPaths)));
+		} else {
+			return 'Error';
+		}
+	});
 var $author$project$Day14$run = function (puzzleInput) {
 	return _Utils_Tuple2(
-		$author$project$Day14$runPartA(puzzleInput),
-		'No solution');
+		A2($author$project$Day14$runPart, puzzleInput, 0),
+		A2($author$project$Day14$runPart, puzzleInput, 1));
 };
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(

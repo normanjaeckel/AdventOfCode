@@ -6,16 +6,21 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPart puzzleInput PuzzlePartA, runPart puzzleInput PuzzlePartB )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+type PuzzlePart
+    = PuzzlePartA
+    | PuzzlePartB
+
+
+runPart : String -> PuzzlePart -> String
+runPart puzzleInput puzzlePart =
     case puzzleInput |> Parser.run puzzleInputParser of
         Ok rockPaths ->
             rockPaths
                 |> toRockPoints
-                |> dropSand
+                |> dropSand puzzlePart
                 |> String.fromInt
 
         Err _ ->
@@ -109,8 +114,8 @@ rockLine ( x1, y1 ) ( x2, y2 ) =
         |> Set.fromList
 
 
-dropSand : Set.Set Position -> Int
-dropSand rocks =
+dropSand : PuzzlePart -> Set.Set Position -> Int
+dropSand puzzlePart rocks =
     let
         lowestRock : Int
         lowestRock =
@@ -122,27 +127,35 @@ dropSand rocks =
                 |> List.head
                 |> Maybe.withDefault 0
     in
-    Set.size (walk lowestRock rocks) - Set.size rocks
+    Set.size (walk puzzlePart lowestRock rocks) - Set.size rocks
 
 
-walk : Int -> Set.Set Position -> Set.Set Position
-walk lowest points =
-    sandUntil lowest points ( 500, 0 )
+walk : PuzzlePart -> Int -> Set.Set Position -> Set.Set Position
+walk puzzlePart lowest points =
+    sandUntil puzzlePart lowest points ( 500, 0 )
 
 
-sandUntil : Int -> Set.Set Position -> Position -> Set.Set Position
-sandUntil lowest points ( x, y ) =
+sandUntil : PuzzlePart -> Int -> Set.Set Position -> Position -> Set.Set Position
+sandUntil puzzlePart lowest points ( x, y ) =
     if y > lowest then
-        points
+        case puzzlePart of
+            PuzzlePartA ->
+                points
+
+            PuzzlePartB ->
+                points |> Set.insert ( x, y ) |> walk puzzlePart lowest
 
     else if points |> Set.member ( x, y + 1 ) |> not then
-        sandUntil lowest points ( x, y + 1 )
+        sandUntil puzzlePart lowest points ( x, y + 1 )
 
     else if points |> Set.member ( x - 1, y + 1 ) |> not then
-        sandUntil lowest points ( x - 1, y + 1 )
+        sandUntil puzzlePart lowest points ( x - 1, y + 1 )
 
     else if points |> Set.member ( x + 1, y + 1 ) |> not then
-        sandUntil lowest points ( x + 1, y + 1 )
+        sandUntil puzzlePart lowest points ( x + 1, y + 1 )
+
+    else if y == 0 then
+        points |> Set.insert ( x, y )
 
     else
-        points |> Set.insert ( x, y ) |> walk lowest
+        points |> Set.insert ( x, y ) |> walk puzzlePart lowest
