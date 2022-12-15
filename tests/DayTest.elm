@@ -14,6 +14,7 @@ import Day11
 import Day12
 import Day13
 import Day14
+import Day15
 import Expect
 import Test exposing (..)
 
@@ -229,6 +230,19 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "93"
             ]
+
+        -- , describe "day 15"
+        --     [ test "the first part is correct" <|
+        --         \_ ->
+        --             Day15.run inputDay15
+        --                 |> Tuple.first
+        --                 |> Expect.equal "26"
+        --     , test "the second part is correct" <|
+        --         \_ ->
+        --             Day15.run inputDay15
+        --                 |> Tuple.second
+        --                 |> Expect.equal "No solution"
+        --     ]
         ]
 
 
@@ -315,3 +329,8 @@ inputDay13 =
 inputDay14 : String
 inputDay14 =
     "498,4 -> 498,6 -> 496,6\n503,4 -> 502,4 -> 502,9 -> 494,9\n"
+
+
+inputDay15 : String
+inputDay15 =
+    "Sensor at x=2, y=18: closest beacon is at x=-2, y=15\nSensor at x=9, y=16: closest beacon is at x=10, y=16\nSensor at x=13, y=2: closest beacon is at x=15, y=3\nSensor at x=12, y=14: closest beacon is at x=10, y=16\nSensor at x=10, y=20: closest beacon is at x=10, y=16\nSensor at x=14, y=17: closest beacon is at x=10, y=16\nSensor at x=8, y=7: closest beacon is at x=2, y=10\nSensor at x=2, y=0: closest beacon is at x=2, y=10\nSensor at x=0, y=11: closest beacon is at x=2, y=10\nSensor at x=20, y=14: closest beacon is at x=25, y=17\nSensor at x=17, y=20: closest beacon is at x=21, y=22\nSensor at x=16, y=7: closest beacon is at x=15, y=3\nSensor at x=14, y=3: closest beacon is at x=15, y=3\nSensor at x=20, y=1: closest beacon is at x=15, y=3\n"
