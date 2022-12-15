@@ -18,11 +18,19 @@ runPart : String -> PuzzlePart -> String
 runPart puzzleInput puzzlePart =
     case puzzleInput |> Parser.run puzzleInputParser of
         Ok rockPaths ->
-            rockPaths
-                |> toRockPoints
+            let
+                rocks : Set.Set Position
+                rocks =
+                    rockPaths
+                        |> toRockPoints
+            in
+            rocks
                 |> dropSand puzzlePart
+                |> Tuple.first
                 |> String.fromInt
 
+        --|> Tuple.second
+        --|> changeToGrid rocks
         Err _ ->
             "Error"
 
@@ -114,7 +122,7 @@ rockLine ( x1, y1 ) ( x2, y2 ) =
         |> Set.fromList
 
 
-dropSand : PuzzlePart -> Set.Set Position -> Int
+dropSand : PuzzlePart -> Set.Set Position -> ( Int, Set.Set Position )
 dropSand puzzlePart rocks =
     let
         lowestRock : Int
@@ -126,8 +134,12 @@ dropSand puzzlePart rocks =
                 |> List.reverse
                 |> List.head
                 |> Maybe.withDefault 0
+
+        newPoints : Set.Set Position
+        newPoints =
+            walk puzzlePart lowestRock rocks
     in
-    Set.size (walk puzzlePart lowestRock rocks) - Set.size rocks
+    ( Set.size newPoints - Set.size rocks, newPoints )
 
 
 walk : PuzzlePart -> Int -> Set.Set Position -> Set.Set Position
@@ -175,3 +187,42 @@ sandUntil puzzlePart lowest points ( x, y ) =
 
     else
         points |> Set.insert ( x, y )
+
+
+
+-- Draw
+-- changeToGrid : Set.Set Position -> Set.Set Position -> String
+-- changeToGrid rocks points =
+--     let
+--         border : { xMin : Int, xMax : Int, yMin : Int, yMax : Int }
+--         border =
+--             points |> Set.foldl fn { xMin = 0, xMax = 0, yMin = 0, yMax = 0 }
+--         fn ( x, y ) acc =
+--             { xMin = min x acc.xMin
+--             , xMax = max x acc.xMax
+--             , yMin = min y acc.yMin
+--             , yMax = max y acc.yMax
+--             }
+--     in
+--     List.range border.yMin border.yMax
+--         |> List.foldl
+--             (\y acc1 ->
+--                 (List.range border.xMin border.xMax
+--                     |> List.foldl
+--                         (\x acc2 ->
+--                             acc2
+--                                 ++ (if Set.member ( x, y ) rocks then
+--                                         "#"
+--                                     else if Set.member ( x, y ) points then
+--                                         "o"
+--                                     else
+--                                         "."
+--                                    )
+--                         )
+--                         ""
+--                 )
+--                     :: acc1
+--             )
+--             []
+--         |> List.reverse
+--         |> String.join "\n"
