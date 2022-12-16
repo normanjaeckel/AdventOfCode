@@ -6,7 +6,15 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput 2000000, "No solution" )
+    let
+        ( row, cave ) =
+            if puzzleInput |> String.startsWith "Sensor at x=2," then
+                ( 10, 20 )
+
+            else
+                ( 2000000, 4000000 )
+    in
+    ( runPartA puzzleInput row, runPartB puzzleInput cave )
 
 
 runPartA : String -> Int -> String
@@ -77,10 +85,10 @@ type alias Field =
 
 
 toField : Position -> Position -> Field
-toField ( x1, y1 ) ( x2, y2 ) =
-    { sensor = ( x1, y1 )
-    , beacon = ( x2, y2 )
-    , distance = abs (x1 - x2) + abs (y1 - y2)
+toField sensor beacon =
+    { sensor = sensor
+    , beacon = beacon
+    , distance = distanceBetween sensor beacon
     }
 
 
@@ -127,3 +135,123 @@ calcForField row field =
                     |> Set.insert ( xField - x, row )
             )
             Set.empty
+
+
+
+-- Part B
+
+
+runPartB : String -> Int -> String
+runPartB puzzleInput cave =
+    case puzzleInput |> Parser.run puzzleParser of
+        Ok l ->
+            l
+                |> List.map (\( sensor, beacon ) -> toField sensor beacon)
+                |> solvePartB cave
+                |> (\( x, y ) -> x * 4000000 + y)
+                |> String.fromInt
+
+        Err _ ->
+            "Error"
+
+
+solvePartB : Int -> List Field -> Position
+solvePartB cave fields =
+    walk fields cave fields |> Maybe.withDefault ( 0, 0 )
+
+
+walk : List Field -> Int -> List Field -> Maybe Position
+walk allFields cave fields =
+    case fields of
+        field :: rest ->
+            case field |> getBorderPoints |> checkIsOutside allFields cave of
+                Just point ->
+                    Just point
+
+                Nothing ->
+                    walk allFields cave rest
+
+        [] ->
+            Nothing
+
+
+getBorderPoints : Field -> Set.Set Position
+getBorderPoints field =
+    let
+        x =
+            Tuple.first field.sensor
+
+        y =
+            Tuple.second field.sensor
+
+        north =
+            ( x, y - field.distance - 1 )
+
+        south =
+            ( x, y + field.distance + 1 )
+
+        west =
+            ( x - field.distance - 1, y )
+
+        east =
+            ( x + field.distance + 1, y )
+    in
+    getLine RightDown north east
+        |> Set.union (getLine RightUp south east)
+        |> Set.union (getLine RightDown west south)
+        |> Set.union (getLine RightUp west north)
+
+
+type Diagonal
+    = RightDown
+    | RightUp
+
+
+getLine : Diagonal -> Position -> Position -> Set.Set Position
+getLine diagonal ( x1, y1 ) ( x2, y2 ) =
+    let
+        i =
+            abs (x1 - x2)
+    in
+    List.range 0 i
+        |> List.map
+            (\n ->
+                case diagonal of
+                    RightDown ->
+                        ( x1 + n, y1 + n )
+
+                    RightUp ->
+                        ( x1 + n, y1 - n )
+            )
+        |> Set.fromList
+
+
+checkIsOutside : List Field -> Int -> Set.Set Position -> Maybe Position
+checkIsOutside allFields cave points =
+    let
+        fn point result =
+            case result of
+                Just found ->
+                    Just found
+
+                Nothing ->
+                    if
+                        (Tuple.first point < 0)
+                            || (Tuple.first point > cave)
+                            || (Tuple.second point < 0)
+                            || (Tuple.second point > cave)
+                    then
+                        Nothing
+
+                    else if allFields |> List.any (\field -> field.distance >= distanceBetween field.sensor point) then
+                        Nothing
+
+                    else
+                        Just point
+    in
+    points |> Set.foldl fn Nothing
+
+
+distanceBetween : Position -> Position -> Int
+distanceBetween ( x1, y1 ) ( x2, y2 ) =
+    abs (x1 - x2) + abs (y1 - y2)

@@ -230,19 +230,18 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "93"
             ]
-
-        -- , describe "day 15"
-        --     [ test "the first part is correct" <|
-        --         \_ ->
-        --             Day15.run inputDay15
-        --                 |> Tuple.first
-        --                 |> Expect.equal "26"
-        --     , test "the second part is correct" <|
-        --         \_ ->
-        --             Day15.run inputDay15
-        --                 |> Tuple.second
-        --                 |> Expect.equal "No solution"
-        --     ]
+        , describe "day 15"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day15.run inputDay15
+                        |> Tuple.first
+                        |> Expect.equal "26"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day15.run inputDay15
+                        |> Tuple.second
+                        |> Expect.equal "56000011"
+            ]
         ]
 
 
