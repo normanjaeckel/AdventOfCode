@@ -244,16 +244,14 @@ suite =
                         |> Expect.equal "56000011"
             ]
         , describe "day 16"
-            [ test "the first part is correct" <|
+            [ test "both parts are correct" <|
                 \_ ->
                     Day16.run inputDay16
-                        |> Tuple.first
-                        |> Expect.equal "1651"
-            , test "the second part is correct" <|
-                \_ ->
-                    Day16.run inputDay16
-                        |> Tuple.second
-                        |> Expect.equal "1707"
+                        |> Debug.log "test result"
+                        |> Expect.all
+                            [ Tuple.first >> Expect.equal "1651"
+                            , Tuple.second >> Expect.equal "1707"
+                            ]
             ]
         ]
 
@@ -351,8 +349,3 @@ inputDay15 =
 inputDay16 : String
 inputDay16 =
     "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB\nValve BB has flow rate=13; tunnels lead to valves CC, AA\nValve CC has flow rate=2; tunnels lead to valves DD, BB\nValve DD has flow rate=20; tunnels lead to valves CC, AA, EE\nValve EE has flow rate=3; tunnels lead to valves FF, DD\nValve FF has flow rate=0; tunnels lead to valves EE, GG\nValve GG has flow rate=0; tunnels lead to valves FF, HH\nValve HH has flow rate=22; tunnel leads to valve GG\nValve II has flow rate=0; tunnels lead to valves AA, JJ\nValve JJ has flow rate=21; tunnel leads to valve II\n"
-
-
-inputDay16Prod : String
-inputDay16Prod =
-    "Valve RU has flow rate=0; tunnels lead to valves YH, ID\nValve QK has flow rate=24; tunnels lead to valves PQ, PP\nValve RP has flow rate=11; tunnels lead to valves RM, BA, RI, EM\nValve BX has flow rate=0; tunnels lead to valves ZX, VK\nValve JL has flow rate=0; tunnels lead to valves ID, LC\nValve DC has flow rate=25; tunnel leads to valve ST\nValve HX has flow rate=0; tunnels lead to valves DH, FE\nValve KJ has flow rate=0; tunnels lead to valves ZK, XN\nValve EM has flow rate=0; tunnels lead to valves AW, RP\nValve XN has flow rate=7; tunnels lead to valves LH, KJ, KU, AO\nValve DH has flow rate=9; tunnels lead to valves SY, CC, QL, LH, HX\nValve LH has flow rate=0; tunnels lead to valves XN, DH\nValve PP has flow rate=0; tunnels lead to valves QK, TA\nValve AO has flow rate=0; tunnels lead to valves AA, XN\nValve SY has flow rate=0; tunnels lead to valves DH, AA\nValve MZ has flow rate=0; tunnels lead to valves JT, PF\nValve AA has flow rate=0; tunnels lead to valves JN, UN, WG, SY, AO\nValve RM has flow rate=0; tunnels lead to valves XL, RP\nValve BA has flow rate=0; tunnels lead to valves RP, YP\nValve AD has flow rate=12; tunnels lead to valves LK, ZX, AW\nValve ZN has flow rate=0; tunnels lead to valves EQ, HL\nValve EX has flow rate=18; tunnel leads to valve RB\nValve CR has flow rate=0; tunnels lead to valves TA, ST\nValve WG has flow rate=0; tunnels lead to valves AA, TA\nValve UN has flow rate=0; tunnels lead to valves WK, AA\nValve VE has flow rate=0; tunnels lead to valves JA, KW\nValve JA has flow rate=19; tunnels lead to valves PQ, VE\nValve AW has flow rate=0; tunnels lead to valves AD, EM\nValve XL has flow rate=0; tunnels lead to valves RM, PF\nValve OD has flow rate=0; tunnels lead to valves VK, RI\nValve FE has flow rate=0; tunnels lead to valves JT, HX\nValve PQ has flow rate=0; tunnels lead to valves JA, QK\nValve RB has flow rate=0; tunnels lead to valves CC, EX\nValve JT has flow rate=3; tunnels lead to valves RF, MZ, ZK, FE, DD\nValve YP has flow rate=0; tunnels lead to valves ID, BA\nValve ID has flow rate=14; tunnels lead to valves JL, RU, YP\nValve YH has flow rate=0; tunnels lead to valves RU, VK\nValve TA has flow rate=21; tunnels lead to valves WG, KU, PP, RF, CR\nValve LK has flow rate=0; tunnels lead to valves PF, AD\nValve DD has flow rate=0; tunnels lead to valves JN, JT\nValve HL has flow rate=0; tunnels lead to valves ZN, DW\nValve VK has flow rate=22; tunnels lead to valves OD, KW, BX, YH\nValve RF has flow rate=0; tunnels lead to valves JT, TA\nValve CC has flow rate=0; tunnels lead to valves RB, DH\nValve KW has flow rate=0; tunnels lead to valves VE, VK\nValve PF has flow rate=10; tunnels lead to valves WK, MZ, QL, XL, LK\nValve ZX has flow rate=0; tunnels lead to valves AD, BX\nValve JN has flow rate=0; tunnels lead to valves DD, AA\nValve ST has flow rate=0; tunnels lead to valves CR, DC\nValve WK has flow rate=0; tunnels lead to valves PF, UN\nValve DW has flow rate=13; tunnels lead to valves LC, HL\nValve ZK has flow rate=0; tunnels lead to valves KJ, JT\nValve QL has flow rate=0; tunnels lead to valves DH, PF\nValve RI has flow rate=0; tunnels lead to valves OD, RP\nValve EQ has flow rate=23; tunnel leads to valve ZN\nValve LC has flow rate=0; tunnels lead to valves JL, DW\nValve KU has flow rate=0; tunnels lead to valves XN, TA\n"

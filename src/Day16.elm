@@ -1,18 +1,24 @@
 module Day16 exposing (run)
 
 import Dict
-import Html.Attributes exposing (disabled)
 import Parser exposing ((|.), (|=))
 import Set
 
 
+type PuzzlePart
+    = PuzzlePartA
+    | PuzzlePartB
+
+
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPart puzzleInput PuzzlePartA
+    , runPart puzzleInput PuzzlePartB
+    )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+runPart : String -> PuzzlePart -> String
+runPart puzzleInput puzzlePart =
     case puzzleInput |> Parser.run puzzleParser of
         Ok valves ->
             let
@@ -21,7 +27,7 @@ runPartA puzzleInput =
             in
             valves
                 |> Dict.filter (\_ valve -> valve.rate > 0)
-                |> searchBestPath distances
+                |> searchBest distances puzzlePart
                 |> String.fromInt
 
         Err _ ->
@@ -40,11 +46,6 @@ type alias Valve =
 
 type alias Valves =
     Dict.Dict ValveID Valve
-
-
-globalTime : Int
-globalTime =
-    30
 
 
 getRate : ValveID -> Valves -> Int
@@ -187,48 +188,184 @@ calcDistances valves =
     valveIDs |> List.foldl fnForInBetween (startingDistances valves)
 
 
-searchBestPath : Distances -> Valves -> Int
-searchBestPath distances valves =
+globalTime : PuzzlePart -> Int
+globalTime part =
+    case part of
+        PuzzlePartA ->
+            30
+
+        PuzzlePartB ->
+            26
+
+
+globalStartValveID : String
+globalStartValveID =
+    "AA"
+
+
+type alias Presure =
+    Int
+
+
+type alias TeamMember =
+    { valveID : ValveID
+    , time : Int
+    , presure : Presure
+    }
+
+
+type alias Team =
+    { inGame : List TeamMember
+    , out : List TeamMember
+    , bestPresure : Presure
+    }
+
+
+searchBest : Distances -> PuzzlePart -> Valves -> Presure
+searchBest distances puzzlePart valves =
     let
-        unVisited =
+        allRelevantValves : Set.Set ValveID
+        allRelevantValves =
             valves
                 |> Dict.filter (\_ valve -> valve.rate > 0)
                 |> Dict.keys
                 |> Set.fromList
 
+        startingTeam : Team
+        startingTeam =
+            let
+                oneMember =
+                    { valveID = globalStartValveID
+                    , time = globalTime puzzlePart
+                    , presure = 0
+                    }
+            in
+            case puzzlePart of
+                PuzzlePartA ->
+                    { inGame = [ oneMember ], out = [], bestPresure = 0 }
+
+                PuzzlePartB ->
+                    { inGame = [ oneMember, oneMember ], out = [], bestPresure = 0 }
+
         rateOfStart =
-            valves |> getRate "AA"
+            valves |> getRate globalStartValveID
     in
     if rateOfStart == 0 then
-        walk valves distances "AA" unVisited globalTime 0 0
+        walk
+            valves
+            distances
+            startingTeam
+            allRelevantValves
+            |> .bestPresure
 
     else
         0
 
 
-type alias Time =
-    Int
-
-
-walk : Valves -> Distances -> ValveID -> Set.Set ValveID -> Time -> Int -> Int -> Int
-walk valves distances valveID unVisited time bestCase currentPresure =
+walk :
+    Valves
+    -> Distances
+    -> Team
+    -> Set.Set ValveID
+    -> Team
+walk valves distances team unVisited =
     let
-        fn u bestCaseInner =
+        fn : ValveID -> Team -> Team
+        fn u innerTeam =
             let
-                newTime =
-                    time - (distances |> Dict.get ( valveID, u ) |> Maybe.withDefault 0) - 1
+                fn2 : Int -> { team : Team, found : Bool } -> { team : Team, found : Bool }
+                fn2 _ acc =
+                    if acc.found then
+                        acc
 
-                newPresure =
-                    currentPresure + (newTime * (valves |> getRate u))
+                    else
+                        case acc.team.inGame of
+                            [] ->
+                                acc
+
+                            onTurn :: rest ->
+                                case tryToGoTo valves distances onTurn u of
+                                    Nothing ->
+                                        { team =
+                                            { inGame = rest
+                                            , out = onTurn :: acc.team.out
+                                            , bestPresure = acc.team.bestPresure
+                                            }
+                                        , found = False
+                                        }
+
+                                    Just ( newTime, newPresure ) ->
+                                        { team =
+                                            { inGame = rest ++ [ { onTurn | valveID = u, time = newTime, presure = newPresure } ]
+                                            , out = acc.team.out
+                                            , bestPresure = acc.team.bestPresure
+                                            }
+                                        , found = True
+                                        }
+
+                container : { team : Team, found : Bool }
+                container =
+                    List.range 1 (List.length innerTeam.inGame)
+                        |> List.foldl fn2 { team = innerTeam, found = False }
+
+                --|> Debug.log "container"
             in
-            if newTime <= 0 then
-                max bestCaseInner currentPresure
+            if container.found then
+                -- Walk in with new team
+                let
+                    bp : Presure
+                    bp =
+                        walk
+                            valves
+                            distances
+                            container.team
+                            (unVisited |> Set.remove u)
+                            |> .bestPresure
+                in
+                { innerTeam | bestPresure = bp }
 
             else
-                walk valves distances u (unVisited |> Set.remove u) newTime bestCaseInner newPresure
+                -- Take current presure of team and put it into bestPresure of team if it is greater, then return team
+                { innerTeam
+                    | bestPresure =
+                        max
+                            ((innerTeam.inGame ++ innerTeam.out) |> List.map .presure |> List.sum)
+                            innerTeam.bestPresure
+                }
     in
     if Set.isEmpty unVisited then
-        max bestCase currentPresure
+        -- Take current presure of team and put it into bestPresure of team if it is greater, then return team
+        { team
+            | bestPresure =
+                max
+                    ((team.inGame ++ team.out) |> List.map .presure |> List.sum)
+                    team.bestPresure
+        }
 
     else
-        unVisited |> Set.foldl fn bestCase
+        unVisited |> Set.foldl fn team
+
+
+tryToGoTo : Valves -> Distances -> TeamMember -> ValveID -> Maybe ( Int, Presure )
+tryToGoTo valves distances teamMember targetValveID =
+    let
+        newTime =
+            teamMember.time - (distances |> Dict.get ( teamMember.valveID, targetValveID ) |> Maybe.withDefault 0) - 1
+
+        newPresure =
+            teamMember.presure + (newTime * (valves |> getRate targetValveID))
+    in
+    if newTime <= 0 then
+        Nothing
+
+    else
+        Just ( newTime, newPresure )
+
+
+
+--     comparePathAndPresure : Path -> Presure -> Path -> Presure -> ( Path, Presure )
+--     comparePathAndPresure path1 presure1 path2 presure2 =
+--         if presure1 > presure2 then
+--             ( path1, presure1 )
+--         else
+--             ( path2, presure2 )
