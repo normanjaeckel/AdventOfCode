@@ -16,6 +16,7 @@ import Day13
 import Day14
 import Day15
 import Day16
+import Day17
 import Expect
 import Test exposing (..)
 
@@ -243,14 +244,23 @@ suite =
                         |> Tuple.second
                         |> Expect.equal "56000011"
             ]
-        , describe "day 16"
+
+        -- , describe "day 16"
+        --     [ test "both parts are correct" <|
+        --         \_ ->
+        --             Day16.run inputDay16
+        --                 |> Expect.all
+        --                     [ Tuple.first >> Expect.equal "1651"
+        --                     , Tuple.second >> Expect.equal "1707"
+        --                     ]
+        --    ]
+        , describe "day 17"
             [ test "both parts are correct" <|
                 \_ ->
-                    Day16.run inputDay16
-                        |> Debug.log "test result"
+                    Day17.run inputDay17
                         |> Expect.all
-                            [ Tuple.first >> Expect.equal "1651"
-                            , Tuple.second >> Expect.equal "1707"
+                            [ Tuple.first >> Expect.equal "3068"
+                            , Tuple.second >> Expect.equal "No solution"
                             ]
             ]
         ]
@@ -349,3 +359,8 @@ inputDay15 =
 inputDay16 : String
 inputDay16 =
     "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB\nValve BB has flow rate=13; tunnels lead to valves CC, AA\nValve CC has flow rate=2; tunnels lead to valves DD, BB\nValve DD has flow rate=20; tunnels lead to valves CC, AA, EE\nValve EE has flow rate=3; tunnels lead to valves FF, DD\nValve FF has flow rate=0; tunnels lead to valves EE, GG\nValve GG has flow rate=0; tunnels lead to valves FF, HH\nValve HH has flow rate=22; tunnel leads to valve GG\nValve II has flow rate=0; tunnels lead to valves AA, JJ\nValve JJ has flow rate=21; tunnel leads to valve II\n"
+
+
+inputDay17 : String
+inputDay17 =
+    ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>\n"
