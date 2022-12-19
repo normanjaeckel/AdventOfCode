@@ -23,239 +23,239 @@ import Test exposing (..)
 
 suite : Test
 suite =
-    skip <|
-        describe "Puzzle for"
-            [ describe "day 01"
-                [ test "the first part is correct" <|
+    describe "Puzzle for"
+        [ describe "day 01"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day01.run inputDay01
+                        |> Tuple.first
+                        |> Expect.equal "24000"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day01.run inputDay01
+                        |> Tuple.second
+                        |> Expect.equal "45000"
+            ]
+        , describe "day 02"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day02.run inputDay02
+                        |> Tuple.first
+                        |> Expect.equal "15"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day02.run inputDay02
+                        |> Tuple.second
+                        |> Expect.equal "12"
+            ]
+        , describe "day 03"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day03.run inputDay03
+                        |> Tuple.first
+                        |> Expect.equal "157"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day03.run inputDay03
+                        |> Tuple.second
+                        |> Expect.equal "70"
+            ]
+        , describe "day 04"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day04.run inputDay04
+                        |> Tuple.first
+                        |> Expect.equal "2"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day04.run inputDay04
+                        |> Tuple.second
+                        |> Expect.equal "4"
+            ]
+        , describe "day 05"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day05.run inputDay05
+                        |> Tuple.first
+                        |> Expect.equal "CMZ"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day05.run inputDay05
+                        |> Tuple.second
+                        |> Expect.equal "MCD"
+            ]
+        , describe "day 06"
+            [ test "the first part is correct A" <|
+                \_ ->
+                    Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
+                        |> Tuple.first
+                        |> Expect.equal "5"
+            , test "the first part is correct B" <|
+                \_ ->
+                    Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
+                        |> Tuple.first
+                        |> Expect.equal "6"
+            , test "the first part is correct C" <|
+                \_ ->
+                    Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
+                        |> Tuple.first
+                        |> Expect.equal "10"
+            , test "the first part is correct D" <|
+                \_ ->
+                    Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
+                        |> Tuple.first
+                        |> Expect.equal "11"
+            , test "the second part is correct A" <|
+                \_ ->
+                    Day06.run "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
+                        |> Tuple.second
+                        |> Expect.equal "19"
+            , test "the second part is correct B" <|
+                \_ ->
+                    Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
+                        |> Tuple.second
+                        |> Expect.equal "23"
+            , test "the second part is correct C" <|
+                \_ ->
+                    Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
+                        |> Tuple.second
+                        |> Expect.equal "23"
+            , test "the second part is correct D" <|
+                \_ ->
+                    Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
+                        |> Tuple.second
+                        |> Expect.equal "29"
+            , test "the second part is correct E" <|
+                \_ ->
+                    Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
+                        |> Tuple.second
+                        |> Expect.equal "26"
+            ]
+        , describe "day 07"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day07.run inputDay07
+                        |> Tuple.first
+                        |> Expect.equal "95437"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day07.run inputDay07
+                        |> Tuple.second
+                        |> Expect.equal "24933642"
+            ]
+        , describe "day 08"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day08.run inputDay08
+                        |> Tuple.first
+                        |> Expect.equal "21"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day08.run inputDay08
+                        |> Tuple.second
+                        |> Expect.equal "8"
+            ]
+        , describe "day 09"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day09.run inputDay09a
+                        |> Tuple.first
+                        |> Expect.equal "13"
+            , test "the second part is correct a" <|
+                \_ ->
+                    Day09.run inputDay09a
+                        |> Tuple.second
+                        |> Expect.equal "1"
+            , test "the second part is correct b" <|
+                \_ ->
+                    Day09.run inputDay09b
+                        |> Tuple.second
+                        |> Expect.equal "36"
+            ]
+        , describe "day 10"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day10.run inputDay10
+                        |> Tuple.first
+                        |> Expect.equal "13140"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day10.run inputDay10
+                        |> Tuple.second
+                        |> Expect.equal "##..##..##..##..##..##..##..##..##..##..\n###...###...###...###...###...###...###.\n####....####....####....####....####....\n#####.....#####.....#####.....#####.....\n######......######......######......####\n#######.......#######.......#######....."
+            ]
+        , describe "day 11"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day11.run inputDay11
+                        |> Tuple.first
+                        |> Expect.equal "10605"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day11.run inputDay11
+                        |> Tuple.second
+                        |> Expect.equal "2713310158"
+            ]
+        , describe "day 12"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day12.run inputDay12
+                        |> Tuple.first
+                        |> Expect.equal "31"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day12.run inputDay12
+                        |> Tuple.second
+                        |> Expect.equal "29"
+            ]
+        , describe "day 13"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day13.run inputDay13
+                        |> Tuple.first
+                        |> Expect.equal "13"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day13.run inputDay13
+                        |> Tuple.second
+                        |> Expect.equal "140"
+            ]
+        , describe "day 14"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day14.run inputDay14
+                        |> Tuple.first
+                        |> Expect.equal "24"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day14.run inputDay14
+                        |> Tuple.second
+                        |> Expect.equal "93"
+            ]
+        , describe "day 15"
+            [ test "the first part is correct" <|
+                \_ ->
+                    Day15.run inputDay15
+                        |> Tuple.first
+                        |> Expect.equal "26"
+            , test "the second part is correct" <|
+                \_ ->
+                    Day15.run inputDay15
+                        |> Tuple.second
+                        |> Expect.equal "56000011"
+            ]
+        , skip <|
+            describe "day 16"
+                [ test "both parts are correct" <|
                     \_ ->
-                        Day01.run inputDay01
-                            |> Tuple.first
-                            |> Expect.equal "24000"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day01.run inputDay01
-                            |> Tuple.second
-                            |> Expect.equal "45000"
+                        Day16.run inputDay16
+                            |> Expect.all
+                                [ Tuple.first >> Expect.equal "1651"
+                                , Tuple.second >> Expect.equal "1707"
+                                ]
                 ]
-            , describe "day 02"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day02.run inputDay02
-                            |> Tuple.first
-                            |> Expect.equal "15"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day02.run inputDay02
-                            |> Tuple.second
-                            |> Expect.equal "12"
-                ]
-            , describe "day 03"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day03.run inputDay03
-                            |> Tuple.first
-                            |> Expect.equal "157"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day03.run inputDay03
-                            |> Tuple.second
-                            |> Expect.equal "70"
-                ]
-            , describe "day 04"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day04.run inputDay04
-                            |> Tuple.first
-                            |> Expect.equal "2"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day04.run inputDay04
-                            |> Tuple.second
-                            |> Expect.equal "4"
-                ]
-            , describe "day 05"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day05.run inputDay05
-                            |> Tuple.first
-                            |> Expect.equal "CMZ"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day05.run inputDay05
-                            |> Tuple.second
-                            |> Expect.equal "MCD"
-                ]
-            , describe "day 06"
-                [ test "the first part is correct A" <|
-                    \_ ->
-                        Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
-                            |> Tuple.first
-                            |> Expect.equal "5"
-                , test "the first part is correct B" <|
-                    \_ ->
-                        Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
-                            |> Tuple.first
-                            |> Expect.equal "6"
-                , test "the first part is correct C" <|
-                    \_ ->
-                        Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
-                            |> Tuple.first
-                            |> Expect.equal "10"
-                , test "the first part is correct D" <|
-                    \_ ->
-                        Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
-                            |> Tuple.first
-                            |> Expect.equal "11"
-                , test "the second part is correct A" <|
-                    \_ ->
-                        Day06.run "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
-                            |> Tuple.second
-                            |> Expect.equal "19"
-                , test "the second part is correct B" <|
-                    \_ ->
-                        Day06.run "bvwbjplbgvbhsrlpgdmjqwftvncz"
-                            |> Tuple.second
-                            |> Expect.equal "23"
-                , test "the second part is correct C" <|
-                    \_ ->
-                        Day06.run "nppdvjthqldpwncqszvftbrmjlhg"
-                            |> Tuple.second
-                            |> Expect.equal "23"
-                , test "the second part is correct D" <|
-                    \_ ->
-                        Day06.run "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"
-                            |> Tuple.second
-                            |> Expect.equal "29"
-                , test "the second part is correct E" <|
-                    \_ ->
-                        Day06.run "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"
-                            |> Tuple.second
-                            |> Expect.equal "26"
-                ]
-            , describe "day 07"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day07.run inputDay07
-                            |> Tuple.first
-                            |> Expect.equal "95437"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day07.run inputDay07
-                            |> Tuple.second
-                            |> Expect.equal "24933642"
-                ]
-            , describe "day 08"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day08.run inputDay08
-                            |> Tuple.first
-                            |> Expect.equal "21"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day08.run inputDay08
-                            |> Tuple.second
-                            |> Expect.equal "8"
-                ]
-            , describe "day 09"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day09.run inputDay09a
-                            |> Tuple.first
-                            |> Expect.equal "13"
-                , test "the second part is correct a" <|
-                    \_ ->
-                        Day09.run inputDay09a
-                            |> Tuple.second
-                            |> Expect.equal "1"
-                , test "the second part is correct b" <|
-                    \_ ->
-                        Day09.run inputDay09b
-                            |> Tuple.second
-                            |> Expect.equal "36"
-                ]
-            , describe "day 10"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day10.run inputDay10
-                            |> Tuple.first
-                            |> Expect.equal "13140"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day10.run inputDay10
-                            |> Tuple.second
-                            |> Expect.equal "##..##..##..##..##..##..##..##..##..##..\n###...###...###...###...###...###...###.\n####....####....####....####....####....\n#####.....#####.....#####.....#####.....\n######......######......######......####\n#######.......#######.......#######....."
-                ]
-            , describe "day 11"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day11.run inputDay11
-                            |> Tuple.first
-                            |> Expect.equal "10605"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day11.run inputDay11
-                            |> Tuple.second
-                            |> Expect.equal "2713310158"
-                ]
-            , describe "day 12"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day12.run inputDay12
-                            |> Tuple.first
-                            |> Expect.equal "31"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day12.run inputDay12
-                            |> Tuple.second
-                            |> Expect.equal "29"
-                ]
-            , describe "day 13"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day13.run inputDay13
-                            |> Tuple.first
-                            |> Expect.equal "13"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day13.run inputDay13
-                            |> Tuple.second
-                            |> Expect.equal "140"
-                ]
-            , describe "day 14"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day14.run inputDay14
-                            |> Tuple.first
-                            |> Expect.equal "24"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day14.run inputDay14
-                            |> Tuple.second
-                            |> Expect.equal "93"
-                ]
-            , describe "day 15"
-                [ test "the first part is correct" <|
-                    \_ ->
-                        Day15.run inputDay15
-                            |> Tuple.first
-                            |> Expect.equal "26"
-                , test "the second part is correct" <|
-                    \_ ->
-                        Day15.run inputDay15
-                            |> Tuple.second
-                            |> Expect.equal "56000011"
-                ]
-            , skip <|
-                describe "day 16"
-                    [ test "both parts are correct" <|
-                        \_ ->
-                            Day16.run inputDay16
-                                |> Expect.all
-                                    [ Tuple.first >> Expect.equal "1651"
-                                    , Tuple.second >> Expect.equal "1707"
-                                    ]
-                    ]
-            , describe "day 17"
+        , skip <|
+            describe "day 17"
                 [ test "both parts are correct" <|
                     \_ ->
                         Day17.run inputDay17
@@ -264,7 +264,7 @@ suite =
                                 , Tuple.second >> Expect.equal "1514285714288"
                                 ]
                 ]
-            ]
+        ]
 
 
 
