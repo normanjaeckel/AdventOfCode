@@ -6,7 +6,7 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -15,6 +15,18 @@ runPartA puzzleInput =
         Ok cubes ->
             cubes
                 |> getSurface
+                |> String.fromInt
+
+        Err _ ->
+            "Error"
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    case puzzleInput |> Parser.run puzzleParser of
+        Ok cubes ->
+            cubes
+                |> getOuterSurface
                 |> String.fromInt
 
         Err _ ->
@@ -51,35 +63,12 @@ cubeParser =
         |= Parser.int
 
 
-
--- type alias MinMax =
---     { xMin : Int, xMax : Int, yMin : Int, yMax : Int, zMin : Int, zMax : Int }
--- getMinMax : List Cube -> MinMax
--- getMinMax cubes =
---     let
---         fn : Cube -> MinMax -> MinMax
---         fn (Cube x y z) result =
---             { xMin = min x result.xMin
---             , xMax = max x result.xMax
---             , yMin = min y result.yMin
---             , yMax = max y result.yMax
---             , zMin = min z result.zMin
---             , zMax = max z result.zMax
---             }
---     in
---     cubes
---         |> List.foldl
---             fn
---             { xMin = 1000, xMax = 0, yMin = 1000, yMax = 0, zMin = 1000, zMax = 0 }
-
-
-type State
-    = Empty
-    | Lava
-
-
 type alias Space =
     Set.Set String
+
+
+
+-- Part A
 
 
 getSurface : List Cube -> Int
@@ -133,3 +122,128 @@ neighbours space (Cube x y z) =
     [ x1, x2, y1, y2, z1, z2 ]
         |> List.filter (\n -> space |> Set.member (toString n))
         |> List.length
+
+
+
+-- Part B
+
+
+type alias MinMax =
+    { xMin : Int, xMax : Int, yMin : Int, yMax : Int, zMin : Int, zMax : Int }
+
+
+getMinMax : List Cube -> MinMax
+getMinMax cubes =
+    let
+        fn : Cube -> MinMax -> MinMax
+        fn (Cube x y z) result =
+            { xMin = min x result.xMin
+            , xMax = max x result.xMax
+            , yMin = min y result.yMin
+            , yMax = max y result.yMax
+            , zMin = min z result.zMin
+            , zMax = max z result.zMax
+            }
+
+        m : MinMax
+        m =
+            cubes
+                |> List.foldl
+                    fn
+                    { xMin = 100000, xMax = 0, yMin = 100000, yMax = 0, zMin = 100000, zMax = 0 }
+    in
+    { xMin = m.xMin - 1
+    , xMax = m.xMax + 1
+    , yMin = m.yMin - 1
+    , yMax = m.yMax + 1
+    , zMin = m.zMin - 1
+    , zMax = m.zMax + 1
+    }
+
+
+getOuterSurface : List Cube -> Int
+getOuterSurface cubes =
+    let
+        m : MinMax
+        m =
+            getMinMax cubes
+
+        cubeSet : Set.Set String
+        cubeSet =
+            cubes |> List.map toString |> Set.fromList
+
+        firstWater : Cube
+        firstWater =
+            Cube m.xMin m.yMin m.zMin
+    in
+    if cubeSet |> Set.member (firstWater |> toString) then
+        -1
+
+    else
+        walk cubeSet m { water = firstWater |> toString |> Set.singleton, newWater = [ firstWater ], surface = 0 }
+            |> .surface
+
+
+type alias Accumulator =
+    { water : Set.Set String
+    , newWater : List Cube
+    , surface : Int
+    }
+
+
+walk : Set.Set String -> MinMax -> Accumulator -> Accumulator
+walk cubes m acc =
+    let
+        fn1 : Cube -> ( List Cube, Int ) -> ( List Cube, Int )
+        fn1 cube ( n, s ) =
+            cube
+                |> adjacent
+                |> List.filter (not << outOf)
+                |> List.filter (\c -> List.member c n |> not)
+                |> List.filter (\c -> acc.water |> Set.member (c |> toString) |> not)
+                |> List.foldl fn2 ( n, s )
+
+        fn2 : Cube -> ( List Cube, Int ) -> ( List Cube, Int )
+        fn2 cube ( n, s ) =
+            if cubes |> Set.member (cube |> toString) then
+                ( n, s + 1 )
+
+            else
+                ( cube :: n, s )
+
+        ( possibleNext, newSurface ) =
+            acc.newWater |> List.foldl fn1 ( [], 0 )
+
+        outOf : Cube -> Bool
+        outOf (Cube x y z) =
+            (x < m.xMin)
+                || (y < m.yMin)
+                || (z < m.zMin)
+                || (x > m.xMax)
+                || (y > m.yMax)
+                || (z > m.zMax)
+
+        newAcc : Accumulator
+        newAcc =
+            { acc
+                | water = acc.water |> Set.union (possibleNext |> List.map toString |> Set.fromList)
+                , newWater = possibleNext
+                , surface = acc.surface + newSurface
+            }
+    in
+    if List.length newAcc.newWater == 0 then
+        newAcc
+
+    else
+        walk cubes m newAcc
+
+
+adjacent : Cube -> List Cube
+adjacent (Cube x y z) =
+    [ Cube (x - 1) y z
+    , Cube (x + 1) y z
+    , Cube x (y - 1) z
+    , Cube x (y + 1) z
+    , Cube x y (z - 1)
+    , Cube x y (z + 1)
+    ]
