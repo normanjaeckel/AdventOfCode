@@ -10793,21 +10793,17 @@ var $author$project$Day17$rockInCave = F3(
 	function (allJets, i, acc) {
 		var nextRock = $author$project$Day17$rockType(
 			A2($elm$core$Basics$modBy, 5, i));
-		var height = function (cave) {
-			return A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				$elm$core$List$maximum(
-					A2(
-						$elm$core$List$map,
-						$elm$core$Tuple$second,
-						$elm$core$Set$toList(cave))));
-		};
-		var rockPos = A2(
-			$author$project$Day17$newRock,
-			nextRock,
-			height(acc.af) + 4);
-		return A4($author$project$Day17$rockFalls, allJets, acc.aH, rockPos, acc.af);
+		var newCave = acc.af;
+		var height = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$maximum(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Tuple$second,
+					$elm$core$Set$toList(acc.af))));
+		var rockPos = A2($author$project$Day17$newRock, nextRock, height + 4);
+		return A4($author$project$Day17$rockFalls, allJets, acc.aH, rockPos, newCave);
 	});
 var $elm$core$String$trim = _String_trim;
 var $author$project$Day17$runPartA = function (puzzleInput) {
@@ -10844,6 +10840,129 @@ var $author$project$Day17$run = function (puzzleInput) {
 		$author$project$Day17$runPartA(puzzleInput),
 		'No solution');
 };
+var $author$project$Day18$Cube = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $author$project$Day18$toString = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	var z = _v0.c;
+	return A2(
+		$elm$core$String$join,
+		',',
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$fromInt,
+			_List_fromArray(
+				[x, y, z])));
+};
+var $author$project$Day18$neighbours = F2(
+	function (space, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var z = _v0.c;
+		var z2 = A3($author$project$Day18$Cube, x, y, z + 1);
+		var z1 = A3($author$project$Day18$Cube, x, y, z - 1);
+		var y2 = A3($author$project$Day18$Cube, x, y + 1, z);
+		var y1 = A3($author$project$Day18$Cube, x, y - 1, z);
+		var x2 = A3($author$project$Day18$Cube, x + 1, y, z);
+		var x1 = A3($author$project$Day18$Cube, x - 1, y, z);
+		return $elm$core$List$length(
+			A2(
+				$elm$core$List$filter,
+				function (n) {
+					return A2(
+						$elm$core$Set$member,
+						$author$project$Day18$toString(n),
+						space);
+				},
+				_List_fromArray(
+					[x1, x2, y1, y2, z1, z2])));
+	});
+var $author$project$Day18$foldFn = F2(
+	function (cube, _v0) {
+		var space = _v0.a;
+		var surface = _v0.b;
+		var newSurface = (surface + 6) - (2 * A2($author$project$Day18$neighbours, space, cube));
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Set$insert,
+				$author$project$Day18$toString(cube),
+				space),
+			newSurface);
+	});
+var $author$project$Day18$getSurface = function (cubes) {
+	return A3(
+		$elm$core$List$foldl,
+		$author$project$Day18$foldFn,
+		_Utils_Tuple2($elm$core$Set$empty, 0),
+		cubes).b;
+};
+var $author$project$Day18$cubeParser = A2(
+	$elm$parser$Parser$keeper,
+	A2(
+		$elm$parser$Parser$keeper,
+		A2(
+			$elm$parser$Parser$keeper,
+			$elm$parser$Parser$succeed(
+				F3(
+					function (x, y, z) {
+						return A3($author$project$Day18$Cube, x, y, z);
+					})),
+			A2(
+				$elm$parser$Parser$ignorer,
+				$elm$parser$Parser$int,
+				$elm$parser$Parser$symbol(','))),
+		A2(
+			$elm$parser$Parser$ignorer,
+			$elm$parser$Parser$int,
+			$elm$parser$Parser$symbol(','))),
+	$elm$parser$Parser$int);
+var $author$project$Day18$puzzleParser = A2(
+	$elm$parser$Parser$loop,
+	_List_Nil,
+	function (all) {
+		return $elm$parser$Parser$oneOf(
+			_List_fromArray(
+				[
+					A2(
+					$elm$parser$Parser$keeper,
+					$elm$parser$Parser$succeed(
+						function (cube) {
+							return $elm$parser$Parser$Loop(
+								A2($elm$core$List$cons, cube, all));
+						}),
+					A2(
+						$elm$parser$Parser$ignorer,
+						$author$project$Day18$cubeParser,
+						$elm$parser$Parser$symbol('\n'))),
+					A2(
+					$elm$parser$Parser$map,
+					$elm$core$Basics$always(
+						$elm$parser$Parser$Done(
+							$elm$core$List$reverse(all))),
+					A2(
+						$elm$parser$Parser$ignorer,
+						$elm$parser$Parser$succeed(0),
+						$elm$parser$Parser$end))
+				]));
+	});
+var $author$project$Day18$runPartA = function (puzzleInput) {
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day18$puzzleParser, puzzleInput);
+	if (!_v0.$) {
+		var cubes = _v0.a;
+		return $elm$core$String$fromInt(
+			$author$project$Day18$getSurface(cubes));
+	} else {
+		return 'Error';
+	}
+};
+var $author$project$Day18$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day18$runPartA(puzzleInput),
+		'No solution');
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -10863,7 +10982,8 @@ var $author$project$Main$allDays = $elm$core$Dict$fromList(
 			_Utils_Tuple2(14, $author$project$Day14$run),
 			_Utils_Tuple2(15, $author$project$Day15$run),
 			_Utils_Tuple2(16, $author$project$Day16$run),
-			_Utils_Tuple2(17, $author$project$Day17$run)
+			_Utils_Tuple2(17, $author$project$Day17$run),
+			_Utils_Tuple2(18, $author$project$Day18$run)
 		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {

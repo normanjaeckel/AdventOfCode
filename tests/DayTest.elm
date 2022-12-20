@@ -17,6 +17,7 @@ import Day14
 import Day15
 import Day16
 import Day17
+import Day18
 import Expect
 import Test exposing (..)
 
@@ -264,6 +265,15 @@ suite =
                                 , Tuple.second >> Expect.equal "1514285714288"
                                 ]
                 ]
+        , describe "day 18"
+            [ test "both parts are correct" <|
+                \_ ->
+                    Day18.run inputDay18
+                        |> Expect.all
+                            [ Tuple.first >> Expect.equal "64"
+                            , Tuple.second >> Expect.equal "No solution"
+                            ]
+            ]
         ]
 
 
@@ -365,3 +375,8 @@ inputDay16 =
 inputDay17 : String
 inputDay17 =
     ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>\n"
+
+
+inputDay18 : String
+inputDay18 =
+    "2,2,2\n1,2,2\n3,2,2\n2,1,2\n2,3,2\n2,2,1\n2,2,3\n2,2,4\n2,2,6\n1,2,5\n3,2,5\n2,1,5\n2,3,5\n"
