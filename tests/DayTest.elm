@@ -18,6 +18,7 @@ import Day15
 import Day16
 import Day17
 import Day18
+import Day19
 import Expect
 import Test exposing (..)
 
@@ -274,6 +275,15 @@ suite =
                             , Tuple.second >> Expect.equal "58"
                             ]
             ]
+        , describe "day 19"
+            [ test "both parts are correct" <|
+                \_ ->
+                    Day19.run inputDay19
+                        |> Expect.all
+                            [ Tuple.first >> Expect.equal "33"
+                            , Tuple.second >> Expect.equal "No solution"
+                            ]
+            ]
         ]
 
 
@@ -380,3 +390,8 @@ inputDay17 =
 inputDay18 : String
 inputDay18 =
     "2,2,2\n1,2,2\n3,2,2\n2,1,2\n2,3,2\n2,2,1\n2,2,3\n2,2,4\n2,2,6\n1,2,5\n3,2,5\n2,1,5\n2,3,5\n"
+
+
+inputDay19 : String
+inputDay19 =
+    "Blueprint 1:\n  Each ore robot costs 4 ore.\n  Each clay robot costs 2 ore.\n  Each obsidian robot costs 3 ore and 14 clay.\n  Each geode robot costs 2 ore and 7 obsidian.\n\nBlueprint 2:\n  Each ore robot costs 2 ore.\n  Each clay robot costs 3 ore.\n  Each obsidian robot costs 3 ore and 8 clay.\n  Each geode robot costs 3 ore and 12 obsidian.\n"
