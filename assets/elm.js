@@ -11280,7 +11280,6 @@ var $author$project$Day19$puzzleParser = A2(
 	});
 var $author$project$Day19$startingResources = {y: 0, B: 0, C: 0, i: 0};
 var $author$project$Day19$startingRobots = {y: 0, B: 0, C: 0, i: 1};
-var $author$project$Day19$startingTime = 24;
 var $author$project$Day19$addOne = F2(
 	function (robot, robots) {
 		switch (robot) {
@@ -11449,9 +11448,38 @@ var $author$project$Day19$runPartA = function (puzzleInput) {
 					$elm$core$Dict$map,
 					F2(
 						function (_v1, bp) {
-							return A6($author$project$Day19$walk, bp, 0, $author$project$Day19$startingTime, $author$project$Day19$startingRobots, _List_Nil, $author$project$Day19$startingResources);
+							return A6($author$project$Day19$walk, bp, 0, 24, $author$project$Day19$startingRobots, _List_Nil, $author$project$Day19$startingResources);
 						}),
 					blueprints)));
+	} else {
+		return 'Error';
+	}
+};
+var $author$project$Day19$runPartB = function (puzzleInput) {
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day19$puzzleParser, puzzleInput);
+	if (!_v0.$) {
+		var blueprints = _v0.a;
+		return $elm$core$String$fromInt(
+			A3(
+				$elm$core$Dict$foldl,
+				F3(
+					function (k, v, totalQualityLevel) {
+						return v * totalQualityLevel;
+					}),
+				1,
+				A2(
+					$elm$core$Dict$map,
+					F2(
+						function (_v2, bp) {
+							return A6($author$project$Day19$walk, bp, 0, 32, $author$project$Day19$startingRobots, _List_Nil, $author$project$Day19$startingResources);
+						}),
+					A2(
+						$elm$core$Dict$filter,
+						F2(
+							function (k, _v1) {
+								return k <= 3;
+							}),
+						blueprints))));
 	} else {
 		return 'Error';
 	}
@@ -11459,7 +11487,7 @@ var $author$project$Day19$runPartA = function (puzzleInput) {
 var $author$project$Day19$run = function (puzzleInput) {
 	return _Utils_Tuple2(
 		$author$project$Day19$runPartA(puzzleInput),
-		'No solution');
+		$author$project$Day19$runPartB(puzzleInput));
 };
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(

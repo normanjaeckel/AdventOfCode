@@ -6,7 +6,7 @@ import Parser exposing ((|.), (|=))
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -14,8 +14,22 @@ runPartA puzzleInput =
     case puzzleInput |> Parser.run puzzleParser of
         Ok blueprints ->
             blueprints
-                |> Dict.map (\_ bp -> walk bp 0 startingTime startingRobots [] startingResources)
+                |> Dict.map (\_ bp -> walk bp 0 24 startingRobots [] startingResources)
                 |> Dict.foldl (\k v totalQualityLevel -> (k * v) + totalQualityLevel) 0
+                |> String.fromInt
+
+        Err _ ->
+            "Error"
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    case puzzleInput |> Parser.run puzzleParser of
+        Ok blueprints ->
+            blueprints
+                |> Dict.filter (\k _ -> k <= 3)
+                |> Dict.map (\_ bp -> walk bp 0 32 startingRobots [] startingResources)
+                |> Dict.foldl (\k v totalQualityLevel -> v * totalQualityLevel) 1
                 |> String.fromInt
 
         Err _ ->
