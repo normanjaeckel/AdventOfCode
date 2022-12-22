@@ -11463,7 +11463,7 @@ var $author$project$Day19$runPartB = function (puzzleInput) {
 			A3(
 				$elm$core$Dict$foldl,
 				F3(
-					function (k, v, totalQualityLevel) {
+					function (_v3, v, totalQualityLevel) {
 						return v * totalQualityLevel;
 					}),
 				1,
@@ -11489,6 +11489,482 @@ var $author$project$Day19$run = function (puzzleInput) {
 		$author$project$Day19$runPartA(puzzleInput),
 		$author$project$Day19$runPartB(puzzleInput));
 };
+var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
+var $elm$core$Elm$JsArray$slice = _JsArray_slice;
+var $elm$core$Array$appendHelpBuilder = F2(
+	function (tail, builder) {
+		var tailLen = $elm$core$Elm$JsArray$length(tail);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.n)) - tailLen;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.n, tail);
+		return (notAppended < 0) ? {
+			o: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.o),
+			l: builder.l + 1,
+			n: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
+		} : ((!notAppended) ? {
+			o: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.o),
+			l: builder.l + 1,
+			n: $elm$core$Elm$JsArray$empty
+		} : {o: builder.o, l: builder.l, n: appended});
+	});
+var $elm$core$Array$appendHelpTree = F2(
+	function (toAppend, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
+		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
+		if (notAppended < 0) {
+			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
+			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
+		} else {
+			return newArray;
+		}
+	});
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$builderFromArray = function (_v0) {
+	var len = _v0.a;
+	var tree = _v0.c;
+	var tail = _v0.d;
+	var helper = F2(
+		function (node, acc) {
+			if (!node.$) {
+				var subTree = node.a;
+				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+			} else {
+				return A2($elm$core$List$cons, node, acc);
+			}
+		});
+	return {
+		o: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
+		l: (len / $elm$core$Array$branchFactor) | 0,
+		n: tail
+	};
+};
+var $elm$core$Array$append = F2(
+	function (a, _v0) {
+		var aTail = a.d;
+		var bLen = _v0.a;
+		var bTree = _v0.c;
+		var bTail = _v0.d;
+		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
+			var foldHelper = F2(
+				function (node, array) {
+					if (!node.$) {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpTree, leaf, array);
+					}
+				});
+			return A2(
+				$elm$core$Array$appendHelpTree,
+				bTail,
+				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
+		} else {
+			var foldHelper = F2(
+				function (node, builder) {
+					if (!node.$) {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
+					}
+				});
+			return A2(
+				$elm$core$Array$builderToArray,
+				true,
+				A2(
+					$elm$core$Array$appendHelpBuilder,
+					bTail,
+					A3(
+						$elm$core$Elm$JsArray$foldl,
+						foldHelper,
+						$elm$core$Array$builderFromArray(a),
+						bTree)));
+		}
+	});
+var $elm$core$Array$filter = F2(
+	function (isGood, array) {
+		return $elm$core$Array$fromList(
+			A3(
+				$elm$core$Array$foldr,
+				F2(
+					function (x, xs) {
+						return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+					}),
+				_List_Nil,
+				array));
+	});
+var $elm$core$Array$toIndexedList = function (array) {
+	var len = array.a;
+	var helper = F2(
+		function (entry, _v0) {
+			var index = _v0.a;
+			var list = _v0.b;
+			return _Utils_Tuple2(
+				index - 1,
+				A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(index, entry),
+					list));
+		});
+	return A3(
+		$elm$core$Array$foldr,
+		helper,
+		_Utils_Tuple2(len - 1, _List_Nil),
+		array).b;
+};
+var $author$project$Day20$findIndexFor = F2(
+	function (value, data) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Tuple$first,
+					A2(
+						$elm$core$List$filter,
+						function (_v0) {
+							var v = _v0.b;
+							return _Utils_eq(v, value);
+						},
+						$elm$core$Array$toIndexedList(data)))));
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Array$sliceLeft = F2(
+	function (from, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		if (!from) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				from,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					len - from,
+					$elm$core$Array$shiftStep,
+					$elm$core$Elm$JsArray$empty,
+					A3(
+						$elm$core$Elm$JsArray$slice,
+						from - $elm$core$Array$tailIndex(len),
+						$elm$core$Elm$JsArray$length(tail),
+						tail));
+			} else {
+				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
+				var helper = F2(
+					function (node, acc) {
+						if (!node.$) {
+							var subTree = node.a;
+							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+						} else {
+							var leaf = node.a;
+							return A2($elm$core$List$cons, leaf, acc);
+						}
+					});
+				var leafNodes = A3(
+					$elm$core$Elm$JsArray$foldr,
+					helper,
+					_List_fromArray(
+						[tail]),
+					tree);
+				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
+				if (!nodesToInsert.b) {
+					return $elm$core$Array$empty;
+				} else {
+					var head = nodesToInsert.a;
+					var rest = nodesToInsert.b;
+					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
+					var initialBuilder = {
+						o: _List_Nil,
+						l: 0,
+						n: A3(
+							$elm$core$Elm$JsArray$slice,
+							firstSlice,
+							$elm$core$Elm$JsArray$length(head),
+							head)
+					};
+					return A2(
+						$elm$core$Array$builderToArray,
+						true,
+						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
+				}
+			}
+		}
+	});
+var $elm$core$Array$fetchNewTail = F4(
+	function (shift, end, treeEnd, tree) {
+		fetchNewTail:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var sub = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$end = end,
+					$temp$treeEnd = treeEnd,
+					$temp$tree = sub;
+				shift = $temp$shift;
+				end = $temp$end;
+				treeEnd = $temp$treeEnd;
+				tree = $temp$tree;
+				continue fetchNewTail;
+			} else {
+				var values = _v0.a;
+				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
+			}
+		}
+	});
+var $elm$core$Array$hoistTree = F3(
+	function (oldShift, newShift, tree) {
+		hoistTree:
+		while (true) {
+			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
+				return tree;
+			} else {
+				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
+				if (!_v0.$) {
+					var sub = _v0.a;
+					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
+						$temp$newShift = newShift,
+						$temp$tree = sub;
+					oldShift = $temp$oldShift;
+					newShift = $temp$newShift;
+					tree = $temp$tree;
+					continue hoistTree;
+				} else {
+					return tree;
+				}
+			}
+		}
+	});
+var $elm$core$Array$sliceTree = F3(
+	function (shift, endIdx, tree) {
+		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
+		if (!_v0.$) {
+			var sub = _v0.a;
+			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
+			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				lastPos,
+				$elm$core$Array$SubTree(newSub),
+				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
+		} else {
+			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
+		}
+	});
+var $elm$core$Array$sliceRight = F2(
+	function (end, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		if (_Utils_eq(end, len)) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				end,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					startShift,
+					tree,
+					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
+			} else {
+				var endIdx = $elm$core$Array$tailIndex(end);
+				var depth = $elm$core$Basics$floor(
+					A2(
+						$elm$core$Basics$logBase,
+						$elm$core$Array$branchFactor,
+						A2($elm$core$Basics$max, 1, endIdx - 1)));
+				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					newShift,
+					A3(
+						$elm$core$Array$hoistTree,
+						startShift,
+						newShift,
+						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
+					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
+			}
+		}
+	});
+var $elm$core$Array$translateIndex = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var posIndex = (index < 0) ? (len + index) : index;
+		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
+	});
+var $elm$core$Array$slice = F3(
+	function (from, to, array) {
+		var correctTo = A2($elm$core$Array$translateIndex, to, array);
+		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
+		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
+			$elm$core$Array$sliceLeft,
+			correctFrom,
+			A2($elm$core$Array$sliceRight, correctTo, array));
+	});
+var $author$project$Day20$decryptWith = F2(
+	function (indices, encryptedData) {
+		var len = $elm$core$List$length(encryptedData);
+		var fn = F2(
+			function (value, data) {
+				var oldIndex = A2($author$project$Day20$findIndexFor, value, data);
+				var newIndex = A2($elm$core$Basics$modBy, len, oldIndex + value);
+				var offset = (_Utils_cmp(newIndex, oldIndex) > 0) ? 0 : 1;
+				var filtered = A2(
+					$elm$core$Array$filter,
+					$elm$core$Basics$neq(value),
+					data);
+				return A2(
+					$elm$core$Array$append,
+					A2(
+						$elm$core$Array$push,
+						value,
+						A3($elm$core$Array$slice, 0, newIndex + offset, filtered)),
+					A3($elm$core$Array$slice, newIndex + offset, len - 1, filtered));
+			});
+		var newData = A3(
+			$elm$core$List$foldl,
+			fn,
+			$elm$core$Array$fromList(encryptedData),
+			encryptedData);
+		var startIndex = A2($author$project$Day20$findIndexFor, 0, newData);
+		return $elm$core$List$sum(
+			A2(
+				$elm$core$List$filterMap,
+				function (i) {
+					return A2($elm$core$Array$get, i, newData);
+				},
+				A2(
+					$elm$core$List$map,
+					function (i) {
+						return A2($elm$core$Basics$modBy, len, startIndex + i);
+					},
+					indices)));
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Day20$myIntParser = $elm$parser$Parser$oneOf(
+	_List_fromArray(
+		[
+			A2(
+			$elm$parser$Parser$keeper,
+			A2(
+				$elm$parser$Parser$ignorer,
+				$elm$parser$Parser$succeed($elm$core$Basics$negate),
+				$elm$parser$Parser$symbol('-')),
+			$elm$parser$Parser$int),
+			$elm$parser$Parser$int
+		]));
+var $author$project$Day20$puzzleParser = A2(
+	$elm$parser$Parser$loop,
+	_List_Nil,
+	function (l) {
+		return $elm$parser$Parser$oneOf(
+			_List_fromArray(
+				[
+					A2(
+					$elm$parser$Parser$keeper,
+					$elm$parser$Parser$succeed(
+						function (i) {
+							return $elm$parser$Parser$Loop(
+								A2($elm$core$List$cons, i, l));
+						}),
+					A2($elm$parser$Parser$ignorer, $author$project$Day20$myIntParser, $elm$parser$Parser$spaces)),
+					A2(
+					$elm$parser$Parser$map,
+					function (_v0) {
+						return $elm$parser$Parser$Done(
+							$elm$core$List$reverse(l));
+					},
+					A2(
+						$elm$parser$Parser$ignorer,
+						$elm$parser$Parser$succeed(0),
+						$elm$parser$Parser$end))
+				]));
+	});
+var $author$project$Day20$runPartA = function (puzzleInput) {
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day20$puzzleParser, puzzleInput);
+	if (!_v0.$) {
+		var encryptedData = _v0.a;
+		return $elm$core$List$isEmpty(encryptedData) ? 'No input' : $elm$core$String$fromInt(
+			A2(
+				$author$project$Day20$decryptWith,
+				_List_fromArray(
+					[1000, 2000, 3000]),
+				encryptedData));
+	} else {
+		return 'Error';
+	}
+};
+var $author$project$Day20$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day20$runPartA(puzzleInput),
+		'No solution');
+};
+var $author$project$Day21$runPartA = function (puzzleInput) {
+	return puzzleInput;
+};
+var $author$project$Day21$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day21$runPartA(puzzleInput),
+		'No solution');
+};
+var $author$project$Day22$runPartA = function (puzzleInput) {
+	return puzzleInput;
+};
+var $author$project$Day22$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day22$runPartA(puzzleInput),
+		'No solution');
+};
+var $author$project$Day23$runPartA = function (puzzleInput) {
+	return puzzleInput;
+};
+var $author$project$Day23$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day23$runPartA(puzzleInput),
+		'No solution');
+};
+var $author$project$Day24$runPartA = function (puzzleInput) {
+	return puzzleInput;
+};
+var $author$project$Day24$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day24$runPartA(puzzleInput),
+		'No solution');
+};
+var $author$project$Day25$runPartA = function (puzzleInput) {
+	return puzzleInput;
+};
+var $author$project$Day25$run = function (puzzleInput) {
+	return _Utils_Tuple2(
+		$author$project$Day25$runPartA(puzzleInput),
+		'No solution');
+};
 var $author$project$Main$allDays = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -11510,7 +11986,13 @@ var $author$project$Main$allDays = $elm$core$Dict$fromList(
 			_Utils_Tuple2(16, $author$project$Day16$run),
 			_Utils_Tuple2(17, $author$project$Day17$run),
 			_Utils_Tuple2(18, $author$project$Day18$run),
-			_Utils_Tuple2(19, $author$project$Day19$run)
+			_Utils_Tuple2(19, $author$project$Day19$run),
+			_Utils_Tuple2(20, $author$project$Day20$run),
+			_Utils_Tuple2(21, $author$project$Day21$run),
+			_Utils_Tuple2(22, $author$project$Day22$run),
+			_Utils_Tuple2(23, $author$project$Day23$run),
+			_Utils_Tuple2(24, $author$project$Day24$run),
+			_Utils_Tuple2(25, $author$project$Day25$run)
 		]));
 var $author$project$Main$update = F2(
 	function (msg, model) {
