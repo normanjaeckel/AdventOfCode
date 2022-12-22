@@ -29,7 +29,7 @@ runPartB puzzleInput =
             blueprints
                 |> Dict.filter (\k _ -> k <= 3)
                 |> Dict.map (\_ bp -> walk bp 0 32 startingRobots [] startingResources)
-                |> Dict.foldl (\k v totalQualityLevel -> v * totalQualityLevel) 1
+                |> Dict.foldl (\_ v totalQualityLevel -> v * totalQualityLevel) 1
                 |> String.fromInt
 
         Err _ ->
@@ -141,11 +141,6 @@ type alias Resources =
 startingResources : Resources
 startingResources =
     { ore = 0, clay = 0, obsidian = 0, geode = 0 }
-
-
-startingTime : Int
-startingTime =
-    24
 
 
 type Option

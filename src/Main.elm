@@ -20,6 +20,12 @@ import Day16
 import Day17
 import Day18
 import Day19
+import Day20
+import Day21
+import Day22
+import Day23
+import Day24
+import Day25
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, disabled, placeholder, required, rows, selected, value)
@@ -61,6 +67,12 @@ allDays =
         , ( 17, Day17.run )
         , ( 18, Day18.run )
         , ( 19, Day19.run )
+        , ( 20, Day20.run )
+        , ( 21, Day21.run )
+        , ( 22, Day22.run )
+        , ( 23, Day23.run )
+        , ( 24, Day24.run )
+        , ( 25, Day25.run )
         ]
 
 
