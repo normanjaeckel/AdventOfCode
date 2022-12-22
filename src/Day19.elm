@@ -131,7 +131,7 @@ startingResources =
 
 startingTime : Int
 startingTime =
-    30
+    24
 
 
 type Option
@@ -142,10 +142,12 @@ type Option
 walk : Blueprint -> Int -> Int -> Robots -> List Robot -> Resources -> Int
 walk blueprint bestCase time robots forbidden resources =
     if time == 1 then
-        resources |> produceWith robots |> .geode
+        max
+            bestCase
+            (resources |> produceWith robots |> .geode)
 
     else if maxProductionInTimeWith robots.geode time + resources.geode <= bestCase then
-        0
+        bestCase
 
     else
         let
