@@ -58,20 +58,20 @@ decryptWith indices encryptedData =
         len =
             List.length encryptedData
 
-        newData : Array Int
-        newData =
+        mixedData : Array Int
+        mixedData =
             encryptedData |> List.foldl fn (encryptedData |> Array.fromList)
 
         fn : Int -> Array Int -> Array Int
         fn value data =
             let
                 oldIndex =
-                    data |> Debug.log "data" |> findIndexFor value
+                    data |> findIndexFor value
 
                 newIndex =
-                    (oldIndex + value) |> modBy len
+                    (oldIndex + value) |> modBy (len - 1)
             in
-            (if (oldIndex |> Debug.log "oldIndex") < (newIndex |> Debug.log "newIndex") then
+            if oldIndex < newIndex then
                 Array.append
                     (Array.append
                         (data |> Array.slice 0 oldIndex)
@@ -80,23 +80,21 @@ decryptWith indices encryptedData =
                     )
                     (data |> Array.slice (newIndex + 1) len)
 
-             else
+            else
                 Array.append
                     (Array.append
-                        (data |> Array.slice 0 (newIndex + 1) |> Array.push value)
-                        (data |> Array.slice (newIndex + 1) oldIndex)
+                        (data |> Array.slice 0 newIndex |> Array.push value)
+                        (data |> Array.slice newIndex oldIndex)
                     )
                     (data |> Array.slice (oldIndex + 1) len)
-            )
-                |> Debug.log "result"
 
         startIndex : Int
         startIndex =
-            newData |> findIndexFor 0
+            mixedData |> findIndexFor 0
     in
     indices
         |> List.map (\i -> (startIndex + i) |> modBy len)
-        |> List.filterMap (\i -> newData |> Array.get i)
+        |> List.filterMap (\i -> mixedData |> Array.get i)
         |> List.sum
 
 

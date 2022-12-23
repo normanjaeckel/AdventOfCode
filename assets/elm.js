@@ -11593,18 +11593,6 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
-var $elm$core$Array$filter = F2(
-	function (isGood, array) {
-		return $elm$core$Array$fromList(
-			A3(
-				$elm$core$Array$foldr,
-				F2(
-					function (x, xs) {
-						return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-					}),
-				_List_Nil,
-				array));
-	});
 var $elm$core$Array$toIndexedList = function (array) {
 	var len = array.a;
 	var helper = F2(
@@ -11641,7 +11629,6 @@ var $author$project$Day20$findIndexFor = F2(
 						},
 						$elm$core$Array$toIndexedList(data)))));
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Array$sliceLeft = F2(
 	function (from, array) {
 		var len = array.a;
@@ -11827,31 +11814,38 @@ var $author$project$Day20$decryptWith = F2(
 		var fn = F2(
 			function (value, data) {
 				var oldIndex = A2($author$project$Day20$findIndexFor, value, data);
-				var newIndex = A2($elm$core$Basics$modBy, len, oldIndex + value);
-				var offset = (_Utils_cmp(newIndex, oldIndex) > 0) ? 0 : 1;
-				var filtered = A2(
-					$elm$core$Array$filter,
-					$elm$core$Basics$neq(value),
-					data);
-				return A2(
+				var newIndex = A2($elm$core$Basics$modBy, len - 1, oldIndex + value);
+				return (_Utils_cmp(oldIndex, newIndex) < 0) ? A2(
 					$elm$core$Array$append,
 					A2(
 						$elm$core$Array$push,
 						value,
-						A3($elm$core$Array$slice, 0, newIndex + offset, filtered)),
-					A3($elm$core$Array$slice, newIndex + offset, len - 1, filtered));
+						A2(
+							$elm$core$Array$append,
+							A3($elm$core$Array$slice, 0, oldIndex, data),
+							A3($elm$core$Array$slice, oldIndex + 1, newIndex + 1, data))),
+					A3($elm$core$Array$slice, newIndex + 1, len, data)) : A2(
+					$elm$core$Array$append,
+					A2(
+						$elm$core$Array$append,
+						A2(
+							$elm$core$Array$push,
+							value,
+							A3($elm$core$Array$slice, 0, newIndex, data)),
+						A3($elm$core$Array$slice, newIndex, oldIndex, data)),
+					A3($elm$core$Array$slice, oldIndex + 1, len, data));
 			});
-		var newData = A3(
+		var mixedData = A3(
 			$elm$core$List$foldl,
 			fn,
 			$elm$core$Array$fromList(encryptedData),
 			encryptedData);
-		var startIndex = A2($author$project$Day20$findIndexFor, 0, newData);
+		var startIndex = A2($author$project$Day20$findIndexFor, 0, mixedData);
 		return $elm$core$List$sum(
 			A2(
 				$elm$core$List$filterMap,
 				function (i) {
-					return A2($elm$core$Array$get, i, newData);
+					return A2($elm$core$Array$get, i, mixedData);
 				},
 				A2(
 					$elm$core$List$map,
