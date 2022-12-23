@@ -6,7 +6,7 @@ import Parser exposing ((|.), (|=))
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -18,7 +18,24 @@ runPartA puzzleInput =
 
             else
                 encryptedData
-                    |> decryptWith [ 1000, 2000, 3000 ]
+                    |> decryptWith 1 [ 1000, 2000, 3000 ]
+                    |> String.fromInt
+
+        Err _ ->
+            "Error"
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    case puzzleInput |> Parser.run puzzleParser of
+        Ok encryptedData ->
+            if List.isEmpty encryptedData then
+                "No input"
+
+            else
+                encryptedData
+                    |> List.map ((*) 811589153)
+                    |> decryptWith 10 [ 1000, 2000, 3000 ]
                     |> String.fromInt
 
         Err _ ->
@@ -51,25 +68,38 @@ myIntParser =
         ]
 
 
-decryptWith : List Int -> List Int -> Int
-decryptWith indices encryptedData =
+type alias ValueWithIndex =
+    Array ( Int, Int )
+
+
+decryptWith : Int -> List Int -> List Int -> Int
+decryptWith rounds indices encryptedData =
     let
         len : Int
         len =
             List.length encryptedData
 
-        mixedData : Array Int
-        mixedData =
-            encryptedData |> List.foldl fn (encryptedData |> Array.fromList)
+        indexEncryptedData : List ( Int, Int )
+        indexEncryptedData =
+            encryptedData |> List.indexedMap Tuple.pair
 
-        fn : Int -> Array Int -> Array Int
+        mixedData : ValueWithIndex
+        mixedData =
+            List.repeat rounds ()
+                |> List.foldl
+                    (\s innerMixedData -> s |> always indexEncryptedData |> List.foldl fn innerMixedData)
+                    (indexEncryptedData |> Array.fromList)
+
+        fn : ( Int, Int ) -> ValueWithIndex -> ValueWithIndex
         fn value data =
             let
+                oldIndex : Int
                 oldIndex =
                     data |> findIndexFor value
 
+                newIndex : Int
                 newIndex =
-                    (oldIndex + value) |> modBy (len - 1)
+                    (oldIndex + Tuple.second value) |> modBy (len - 1)
             in
             if oldIndex < newIndex then
                 Array.append
@@ -90,15 +120,16 @@ decryptWith indices encryptedData =
 
         startIndex : Int
         startIndex =
-            mixedData |> findIndexFor 0
+            mixedData |> Array.map Tuple.second |> findIndexFor 0
     in
     indices
         |> List.map (\i -> (startIndex + i) |> modBy len)
         |> List.filterMap (\i -> mixedData |> Array.get i)
+        |> List.map Tuple.second
         |> List.sum
 
 
-findIndexFor : Int -> Array Int -> Int
+findIndexFor : a -> Array a -> Int
 findIndexFor value data =
     data
         |> Array.toIndexedList

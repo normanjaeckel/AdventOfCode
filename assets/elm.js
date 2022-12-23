@@ -11629,6 +11629,31 @@ var $author$project$Day20$findIndexFor = F2(
 						},
 						$elm$core$Array$toIndexedList(data)))));
 	});
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (!node.$) {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
 var $elm$core$Array$sliceLeft = F2(
 	function (from, array) {
 		var len = array.a;
@@ -11808,13 +11833,14 @@ var $elm$core$Array$slice = F3(
 			correctFrom,
 			A2($elm$core$Array$sliceRight, correctTo, array));
 	});
-var $author$project$Day20$decryptWith = F2(
-	function (indices, encryptedData) {
+var $author$project$Day20$decryptWith = F3(
+	function (rounds, indices, encryptedData) {
 		var len = $elm$core$List$length(encryptedData);
+		var indexEncryptedData = A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, encryptedData);
 		var fn = F2(
 			function (value, data) {
 				var oldIndex = A2($author$project$Day20$findIndexFor, value, data);
-				var newIndex = A2($elm$core$Basics$modBy, len - 1, oldIndex + value);
+				var newIndex = A2($elm$core$Basics$modBy, len - 1, oldIndex + value.b);
 				return (_Utils_cmp(oldIndex, newIndex) < 0) ? A2(
 					$elm$core$Array$append,
 					A2(
@@ -11837,22 +11863,35 @@ var $author$project$Day20$decryptWith = F2(
 			});
 		var mixedData = A3(
 			$elm$core$List$foldl,
-			fn,
-			$elm$core$Array$fromList(encryptedData),
-			encryptedData);
-		var startIndex = A2($author$project$Day20$findIndexFor, 0, mixedData);
+			F2(
+				function (s, innerMixedData) {
+					return A3(
+						$elm$core$List$foldl,
+						fn,
+						innerMixedData,
+						A2($elm$core$Basics$always, indexEncryptedData, s));
+				}),
+			$elm$core$Array$fromList(indexEncryptedData),
+			A2($elm$core$List$repeat, rounds, 0));
+		var startIndex = A2(
+			$author$project$Day20$findIndexFor,
+			0,
+			A2($elm$core$Array$map, $elm$core$Tuple$second, mixedData));
 		return $elm$core$List$sum(
 			A2(
-				$elm$core$List$filterMap,
-				function (i) {
-					return A2($elm$core$Array$get, i, mixedData);
-				},
+				$elm$core$List$map,
+				$elm$core$Tuple$second,
 				A2(
-					$elm$core$List$map,
+					$elm$core$List$filterMap,
 					function (i) {
-						return A2($elm$core$Basics$modBy, len, startIndex + i);
+						return A2($elm$core$Array$get, i, mixedData);
 					},
-					indices)));
+					A2(
+						$elm$core$List$map,
+						function (i) {
+							return A2($elm$core$Basics$modBy, len, startIndex + i);
+						},
+						indices))));
 	});
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
@@ -11905,8 +11944,9 @@ var $author$project$Day20$runPartA = function (puzzleInput) {
 	if (!_v0.$) {
 		var encryptedData = _v0.a;
 		return $elm$core$List$isEmpty(encryptedData) ? 'No input' : $elm$core$String$fromInt(
-			A2(
+			A3(
 				$author$project$Day20$decryptWith,
+				1,
 				_List_fromArray(
 					[1000, 2000, 3000]),
 				encryptedData));
@@ -11914,10 +11954,28 @@ var $author$project$Day20$runPartA = function (puzzleInput) {
 		return 'Error';
 	}
 };
+var $author$project$Day20$runPartB = function (puzzleInput) {
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day20$puzzleParser, puzzleInput);
+	if (!_v0.$) {
+		var encryptedData = _v0.a;
+		return $elm$core$List$isEmpty(encryptedData) ? 'No input' : $elm$core$String$fromInt(
+			A3(
+				$author$project$Day20$decryptWith,
+				10,
+				_List_fromArray(
+					[1000, 2000, 3000]),
+				A2(
+					$elm$core$List$map,
+					$elm$core$Basics$mul(811589153),
+					encryptedData)));
+	} else {
+		return 'Error';
+	}
+};
 var $author$project$Day20$run = function (puzzleInput) {
 	return _Utils_Tuple2(
 		$author$project$Day20$runPartA(puzzleInput),
-		'No solution');
+		$author$project$Day20$runPartB(puzzleInput));
 };
 var $author$project$Day21$runPartA = function (puzzleInput) {
 	return puzzleInput;
