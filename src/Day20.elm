@@ -66,24 +66,29 @@ decryptWith indices encryptedData =
         fn value data =
             let
                 oldIndex =
-                    data |> findIndexFor value
+                    data |> Debug.log "data" |> findIndexFor value
 
                 newIndex =
                     (oldIndex + value) |> modBy len
-
-                offset =
-                    if newIndex > oldIndex then
-                        0
-
-                    else
-                        1
-
-                filtered =
-                    data |> Array.filter ((/=) value)
             in
-            Array.append
-                (Array.slice 0 (newIndex + offset) filtered |> Array.push value)
-                (Array.slice (newIndex + offset) (len - 1) filtered)
+            (if (oldIndex |> Debug.log "oldIndex") < (newIndex |> Debug.log "newIndex") then
+                Array.append
+                    (Array.append
+                        (data |> Array.slice 0 oldIndex)
+                        (data |> Array.slice (oldIndex + 1) (newIndex + 1))
+                        |> Array.push value
+                    )
+                    (data |> Array.slice (newIndex + 1) len)
+
+             else
+                Array.append
+                    (Array.append
+                        (data |> Array.slice 0 (newIndex + 1) |> Array.push value)
+                        (data |> Array.slice (newIndex + 1) oldIndex)
+                    )
+                    (data |> Array.slice (oldIndex + 1) len)
+            )
+                |> Debug.log "result"
 
         startIndex : Int
         startIndex =
