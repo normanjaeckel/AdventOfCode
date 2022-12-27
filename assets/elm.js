@@ -11979,24 +11979,24 @@ var $author$project$Day20$run = function (puzzleInput) {
 };
 var $author$project$Day21$AfterRoot = 1;
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$Day21$Addition = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
+var $author$project$Day21$Addition = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
 	});
-var $author$project$Day21$Division = F2(
-	function (a, b) {
-		return {$: 3, a: a, b: b};
+var $author$project$Day21$Division = F3(
+	function (a, b, c) {
+		return {$: 3, a: a, b: b, c: c};
 	});
 var $author$project$Day21$Equation = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Day21$Multiplication = F2(
-	function (a, b) {
-		return {$: 2, a: a, b: b};
+var $author$project$Day21$Multiplication = F3(
+	function (a, b, c) {
+		return {$: 2, a: a, b: b, c: c};
 	});
-var $author$project$Day21$Subtraction = F2(
-	function (a, b) {
-		return {$: 1, a: a, b: b};
+var $author$project$Day21$Subtraction = F3(
+	function (a, b, c) {
+		return {$: 1, a: a, b: b, c: c};
 	});
 var $author$project$Day21$Value = function (a) {
 	return {$: 0, a: a};
@@ -12109,19 +12109,19 @@ var $author$project$Day21$expressionParser = $elm$parser$Parser$oneOf(
 												case 0:
 													return _Utils_Tuple2(
 														op,
-														A2($author$project$Day21$Addition, a, b));
+														A3($author$project$Day21$Addition, a, b, ''));
 												case 1:
 													return _Utils_Tuple2(
 														op,
-														A2($author$project$Day21$Subtraction, a, b));
+														A3($author$project$Day21$Subtraction, a, b, ''));
 												case 2:
 													return _Utils_Tuple2(
 														op,
-														A2($author$project$Day21$Multiplication, a, b));
+														A3($author$project$Day21$Multiplication, a, b, ''));
 												default:
 													return _Utils_Tuple2(
 														op,
-														A2($author$project$Day21$Division, a, b));
+														A3($author$project$Day21$Division, a, b, ''));
 											}
 										})),
 								A2(
@@ -12182,6 +12182,7 @@ var $author$project$Day21$puzzleParser = A2(
 						$elm$parser$Parser$end))
 				]));
 	});
+var $author$project$Day21$BeforeRoot = 0;
 var $author$project$Day21$exec = F3(
 	function (fn, mba, mbb) {
 		return A2(
@@ -12197,6 +12198,7 @@ var $author$project$Day21$exec = F3(
 			},
 			mba);
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Day21$resolve = F3(
 	function (all, phase, operand) {
 		var mexp = function () {
@@ -12214,39 +12216,79 @@ var $author$project$Day21$resolve = F3(
 					return $elm$core$Maybe$Just(v);
 				} else {
 					var eq = exp.a;
+					var newPhase = F2(
+						function (op, l) {
+							return ((phase === 1) || (!_Utils_eq(op, l))) ? 1 : 0;
+						});
 					switch (eq.$) {
 						case 0:
 							var a = eq.a;
 							var b = eq.b;
+							var l = eq.c;
 							return A3(
 								$author$project$Day21$exec,
 								$elm$core$Basics$add,
-								A3($author$project$Day21$resolve, all, phase, a),
-								A3($author$project$Day21$resolve, all, phase, b));
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, a, l),
+									a),
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, b, l),
+									b));
 						case 1:
 							var a = eq.a;
 							var b = eq.b;
+							var l = eq.c;
 							return A3(
 								$author$project$Day21$exec,
 								$elm$core$Basics$sub,
-								A3($author$project$Day21$resolve, all, phase, a),
-								A3($author$project$Day21$resolve, all, phase, b));
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, a, l),
+									a),
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, b, l),
+									b));
 						case 2:
 							var a = eq.a;
 							var b = eq.b;
+							var l = eq.c;
 							return A3(
 								$author$project$Day21$exec,
 								$elm$core$Basics$mul,
-								A3($author$project$Day21$resolve, all, phase, a),
-								A3($author$project$Day21$resolve, all, phase, b));
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, a, l),
+									a),
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, b, l),
+									b));
 						case 3:
 							var a = eq.a;
 							var b = eq.b;
+							var l = eq.c;
 							return A3(
 								$author$project$Day21$exec,
 								$elm$core$Basics$fdiv,
-								A3($author$project$Day21$resolve, all, phase, a),
-								A3($author$project$Day21$resolve, all, phase, b));
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, a, l),
+									a),
+								A3(
+									$author$project$Day21$resolve,
+									all,
+									A2(newPhase, b, l),
+									b));
 						default:
 							var a = eq.a;
 							return A3($author$project$Day21$resolve, all, 1, a);
@@ -12274,7 +12316,6 @@ var $author$project$Day21$runPartA = function (puzzleInput) {
 		return 'Error';
 	}
 };
-var $author$project$Day21$BeforeRoot = 0;
 var $author$project$Day21$Equal = function (a) {
 	return {$: 4, a: a};
 };
@@ -12312,12 +12353,12 @@ var $author$project$Day21$transform = function (exps) {
 							$author$project$Day21$dictInsertIfNotExists,
 							b,
 							$author$project$Day21$Equation(
-								A2($author$project$Day21$Subtraction, op, a)),
+								A3($author$project$Day21$Subtraction, op, a, op)),
 							A3(
 								$author$project$Day21$dictInsertIfNotExists,
 								a,
 								$author$project$Day21$Equation(
-									A2($author$project$Day21$Subtraction, op, b)),
+									A3($author$project$Day21$Subtraction, op, b, op)),
 								newExps));
 					case 1:
 						var a = eq.a;
@@ -12326,12 +12367,12 @@ var $author$project$Day21$transform = function (exps) {
 							$author$project$Day21$dictInsertIfNotExists,
 							b,
 							$author$project$Day21$Equation(
-								A2($author$project$Day21$Subtraction, a, op)),
+								A3($author$project$Day21$Subtraction, a, op, op)),
 							A3(
 								$author$project$Day21$dictInsertIfNotExists,
 								a,
 								$author$project$Day21$Equation(
-									A2($author$project$Day21$Addition, op, b)),
+									A3($author$project$Day21$Addition, op, b, op)),
 								newExps));
 					case 2:
 						var a = eq.a;
@@ -12340,12 +12381,12 @@ var $author$project$Day21$transform = function (exps) {
 							$author$project$Day21$dictInsertIfNotExists,
 							b,
 							$author$project$Day21$Equation(
-								A2($author$project$Day21$Division, op, a)),
+								A3($author$project$Day21$Division, op, a, op)),
 							A3(
 								$author$project$Day21$dictInsertIfNotExists,
 								a,
 								$author$project$Day21$Equation(
-									A2($author$project$Day21$Division, op, b)),
+									A3($author$project$Day21$Division, op, b, op)),
 								newExps));
 					case 3:
 						var a = eq.a;
@@ -12354,12 +12395,12 @@ var $author$project$Day21$transform = function (exps) {
 							$author$project$Day21$dictInsertIfNotExists,
 							b,
 							$author$project$Day21$Equation(
-								A2($author$project$Day21$Division, a, op)),
+								A3($author$project$Day21$Division, a, op, op)),
 							A3(
 								$author$project$Day21$dictInsertIfNotExists,
 								a,
 								$author$project$Day21$Equation(
-									A2($author$project$Day21$Multiplication, op, b)),
+									A3($author$project$Day21$Multiplication, op, b, op)),
 								newExps));
 					default:
 						return newExps;

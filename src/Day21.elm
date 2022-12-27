@@ -54,10 +54,10 @@ type Expression
 
 
 type Equation
-    = Addition Operand Operand
-    | Subtraction Operand Operand
-    | Multiplication Operand Operand
-    | Division Operand Operand
+    = Addition Operand Operand LeftSideBeforeTranformation
+    | Subtraction Operand Operand LeftSideBeforeTranformation
+    | Multiplication Operand Operand LeftSideBeforeTranformation
+    | Division Operand Operand LeftSideBeforeTranformation
     | Equal Operand
 
 
@@ -66,6 +66,10 @@ type Operator
     | Minus
     | Times
     | By
+
+
+type alias LeftSideBeforeTranformation =
+    Operand
 
 
 
@@ -90,16 +94,16 @@ expressionParser =
             (\op a operator b ->
                 case operator of
                     Plus ->
-                        ( op, Addition a b )
+                        ( op, Addition a b "" )
 
                     Minus ->
-                        ( op, Subtraction a b )
+                        ( op, Subtraction a b "" )
 
                     Times ->
-                        ( op, Multiplication a b )
+                        ( op, Multiplication a b "" )
 
                     By ->
-                        ( op, Division a b )
+                        ( op, Division a b "" )
             )
             |= operandParser
             |. Parser.symbol ":"
@@ -179,18 +183,35 @@ resolve all phase operand =
                         Just v
 
                     Equation eq ->
+                        let
+                            newPhase : Operand -> LeftSideBeforeTranformation -> Phase
+                            newPhase op l =
+                                if phase == AfterRoot || op /= l then
+                                    AfterRoot
+
+                                else
+                                    BeforeRoot
+                        in
                         case eq of
-                            Addition a b ->
-                                exec (+) (resolve all phase a) (resolve all phase b)
+                            Addition a b l ->
+                                exec (+)
+                                    (resolve all (newPhase a l) a)
+                                    (resolve all (newPhase b l) b)
 
-                            Subtraction a b ->
-                                exec (-) (resolve all phase a) (resolve all phase b)
+                            Subtraction a b l ->
+                                exec (-)
+                                    (resolve all (newPhase a l) a)
+                                    (resolve all (newPhase b l) b)
 
-                            Multiplication a b ->
-                                exec (*) (resolve all phase a) (resolve all phase b)
+                            Multiplication a b l ->
+                                exec (*)
+                                    (resolve all (newPhase a l) a)
+                                    (resolve all (newPhase b l) b)
 
-                            Division a b ->
-                                exec (/) (resolve all phase a) (resolve all phase b)
+                            Division a b l ->
+                                exec (/)
+                                    (resolve all (newPhase a l) a)
+                                    (resolve all (newPhase b l) b)
 
                             Equal a ->
                                 resolve all AfterRoot a
@@ -213,7 +234,7 @@ transform exps =
 
                 Equation eq ->
                     case eq of
-                        Addition a b ->
+                        Addition a b _ ->
                             if op == "root" then
                                 -- We know that root is an Addition case
                                 newExps
@@ -223,26 +244,26 @@ transform exps =
                             else
                                 -- op = a + b leads to a = op - b and b = op - a
                                 newExps
-                                    |> dictInsertIfNotExists a (Equation <| Subtraction op b)
-                                    |> dictInsertIfNotExists b (Equation <| Subtraction op a)
+                                    |> dictInsertIfNotExists a (Equation <| Subtraction op b op)
+                                    |> dictInsertIfNotExists b (Equation <| Subtraction op a op)
 
-                        Subtraction a b ->
+                        Subtraction a b _ ->
                             -- op = a - b leads to a = op + b and b = a - op
                             newExps
-                                |> dictInsertIfNotExists a (Equation <| Addition op b)
-                                |> dictInsertIfNotExists b (Equation <| Subtraction a op)
+                                |> dictInsertIfNotExists a (Equation <| Addition op b op)
+                                |> dictInsertIfNotExists b (Equation <| Subtraction a op op)
 
-                        Multiplication a b ->
+                        Multiplication a b _ ->
                             -- op = a * b leads to a = op / b and b = op / a
                             newExps
-                                |> dictInsertIfNotExists a (Equation <| Division op b)
-                                |> dictInsertIfNotExists b (Equation <| Division op a)
+                                |> dictInsertIfNotExists a (Equation <| Division op b op)
+                                |> dictInsertIfNotExists b (Equation <| Division op a op)
 
-                        Division a b ->
+                        Division a b _ ->
                             -- op = a / b leads to a = op * b and b = a / op
                             newExps
-                                |> dictInsertIfNotExists a (Equation <| Multiplication op b)
-                                |> dictInsertIfNotExists b (Equation <| Division a op)
+                                |> dictInsertIfNotExists a (Equation <| Multiplication op b op)
+                                |> dictInsertIfNotExists b (Equation <| Division a op op)
 
                         Equal _ ->
                             newExps
