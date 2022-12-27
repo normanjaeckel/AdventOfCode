@@ -331,7 +331,7 @@ suite =
                 \_ ->
                     Day22.run inputDay22
                         |> Expect.all
-                            [ Tuple.first >> Expect.equal "No solution"
+                            [ Tuple.first >> Expect.equal "6032"
                             , Tuple.second >> Expect.equal "No solution"
                             ]
             ]
@@ -487,7 +487,7 @@ inputDay21 =
 
 inputDay22 : String
 inputDay22 =
-    "No solution"
+    "        ...#\n        .#..\n        #...\n        ....\n...#.......#\n........#...\n..#....#....\n..........#.\n        ...#....\n        .....#..\n        .#......\n        ......#.\n\n10R5L5R10L4R5L5\n"
 
 
 inputDay23 : String
