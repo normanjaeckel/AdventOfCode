@@ -6,11 +6,16 @@ import Parser exposing ((|.), (|=))
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPart PuzzlePartA puzzleInput, runPart PuzzlePartB puzzleInput )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+type PuzzlePart
+    = PuzzlePartA
+    | PuzzlePartB
+
+
+runPart : PuzzlePart -> String -> String
+runPart puzzlePart puzzleInput =
     case puzzleInput |> Parser.run puzzleParser of
         Ok ( map, commands ) ->
             let
@@ -22,7 +27,7 @@ runPartA puzzleInput =
                         |> Maybe.withDefault ( 0, 0 )
 
                 ( ( x, y ), direction ) =
-                    startPos |> walk map East commands
+                    walk puzzlePart map commands ( startPos, East )
             in
             ((y + 1) * 1000) + ((x + 1) * 4) + (direction |> directionToFacing) |> String.fromInt
 
@@ -125,63 +130,183 @@ commandParser =
 -- Run
 
 
-walk : Map -> Direction -> List Command -> Position -> ( Position, Direction )
-walk map currentDirection commands currentPos =
+walk : PuzzlePart -> Map -> List Command -> ( Position, Direction ) -> ( Position, Direction )
+walk puzzlePart map commands ( currentPos, currentDirection ) =
     case currentPos |> always commands of
         [] ->
             ( currentPos, currentDirection )
 
         TurnRight :: nextCommands ->
-            walk map (turnRight currentDirection) nextCommands currentPos
+            walk puzzlePart map nextCommands ( currentPos, turnRight currentDirection )
 
         TurnLeft :: nextCommands ->
-            walk map (turnLeft currentDirection) nextCommands currentPos
+            walk puzzlePart map nextCommands ( currentPos, turnLeft currentDirection )
 
         (Walk steps) :: nextCommands ->
-            walkStep map currentDirection steps currentPos
-                |> walk map currentDirection nextCommands
+            walkStep puzzlePart map steps ( currentPos, currentDirection )
+                |> walk puzzlePart map nextCommands
 
 
-walkStep : Map -> Direction -> Int -> Position -> Position
-walkStep map currentDirection steps currentPos =
+walkStep : PuzzlePart -> Map -> Int -> ( Position, Direction ) -> ( Position, Direction )
+walkStep puzzlePart map steps vector =
     if steps == 0 then
-        currentPos
+        vector
 
     else
-        case nextLocation map currentDirection currentPos of
+        case nextLocation puzzlePart map vector of
             Nothing ->
-                currentPos
+                vector
 
-            Just newPos ->
-                walkStep map currentDirection (steps - 1) newPos
+            Just new ->
+                walkStep puzzlePart map (steps - 1) new
 
 
-nextLocation : Map -> Direction -> Position -> Maybe Position
-nextLocation ({ locations, width, height } as map) currentDirection ( x, y ) =
+nextLocation : PuzzlePart -> Map -> ( Position, Direction ) -> Maybe ( Position, Direction )
+nextLocation puzzlePart map vector =
     let
-        nextLoc =
-            case currentDirection of
-                North ->
-                    ( x, y - 1 |> modBy height )
-
-                South ->
-                    ( x, y + 1 |> modBy height )
-
-                West ->
-                    ( x - 1 |> modBy width, y )
-
-                East ->
-                    ( x + 1 |> modBy width, y )
+        ( nextLoc, nextDir ) =
+            nextLocationHelperA map vector
     in
-    case locations |> Dict.get nextLoc of
+    case map.locations |> Dict.get nextLoc of
         Just Wall ->
             Nothing
 
         Just Open ->
-            Just nextLoc
+            Just ( nextLoc, nextDir )
 
         Nothing ->
-            nextLocation map currentDirection nextLoc
+            case puzzlePart of
+                PuzzlePartA ->
+                    nextLocation puzzlePart map ( nextLoc, nextDir )
+
+                PuzzlePartB ->
+                    Just <| switchCube (getCube vector) ( nextLoc, nextDir )
+
+
+nextLocationHelperA : Map -> ( Position, Direction ) -> ( Position, Direction )
+nextLocationHelperA map ( ( x, y ), currentDirection ) =
+    ( case currentDirection of
+        North ->
+            ( x, y - 1 |> modBy map.height )
+
+        South ->
+            ( x, y + 1 |> modBy map.height )
+
+        West ->
+            ( x - 1 |> modBy map.width, y )
+
+        East ->
+            ( x + 1 |> modBy map.width, y )
+    , currentDirection
+    )
+
+
+type Cube
+    = Front
+    | Top
+    | Bottom
+    | Left
+    | Right
+    | Rear
+
+
+switchCube : Cube -> ( Position, Direction ) -> ( Position, Direction )
+switchCube whereAmI ( ( x, y ), currentDirection ) =
+    case ( whereAmI, currentDirection ) of
+        ( Front, North ) ->
+            ( ( x, y ), North )
+
+        ( Front, South ) ->
+            ( ( x, y ), South )
+
+        ( Front, West ) ->
+            ( ( y - 50, 100 ), South )
+
+        ( Front, East ) ->
+            ( ( y + 50, 49 ), North )
+
+        ( Top, North ) ->
+            ( ( 0, x + 100 ), East )
+
+        ( Top, South ) ->
+            ( ( x, y ), South )
+
+        ( Top, West ) ->
+            ( ( 0, 149 - y ), East )
+
+        ( Top, East ) ->
+            ( ( x, y ), East )
+
+        ( Bottom, North ) ->
+            ( ( x, y ), North )
+
+        ( Bottom, South ) ->
+            ( ( 49, x + 100 ), West )
+
+        ( Bottom, West ) ->
+            ( ( x, y ), West )
+
+        ( Bottom, East ) ->
+            ( ( 149, 149 - y ), West )
+
+        ( Left, North ) ->
+            ( ( 50, x + 50 ), East )
+
+        ( Left, South ) ->
+            ( ( x, y ), South )
+
+        ( Left, West ) ->
+            ( ( 50, 149 - y ), East )
+
+        ( Left, East ) ->
+            ( ( x, y ), East )
+
+        ( Right, North ) ->
+            ( ( x - 100, 199 ), North )
+
+        ( Right, South ) ->
+            ( ( 99, x - 50 ), West )
+
+        ( Right, West ) ->
+            ( ( x, y ), West )
+
+        ( Right, East ) ->
+            ( ( 99, 149 - y ), West )
+
+        ( Rear, North ) ->
+            ( ( x, y ), North )
+
+        ( Rear, South ) ->
+            ( ( x + 100, 0 ), South )
+
+        ( Rear, West ) ->
+            ( ( y - 100, 0 ), South )
+
+        ( Rear, East ) ->
+            ( ( y - 100, 149 ), North )
+
+
+getCube : ( Position, Direction ) -> Cube
+getCube ( ( x, y ), _ ) =
+    if y < 50 then
+        if x < 100 then
+            Top
+
+        else
+            Right
+
+    else if y < 100 then
+        Front
+
+    else if y < 150 then
+        if x < 50 then
+            Left
+
+        else
+            Bottom
+
+    else
+        Rear
 
 
 type Direction

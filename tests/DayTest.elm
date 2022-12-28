@@ -332,7 +332,7 @@ suite =
                     Day22.run inputDay22
                         |> Expect.all
                             [ Tuple.first >> Expect.equal "6032"
-                            , Tuple.second >> Expect.equal "No solution"
+                            , Tuple.second >> Expect.equal "5031"
                             ]
             ]
         , describe "day 23"
