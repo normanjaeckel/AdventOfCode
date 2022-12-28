@@ -14,6 +14,11 @@ type PuzzlePart
     | PuzzlePartB
 
 
+type InputType
+    = TestInput
+    | PuzzleInput
+
+
 runPart : PuzzlePart -> String -> String
 runPart puzzlePart puzzleInput =
     case puzzleInput |> Parser.run puzzleParser of
@@ -98,7 +103,7 @@ locationsToMap locations =
                     (\( x, y ) ( w, h ) -> ( max x w, max y h ))
                     ( 0, 0 )
     in
-    { locations = locations, width = width + 1, height = height + 1 }
+    { locations = locations, width = width + 2, height = height + 2 }
 
 
 commandListParser : Parser.Parser (List Command)
@@ -132,7 +137,7 @@ commandParser =
 
 walk : PuzzlePart -> Map -> List Command -> ( Position, Direction ) -> ( Position, Direction )
 walk puzzlePart map commands ( currentPos, currentDirection ) =
-    case currentPos |> always commands of
+    case commands of
         [] ->
             ( currentPos, currentDirection )
 
@@ -180,7 +185,23 @@ nextLocation puzzlePart map vector =
                     nextLocation puzzlePart map ( nextLoc, nextDir )
 
                 PuzzlePartB ->
-                    Just <| switchCube (getCube vector) ( nextLoc, nextDir )
+                    let
+                        inputType : InputType
+                        inputType =
+                            PuzzleInput
+
+                        ( newLoc, newDir ) =
+                            switchCube inputType (getCube inputType vector) vector
+                    in
+                    case map.locations |> Dict.get newLoc of
+                        Just Wall ->
+                            Nothing
+
+                        Just Open ->
+                            Just ( newLoc, newDir )
+
+                        Nothing ->
+                            Nothing
 
 
 nextLocationHelperA : Map -> ( Position, Direction ) -> ( Position, Direction )
@@ -210,103 +231,201 @@ type Cube
     | Rear
 
 
-switchCube : Cube -> ( Position, Direction ) -> ( Position, Direction )
-switchCube whereAmI ( ( x, y ), currentDirection ) =
-    case ( whereAmI, currentDirection ) of
-        ( Front, North ) ->
-            ( ( x, y ), North )
+switchCube : InputType -> Cube -> ( Position, Direction ) -> ( Position, Direction )
+switchCube inputType whereAmI ( ( x, y ), currentDirection ) =
+    case inputType of
+        PuzzleInput ->
+            case ( whereAmI, currentDirection ) of
+                ( Front, North ) ->
+                    ( ( x, y ), North )
 
-        ( Front, South ) ->
-            ( ( x, y ), South )
+                ( Front, South ) ->
+                    ( ( x, y ), South )
 
-        ( Front, West ) ->
-            ( ( y - 50, 100 ), South )
+                ( Front, West ) ->
+                    ( ( y - 50, 100 ), South )
 
-        ( Front, East ) ->
-            ( ( y + 50, 49 ), North )
+                ( Front, East ) ->
+                    ( ( y + 50, 49 ), North )
 
-        ( Top, North ) ->
-            ( ( 0, x + 100 ), East )
+                ( Top, North ) ->
+                    ( ( 0, x + 100 ), East )
 
-        ( Top, South ) ->
-            ( ( x, y ), South )
+                ( Top, South ) ->
+                    ( ( x, y ), South )
 
-        ( Top, West ) ->
-            ( ( 0, 149 - y ), East )
+                ( Top, West ) ->
+                    ( ( 0, 149 - y ), East )
 
-        ( Top, East ) ->
-            ( ( x, y ), East )
+                ( Top, East ) ->
+                    ( ( x, y ), East )
 
-        ( Bottom, North ) ->
-            ( ( x, y ), North )
+                ( Bottom, North ) ->
+                    ( ( x, y ), North )
 
-        ( Bottom, South ) ->
-            ( ( 49, x + 100 ), West )
+                ( Bottom, South ) ->
+                    ( ( 49, x + 100 ), West )
 
-        ( Bottom, West ) ->
-            ( ( x, y ), West )
+                ( Bottom, West ) ->
+                    ( ( x, y ), West )
 
-        ( Bottom, East ) ->
-            ( ( 149, 149 - y ), West )
+                ( Bottom, East ) ->
+                    ( ( 149, 149 - y ), West )
 
-        ( Left, North ) ->
-            ( ( 50, x + 50 ), East )
+                ( Left, North ) ->
+                    ( ( 50, x + 50 ), East )
 
-        ( Left, South ) ->
-            ( ( x, y ), South )
+                ( Left, South ) ->
+                    ( ( x, y ), South )
 
-        ( Left, West ) ->
-            ( ( 50, 149 - y ), East )
+                ( Left, West ) ->
+                    ( ( 50, 149 - y ), East )
 
-        ( Left, East ) ->
-            ( ( x, y ), East )
+                ( Left, East ) ->
+                    ( ( x, y ), East )
 
-        ( Right, North ) ->
-            ( ( x - 100, 199 ), North )
+                ( Right, North ) ->
+                    ( ( x - 100, 199 ), North )
 
-        ( Right, South ) ->
-            ( ( 99, x - 50 ), West )
+                ( Right, South ) ->
+                    ( ( 99, x - 50 ), West )
 
-        ( Right, West ) ->
-            ( ( x, y ), West )
+                ( Right, West ) ->
+                    ( ( x, y ), West )
 
-        ( Right, East ) ->
-            ( ( 99, 149 - y ), West )
+                ( Right, East ) ->
+                    ( ( 99, 149 - y ), West )
 
-        ( Rear, North ) ->
-            ( ( x, y ), North )
+                ( Rear, North ) ->
+                    ( ( x, y ), North )
 
-        ( Rear, South ) ->
-            ( ( x + 100, 0 ), South )
+                ( Rear, South ) ->
+                    ( ( x + 100, 0 ), South )
 
-        ( Rear, West ) ->
-            ( ( y - 100, 0 ), South )
+                ( Rear, West ) ->
+                    ( ( y - 100, 0 ), South )
 
-        ( Rear, East ) ->
-            ( ( y - 100, 149 ), North )
+                ( Rear, East ) ->
+                    ( ( y - 100, 149 ), North )
+
+        TestInput ->
+            case ( whereAmI, currentDirection ) of
+                ( Front, North ) ->
+                    ( ( x, y ), North )
+
+                ( Front, South ) ->
+                    ( ( x, y ), South )
+
+                ( Front, West ) ->
+                    ( ( x, y ), West )
+
+                ( Front, East ) ->
+                    ( ( 19 - y, 8 ), South )
+
+                ( Top, North ) ->
+                    ( ( 11 - x, 4 ), South )
+
+                ( Top, South ) ->
+                    ( ( x, y ), South )
+
+                ( Top, West ) ->
+                    ( ( y + 4, 4 ), South )
+
+                ( Top, East ) ->
+                    ( ( 15, 11 - y ), West )
+
+                ( Bottom, North ) ->
+                    ( ( x, y ), North )
+
+                ( Bottom, South ) ->
+                    ( ( 11 - x, 7 ), North )
+
+                ( Bottom, West ) ->
+                    ( ( 15 - y, 7 ), North )
+
+                ( Bottom, East ) ->
+                    ( ( x, y ), East )
+
+                ( Left, North ) ->
+                    ( ( 8, x - 4 ), East )
+
+                ( Left, South ) ->
+                    ( ( 8, 15 - x ), East )
+
+                ( Left, West ) ->
+                    ( ( x, y ), West )
+
+                ( Left, East ) ->
+                    ( ( x, y ), East )
+
+                ( Right, North ) ->
+                    ( ( 11, 19 - x ), West )
+
+                ( Right, South ) ->
+                    ( ( 0, 19 - x ), East )
+
+                ( Right, West ) ->
+                    ( ( x, y ), West )
+
+                ( Right, East ) ->
+                    ( ( 11, 11 - y ), West )
+
+                ( Rear, North ) ->
+                    ( ( 11 - x, 0 ), South )
+
+                ( Rear, South ) ->
+                    ( ( 11 - x, 11 ), North )
+
+                ( Rear, West ) ->
+                    ( ( 19 - y, 11 ), North )
+
+                ( Rear, East ) ->
+                    ( ( x, y ), East )
 
 
-getCube : ( Position, Direction ) -> Cube
-getCube ( ( x, y ), _ ) =
-    if y < 50 then
-        if x < 100 then
-            Top
+getCube : InputType -> ( Position, Direction ) -> Cube
+getCube inputType ( ( x, y ), _ ) =
+    case inputType of
+        PuzzleInput ->
+            if y < 50 then
+                if x < 100 then
+                    Top
 
-        else
-            Right
+                else
+                    Right
 
-    else if y < 100 then
-        Front
+            else if y < 100 then
+                Front
 
-    else if y < 150 then
-        if x < 50 then
-            Left
+            else if y < 150 then
+                if x < 50 then
+                    Left
 
-        else
-            Bottom
+                else
+                    Bottom
 
-    else
-        Rear
+            else
+                Rear
+
+        TestInput ->
+            if y < 4 then
+                Top
+
+            else if y < 8 then
+                if x < 4 then
+                    Rear
+
+                else if x < 8 then
+                    Left
+
+                else
+                    Front
+
+            else if x < 12 then
+                Bottom
+
+            else
+                Right
 
 
 type Direction
