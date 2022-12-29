@@ -14018,8 +14018,250 @@ var $author$project$Day24$run = function (puzzleInput) {
 		A2($author$project$Day24$runPart, puzzleInput, 0),
 		A2($author$project$Day24$runPart, puzzleInput, 1));
 };
+var $author$project$Day25$Zero = 2;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $author$project$Day25$MinusOne = 1;
+var $author$project$Day25$MinusTwo = 0;
+var $author$project$Day25$One = 3;
+var $author$project$Day25$Two = 4;
+var $author$project$Day25$addSNAFUDigits = F2(
+	function (a, b) {
+		switch (a) {
+			case 0:
+				switch (b) {
+					case 0:
+						return _Utils_Tuple2(3, 1);
+					case 1:
+						return _Utils_Tuple2(4, 1);
+					case 2:
+						return _Utils_Tuple2(0, 2);
+					case 3:
+						return _Utils_Tuple2(1, 2);
+					default:
+						return _Utils_Tuple2(2, 2);
+				}
+			case 1:
+				switch (b) {
+					case 0:
+						return _Utils_Tuple2(4, 1);
+					case 1:
+						return _Utils_Tuple2(0, 2);
+					case 2:
+						return _Utils_Tuple2(1, 2);
+					case 3:
+						return _Utils_Tuple2(2, 2);
+					default:
+						return _Utils_Tuple2(3, 2);
+				}
+			case 2:
+				return _Utils_Tuple2(b, 2);
+			case 3:
+				switch (b) {
+					case 0:
+						return _Utils_Tuple2(1, 2);
+					case 1:
+						return _Utils_Tuple2(2, 2);
+					case 2:
+						return _Utils_Tuple2(3, 2);
+					case 3:
+						return _Utils_Tuple2(4, 2);
+					default:
+						return _Utils_Tuple2(0, 3);
+				}
+			default:
+				switch (b) {
+					case 0:
+						return _Utils_Tuple2(2, 2);
+					case 1:
+						return _Utils_Tuple2(3, 2);
+					case 2:
+						return _Utils_Tuple2(4, 2);
+					case 3:
+						return _Utils_Tuple2(0, 3);
+					default:
+						return _Utils_Tuple2(1, 3);
+				}
+		}
+	});
+var $author$project$Day25$fn = F2(
+	function (_v0, _v1) {
+		var a = _v0.a;
+		var b = _v0.b;
+		var sum = _v1.a;
+		var carry = _v1.b;
+		var _v2 = A2($author$project$Day25$addSNAFUDigits, a, carry);
+		var s1 = _v2.a;
+		var c1 = _v2.b;
+		var _v3 = A2($author$project$Day25$addSNAFUDigits, s1, b);
+		var s2 = _v3.a;
+		var c2 = _v3.b;
+		return _Utils_Tuple2(
+			A2($elm$core$List$cons, s2, sum),
+			A2($author$project$Day25$addSNAFUDigits, c1, c2).a);
+	});
+var $author$project$Day25$addSNAFU = F2(
+	function (a, b) {
+		var lenB = $elm$core$List$length(b);
+		var lenA = $elm$core$List$length(a);
+		var offset = A2(
+			$elm$core$List$repeat,
+			$elm$core$Basics$abs(lenA - lenB),
+			2);
+		var aAndB = A3(
+			$elm$core$List$map2,
+			$elm$core$Tuple$pair,
+			$elm$core$List$reverse(
+				A2($elm$core$List$append, offset, a)),
+			$elm$core$List$reverse(
+				A2($elm$core$List$append, offset, b)));
+		var _v0 = A3(
+			$elm$core$List$foldl,
+			$author$project$Day25$fn,
+			_Utils_Tuple2(_List_Nil, 2),
+			aAndB);
+		var sum = _v0.a;
+		var carry = _v0.b;
+		if (carry === 2) {
+			return sum;
+		} else {
+			return A2($elm$core$List$cons, carry, sum);
+		}
+	});
+var $author$project$Day25$fromSNAFUToDigit = function (s) {
+	switch (s) {
+		case 0:
+			return '=';
+		case 1:
+			return '-';
+		case 2:
+			return '0';
+		case 3:
+			return '1';
+		default:
+			return '2';
+	}
+};
+var $author$project$Day25$fromSNAFUToString = function (num) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (ch, s) {
+				return _Utils_ap(
+					s,
+					$elm$core$String$fromChar(ch));
+			}),
+		'',
+		A2($elm$core$List$map, $author$project$Day25$fromSNAFUToDigit, num));
+};
+var $author$project$Day25$toSNAFUDigit = function (ch) {
+	switch (ch) {
+		case '=':
+			return $elm$core$Maybe$Just(0);
+		case '-':
+			return $elm$core$Maybe$Just(1);
+		case '0':
+			return $elm$core$Maybe$Just(2);
+		case '1':
+			return $elm$core$Maybe$Just(3);
+		case '2':
+			return $elm$core$Maybe$Just(4);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Day25$toSNAFUNumber = F2(
+	function (mbnum, chars) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			function (num) {
+				if (!chars.b) {
+					return $elm$core$Maybe$Just(
+						$elm$core$List$reverse(num));
+				} else {
+					var one = chars.a;
+					var rest = chars.b;
+					return A2(
+						$author$project$Day25$toSNAFUNumber,
+						A2(
+							$elm$core$Maybe$andThen,
+							function (ch) {
+								return $elm$core$Maybe$Just(
+									A2($elm$core$List$cons, ch, num));
+							},
+							$author$project$Day25$toSNAFUDigit(one)),
+						rest);
+				}
+			},
+			mbnum);
+	});
+var $author$project$Day25$puzzleParser = A2(
+	$elm$parser$Parser$loop,
+	_List_Nil,
+	function (list) {
+		return $elm$parser$Parser$oneOf(
+			_List_fromArray(
+				[
+					A2(
+					$elm$parser$Parser$keeper,
+					$elm$parser$Parser$succeed(
+						function (s) {
+							var _v0 = A2(
+								$author$project$Day25$toSNAFUNumber,
+								$elm$core$Maybe$Just(_List_Nil),
+								$elm$core$String$toList(s));
+							if (!_v0.$) {
+								var num = _v0.a;
+								return $elm$parser$Parser$Loop(
+									A2($elm$core$List$cons, num, list));
+							} else {
+								return $elm$parser$Parser$Loop(list);
+							}
+						}),
+					A2(
+						$elm$parser$Parser$ignorer,
+						$elm$parser$Parser$getChompedString(
+							A2(
+								$elm$parser$Parser$ignorer,
+								$elm$parser$Parser$succeed(0),
+								$elm$parser$Parser$chompWhile(
+									function (c) {
+										return A2(
+											$elm$core$List$any,
+											$elm$core$Basics$eq(c),
+											_List_fromArray(
+												['=', '-', '0', '1', '2']));
+									}))),
+						$elm$parser$Parser$symbol('\n'))),
+					A2(
+					$elm$parser$Parser$map,
+					function (_v1) {
+						return $elm$parser$Parser$Done(
+							$elm$core$List$reverse(list));
+					},
+					$elm$parser$Parser$succeed(0))
+				]));
+	});
 var $author$project$Day25$runPartA = function (puzzleInput) {
-	return puzzleInput;
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day25$puzzleParser, puzzleInput);
+	if (_v0.$ === 1) {
+		return 'Error';
+	} else {
+		var numbers = _v0.a;
+		return $author$project$Day25$fromSNAFUToString(
+			A3(
+				$elm$core$List$foldl,
+				$author$project$Day25$addSNAFU,
+				_List_fromArray(
+					[2]),
+				numbers));
+	}
 };
 var $author$project$Day25$run = function (puzzleInput) {
 	return _Utils_Tuple2(
