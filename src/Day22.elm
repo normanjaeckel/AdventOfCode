@@ -200,7 +200,7 @@ nextLocation puzzlePart map vector =
                         Just Open ->
                             Just ( newLoc, newDir )
 
-                        Nothing ->
+                        _ ->
                             Nothing
 
 
