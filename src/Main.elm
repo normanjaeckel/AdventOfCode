@@ -152,7 +152,7 @@ view model =
                         (option [ selected True, disabled True ] [ text "Select day" ]
                             :: List.map
                                 (\i -> option [ value (String.fromInt i) ] [ text <| String.fromInt i ])
-                                (List.range 1 24)
+                                (List.range 1 25)
                         )
                     ]
                 ]
