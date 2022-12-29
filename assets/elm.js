@@ -13663,10 +13663,36 @@ var $author$project$Day23$runPartA = function (puzzleInput) {
 		return 'Error';
 	}
 };
+var $author$project$Day23$moveForever = F2(
+	function (elves, index) {
+		moveForever:
+		while (true) {
+			var movedElves = A2($author$project$Day23$moveOneRound, index, elves);
+			if (_Utils_eq(elves, movedElves)) {
+				return index + 1;
+			} else {
+				var $temp$elves = movedElves,
+					$temp$index = index + 1;
+				elves = $temp$elves;
+				index = $temp$index;
+				continue moveForever;
+			}
+		}
+	});
+var $author$project$Day23$runPartB = function (puzzleInput) {
+	var _v0 = A2($elm$parser$Parser$run, $author$project$Day23$puzzleParser, puzzleInput);
+	if (!_v0.$) {
+		var elves = _v0.a;
+		return $elm$core$String$fromInt(
+			A2($author$project$Day23$moveForever, elves, 0));
+	} else {
+		return 'Error';
+	}
+};
 var $author$project$Day23$run = function (puzzleInput) {
 	return _Utils_Tuple2(
 		$author$project$Day23$runPartA(puzzleInput),
-		'No solution');
+		$author$project$Day23$runPartB(puzzleInput));
 };
 var $author$project$Day24$runPartA = function (puzzleInput) {
 	return puzzleInput;

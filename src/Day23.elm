@@ -6,7 +6,7 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -45,6 +45,16 @@ runPartA puzzleInput =
             in
             ((diff xValues * diff yValues) - (movedElves |> Set.size))
                 |> String.fromInt
+
+        Err _ ->
+            "Error"
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    case puzzleInput |> Parser.run puzzleParser of
+        Ok elves ->
+            moveForever elves 0 |> String.fromInt
 
         Err _ ->
             "Error"
@@ -315,3 +325,20 @@ processMove movingElves =
         |> Set.union s
         |> Set.union w
         |> Set.union e
+
+
+
+-- Part B
+
+
+moveForever : Elves -> Int -> Int
+moveForever elves index =
+    let
+        movedElves =
+            moveOneRound index elves
+    in
+    if elves == movedElves then
+        index + 1
+
+    else
+        moveForever movedElves (index + 1)
