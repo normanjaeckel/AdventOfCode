@@ -6,11 +6,16 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPart puzzleInput PuzzlePartA, runPart puzzleInput PuzzlePartB )
 
 
-runPartA : String -> String
-runPartA puzzleInput =
+type PuzzlePart
+    = PuzzlePartA
+    | PuzzlePartB
+
+
+runPart : String -> PuzzlePart -> String
+runPart puzzleInput puzzlePart =
     case puzzleInput |> Parser.run puzzleParser of
         Err _ ->
             "Error"
@@ -24,8 +29,17 @@ runPartA puzzleInput =
                 currentPath : Int
                 currentPath =
                     0
+
+                targets : List Position
+                targets =
+                    case puzzlePart of
+                        PuzzlePartA ->
+                            [ valley.exit ]
+
+                        PuzzlePartB ->
+                            [ valley.exit, valley.entrance, valley.exit ]
             in
-            walk valley currentPos currentPath
+            walk valley targets currentPos currentPath
                 |> String.fromInt
 
 
@@ -151,51 +165,56 @@ toDirection arrow =
 -- Walk
 
 
-walk : Valley -> Set.Set Position -> Int -> Int
-walk valley currentPos currentPath =
-    if currentPos |> Set.member valley.exit then
-        currentPath
+walk : Valley -> List Position -> Set.Set Position -> Int -> Int
+walk valley targets currentPos currentPath =
+    case targets of
+        [] ->
+            currentPath - 1
 
-    else
-        let
-            newBlizzards : List Blizzard
-            newBlizzards =
-                valley.blizzards
-                    |> List.map
-                        (\blizz ->
-                            let
-                                newBlizzPos =
-                                    (case blizz.direction of
-                                        North ->
-                                            blizz.position |> Tuple.mapSecond ((+) -1)
+        target :: nextTargets ->
+            let
+                newBlizzards : List Blizzard
+                newBlizzards =
+                    valley.blizzards
+                        |> List.map
+                            (\blizz ->
+                                let
+                                    newBlizzPos =
+                                        (case blizz.direction of
+                                            North ->
+                                                blizz.position |> Tuple.mapSecond ((+) -1)
 
-                                        South ->
-                                            blizz.position |> Tuple.mapSecond ((+) 1)
+                                            South ->
+                                                blizz.position |> Tuple.mapSecond ((+) 1)
 
-                                        West ->
-                                            blizz.position |> Tuple.mapFirst ((+) -1)
+                                            West ->
+                                                blizz.position |> Tuple.mapFirst ((+) -1)
 
-                                        East ->
-                                            blizz.position |> Tuple.mapFirst ((+) 1)
-                                    )
-                                        |> Tuple.mapBoth
-                                            (\x -> 1 + ((x - 1) |> modBy (valley.width - 2)))
-                                            (\y -> 1 + ((y - 1) |> modBy (valley.height - 2)))
-                            in
-                            { blizz | position = newBlizzPos }
-                        )
+                                            East ->
+                                                blizz.position |> Tuple.mapFirst ((+) 1)
+                                        )
+                                            |> Tuple.mapBoth
+                                                (\x -> 1 + ((x - 1) |> modBy (valley.width - 2)))
+                                                (\y -> 1 + ((y - 1) |> modBy (valley.height - 2)))
+                                in
+                                { blizz | position = newBlizzPos }
+                            )
 
-            newValley : Valley
-            newValley =
-                { valley | blizzards = newBlizzards }
+                newValley : Valley
+                newValley =
+                    { valley | blizzards = newBlizzards }
 
-            newPos : Set.Set Position
-            newPos =
-                currentPos
-                    |> Set.foldl extendPositions Set.empty
-                    |> Set.filter (freePosition newValley)
-        in
-        walk newValley newPos (currentPath + 1)
+                newPos : Set.Set Position -> Set.Set Position
+                newPos curPos =
+                    curPos
+                        |> Set.foldl extendPositions Set.empty
+                        |> Set.filter (freePosition newValley)
+            in
+            if currentPos |> Set.member target then
+                walk newValley nextTargets (newPos (Set.singleton target)) (currentPath + 1)
+
+            else
+                walk newValley targets (newPos currentPos) (currentPath + 1)
 
 
 extendPositions : Position -> Set.Set Position -> Set.Set Position

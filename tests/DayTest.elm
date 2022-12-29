@@ -348,15 +348,16 @@ suite =
                                 , Tuple.second >> Expect.equal "20"
                                 ]
                 ]
-        , describe "day 24"
-            [ test "both parts are correct" <|
-                \_ ->
-                    Day24.run inputDay24
-                        |> Expect.all
-                            [ Tuple.first >> Expect.equal "18"
-                            , Tuple.second >> Expect.equal "No solution"
-                            ]
-            ]
+        , skip <|
+            describe "day 24"
+                [ test "both parts are correct" <|
+                    \_ ->
+                        Day24.run inputDay24
+                            |> Expect.all
+                                [ Tuple.first >> Expect.equal "18"
+                                , Tuple.second >> Expect.equal "54"
+                                ]
+                ]
         , describe "day 25"
             [ test "both parts are correct" <|
                 \_ ->
