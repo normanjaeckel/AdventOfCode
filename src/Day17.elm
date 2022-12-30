@@ -1,12 +1,13 @@
 module Day17 exposing (run)
 
 import Array
+import Dict
 import Set
 
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, "No solution" )
+    ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -111,23 +112,11 @@ rockInCave allJets acc =
         nextRock =
             acc.rockIndex |> modBy 5 |> rockType
 
-        height : Int
-        height =
-            acc.cave
-                |> Set.toList
-                |> List.map Tuple.second
-                |> List.maximum
-                |> Maybe.withDefault 0
-
-        newCave : Set.Set Position
-        newCave =
-            acc.cave
-
         rockPos : Set.Set Position
         rockPos =
-            newRock nextRock (height + 4)
+            newRock nextRock (heightOf acc.cave + 4)
     in
-    rockFalls allJets acc.rockIndex acc.hotGasIndex rockPos newCave
+    rockFalls allJets acc.rockIndex acc.hotGasIndex rockPos acc.cave
 
 
 rockFalls : Array.Array Char -> Int -> Int -> Set.Set Position -> Set.Set Position -> Accumulator
@@ -184,3 +173,116 @@ blowTo cave direction rock =
 
     else
         movedRock
+
+
+heightOf : Set.Set Position -> Int
+heightOf cave =
+    cave
+        |> Set.toList
+        |> List.map Tuple.second
+        |> List.maximum
+        |> Maybe.withDefault 0
+
+
+runPartB : String -> String
+runPartB puzzleInput =
+    let
+        allJets : Array.Array Char
+        allJets =
+            puzzleInput |> String.trim |> String.toList |> Array.fromList
+
+        startCave : Set.Set Position
+        startCave =
+            [ ( 1, 0 ), ( 2, 0 ), ( 3, 0 ), ( 4, 0 ), ( 5, 0 ), ( 6, 0 ), ( 7, 0 ) ]
+                |> Set.fromList
+
+        offsetRocksIndex : Int
+        offsetRocksIndex =
+            300 - 1
+
+        accAfterOffset : Accumulator
+        accAfterOffset =
+            rocksDown allJets offsetRocksIndex { rockIndex = 0, hotGasIndex = 0, cave = startCave }
+
+        pattern : Pattern
+        pattern =
+            findPattern allJets accAfterOffset
+
+        b : Int
+        b =
+            1000000000000 - pattern.startRockIndex
+
+        c : Int
+        c =
+            (b |> toFloat) / (pattern.numberOfRocks |> toFloat) |> floor
+
+        d : Int
+        d =
+            c * pattern.height
+
+        e : Int
+        e =
+            b |> remainderBy pattern.numberOfRocks
+
+        f : Int
+        f =
+            rocksDown
+                allJets
+                (pattern.startRockIndex + e)
+                { rockIndex = pattern.startRockIndex
+                , hotGasIndex = accAfterOffset.hotGasIndex
+                , cave = accAfterOffset.cave
+                }
+                |> .cave
+                |> heightOf
+    in
+    (d + f) |> String.fromInt
+
+
+type alias Pattern =
+    { acc : Accumulator
+    , startRockIndex : Int
+    , numberOfRocks : Int
+    , height : Int
+    }
+
+
+findPattern : Array.Array Char -> Accumulator -> Pattern
+findPattern allJets acc =
+    walk allJets Dict.empty acc
+
+
+walk : Array.Array Char -> Dict.Dict Int ( Int, Int ) -> Accumulator -> Pattern
+walk allJets container acc =
+    case container |> Dict.get (acc.hotGasIndex |> modBy (Array.length allJets)) of
+        Nothing ->
+            let
+                newContainer : Dict.Dict Int ( Int, Int )
+                newContainer =
+                    container |> Dict.insert (acc.hotGasIndex |> modBy (Array.length allJets)) ( acc.rockIndex, heightOf acc.cave )
+
+                newAcc : Accumulator
+                newAcc =
+                    rockInCave allJets acc
+            in
+            walk allJets newContainer newAcc
+
+        Just ( startRockIndex, heightAtStartRockIndex ) ->
+            if (acc.rockIndex |> modBy 5) == (startRockIndex |> modBy 5) then
+                { acc = acc
+                , startRockIndex = startRockIndex
+                , numberOfRocks = acc.rockIndex - startRockIndex
+                , height = heightOf acc.cave - heightAtStartRockIndex
+                }
+
+            else
+                let
+                    newContainer : Dict.Dict Int ( Int, Int )
+                    newContainer =
+                        container |> Dict.insert (acc.hotGasIndex |> modBy (Array.length allJets)) ( acc.rockIndex, heightOf acc.cave )
+
+                    newAcc : Accumulator
+                    newAcc =
+                        rockInCave allJets acc
+                in
+                walk allJets newContainer newAcc

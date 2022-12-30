@@ -283,8 +283,7 @@ suite =
                     Day17.run inputDay17
                         |> Expect.all
                             [ Tuple.first >> Expect.equal "3068"
-
-                            --, Tuple.second >> Expect.equal "1514285714288"
+                            , Tuple.second >> Expect.equal "1514285714288"
                             ]
             ]
         , skip <|
