@@ -1,5 +1,6 @@
 module Day17 exposing (run)
 
+import Array
 import Set
 
 
@@ -11,17 +12,20 @@ run puzzleInput =
 runPartA : String -> String
 runPartA puzzleInput =
     let
-        allJets : List Char
+        allJets : Array.Array Char
         allJets =
-            puzzleInput |> String.trim |> String.toList
+            puzzleInput |> String.trim |> String.toList |> Array.fromList
 
-        cave : Set.Set Position
-        cave =
+        startCave : Set.Set Position
+        startCave =
             [ ( 1, 0 ), ( 2, 0 ), ( 3, 0 ), ( 4, 0 ), ( 5, 0 ), ( 6, 0 ), ( 7, 0 ) ]
                 |> Set.fromList
+
+        lastRockIndex : Int
+        lastRockIndex =
+            2022 - 1
     in
-    List.range 0 (2022 - 1)
-        |> List.foldl (rockInCave allJets) { hotGas = allJets, cave = cave }
+    rocksDown allJets lastRockIndex { rockIndex = 0, hotGasIndex = 0, cave = startCave }
         |> .cave
         |> Set.toList
         |> List.map Tuple.second
@@ -83,16 +87,29 @@ newRock rock row =
         )
 
 
+rocksDown : Array.Array Char -> Int -> Accumulator -> Accumulator
+rocksDown allJets lastRock acc =
+    if acc.rockIndex > lastRock then
+        acc
+
+    else
+        let
+            newAcc =
+                rockInCave allJets acc
+        in
+        rocksDown allJets lastRock newAcc
+
+
 type alias Accumulator =
-    { hotGas : List Char, cave : Set.Set Position }
+    { rockIndex : Int, hotGasIndex : Int, cave : Set.Set Position }
 
 
-rockInCave : List Char -> Int -> Accumulator -> Accumulator
-rockInCave allJets i acc =
+rockInCave : Array.Array Char -> Accumulator -> Accumulator
+rockInCave allJets acc =
     let
         nextRock : RockShape
         nextRock =
-            i |> modBy 5 |> rockType
+            acc.rockIndex |> modBy 5 |> rockType
 
         height : Int
         height =
@@ -110,38 +127,29 @@ rockInCave allJets i acc =
         rockPos =
             newRock nextRock (height + 4)
     in
-    rockFalls allJets acc.hotGas rockPos newCave
+    rockFalls allJets acc.rockIndex acc.hotGasIndex rockPos newCave
 
 
-rockFalls : List Char -> List Char -> Set.Set Position -> Set.Set Position -> Accumulator
-rockFalls allJets hotGas rock cave =
+rockFalls : Array.Array Char -> Int -> Int -> Set.Set Position -> Set.Set Position -> Accumulator
+rockFalls allJets rockNum hotGasIndex rock cave =
     let
-        nextDirection : ( Char, List Char )
+        nextDirection : Char
         nextDirection =
-            case hotGas of
-                ch :: rest ->
-                    ( ch, rest )
-
-                [] ->
-                    ( allJets |> List.head |> Maybe.withDefault '?', allJets |> List.drop 1 )
-
-        newHotGas : List Char
-        newHotGas =
-            Tuple.second nextDirection
+            allJets |> Array.get (hotGasIndex |> modBy (Array.length allJets)) |> Maybe.withDefault '?'
 
         newRockA : Set.Set Position
         newRockA =
-            rock |> blowTo cave (Tuple.first nextDirection)
+            rock |> blowTo cave nextDirection
 
         newRockB : Set.Set Position
         newRockB =
             newRockA |> Set.map (\( x, y ) -> ( x, y - 1 ))
     in
     if newRockB |> collidesWith cave then
-        { hotGas = newHotGas, cave = cave |> Set.union newRockA }
+        { rockIndex = rockNum + 1, hotGasIndex = hotGasIndex + 1, cave = cave |> Set.union newRockA }
 
     else
-        rockFalls allJets newHotGas newRockB cave
+        rockFalls allJets rockNum (hotGasIndex + 1) newRockB cave
 
 
 collidesWith : Set.Set Position -> Set.Set Position -> Bool

@@ -277,16 +277,16 @@ suite =
                                 , Tuple.second >> Expect.equal "1707"
                                 ]
                 ]
-        , skip <|
-            describe "day 17"
-                [ test "both parts are correct" <|
-                    \_ ->
-                        Day17.run inputDay17
-                            |> Expect.all
-                                [ Tuple.first >> Expect.equal "3068"
-                                , Tuple.second >> Expect.equal "1514285714288"
-                                ]
-                ]
+        , describe "day 17"
+            [ test "both parts are correct" <|
+                \_ ->
+                    Day17.run inputDay17
+                        |> Expect.all
+                            [ Tuple.first >> Expect.equal "3068"
+
+                            --, Tuple.second >> Expect.equal "1514285714288"
+                            ]
+            ]
         , skip <|
             describe "day 18"
                 [ test "both parts are correct" <|
@@ -358,31 +358,17 @@ suite =
                                 , Tuple.second >> Expect.equal "54"
                                 ]
                 ]
-        , describe "day 25"
-            [ test "both parts are correct" <|
-                \_ ->
-                    Day25.run inputDay25
-                        |> Expect.all
-                            [ Tuple.first >> Expect.equal "2=-1=0"
-                            , Tuple.second >> Expect.equal "No solution"
-                            ]
-            ]
+        , skip <|
+            describe "day 25"
+                [ test "both parts are correct" <|
+                    \_ ->
+                        Day25.run inputDay25
+                            |> Expect.all
+                                [ Tuple.first >> Expect.equal "2=-1=0"
+                                , Tuple.second >> Expect.equal "No solution"
+                                ]
+                ]
         ]
-
-
-
--- , describe "day ..."
---     [ test "the first part is correct" <|
---         \_ ->
---             Day....run inputDay...
---                 |> Tuple.first
---                 |> Expect.equal "No solution"
---     , test "the second part is correct" <|
---         \_ ->
---             Day....run inputDay...
---                 |> Tuple.second
---                 |> Expect.equal "No solution"
---     ]
 
 
 inputDay01 : String
