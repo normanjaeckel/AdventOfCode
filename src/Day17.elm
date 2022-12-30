@@ -7,7 +7,11 @@ import Set
 
 run : String -> ( String, String )
 run puzzleInput =
-    ( runPartA puzzleInput, runPartB puzzleInput )
+    if puzzleInput == "" then
+        ( "No input", "No input" )
+
+    else
+        ( runPartA puzzleInput, runPartB puzzleInput )
 
 
 runPartA : String -> String
@@ -198,7 +202,7 @@ runPartB puzzleInput =
 
         offsetRocksIndex : Int
         offsetRocksIndex =
-            300 - 1
+            100 - 1
 
         accAfterOffset : Accumulator
         accAfterOffset =
@@ -208,35 +212,35 @@ runPartB puzzleInput =
         pattern =
             findPattern allJets accAfterOffset
 
+        a : Int
+        a =
+            1000000000000 - pattern.startRockIndex
+
         b : Int
         b =
-            1000000000000 - pattern.startRockIndex
+            (a |> toFloat) / (pattern.numberOfRocks |> toFloat) |> floor
 
         c : Int
         c =
-            (b |> toFloat) / (pattern.numberOfRocks |> toFloat) |> floor
+            b * pattern.height
 
         d : Int
         d =
-            c * pattern.height
+            a |> remainderBy pattern.numberOfRocks
 
         e : Int
         e =
-            b |> remainderBy pattern.numberOfRocks
-
-        f : Int
-        f =
             rocksDown
                 allJets
-                (pattern.startRockIndex + e)
-                { rockIndex = pattern.startRockIndex
-                , hotGasIndex = accAfterOffset.hotGasIndex
-                , cave = accAfterOffset.cave
+                (pattern.startRockIndex - 1 + d)
+                { rockIndex = 0
+                , hotGasIndex = 0
+                , cave = startCave
                 }
                 |> .cave
                 |> heightOf
     in
-    (d + f) |> String.fromInt
+    (c + e) |> String.fromInt
 
 
 type alias Pattern =
