@@ -10623,14 +10623,15 @@ var $author$project$Day16$run = function (puzzleInput) {
 		A2($author$project$Day16$runPart, puzzleInput, 1));
 };
 var $author$project$Day17$heightOf = function (cave) {
-	return A2(
-		$elm$core$Maybe$withDefault,
+	return A3(
+		$elm$core$Set$foldl,
+		F2(
+			function (_v0, height) {
+				var y = _v0.b;
+				return A2($elm$core$Basics$max, y, height);
+			}),
 		0,
-		$elm$core$List$maximum(
-			A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$second,
-				$elm$core$Set$toList(cave))));
+		cave);
 };
 var $author$project$Day17$newRock = F2(
 	function (rock, row) {
@@ -10734,6 +10735,16 @@ var $author$project$Day17$blowTo = F3(
 			},
 			$elm$core$Set$toList(movedRock)) || A2($author$project$Day17$collidesWith, cave, movedRock)) ? rock : movedRock;
 	});
+var $author$project$Day17$stripCave = function (cave) {
+	var h = $author$project$Day17$heightOf(cave);
+	return A2(
+		$elm$core$Set$filter,
+		function (_v0) {
+			var y = _v0.b;
+			return _Utils_cmp(y, h - 60) > 0;
+		},
+		cave);
+};
 var $author$project$Day17$rockFalls = F5(
 	function (allJets, rockNum, hotGasIndex, rock, cave) {
 		rockFalls:
@@ -10759,7 +10770,8 @@ var $author$project$Day17$rockFalls = F5(
 				newRockA);
 			if (A2($author$project$Day17$collidesWith, cave, newRockB)) {
 				return {
-					y: A2($elm$core$Set$union, newRockA, cave),
+					y: $author$project$Day17$stripCave(
+						A2($elm$core$Set$union, newRockA, cave)),
 					Q: hotGasIndex + 1,
 					E: rockNum + 1
 				};
@@ -10808,18 +10820,18 @@ var $author$project$Day17$rockInCave = F2(
 		return A5($author$project$Day17$rockFalls, allJets, acc.E, acc.Q, rockPos, acc.y);
 	});
 var $author$project$Day17$rocksDown = F3(
-	function (allJets, lastRock, acc) {
+	function (allJets, lastRockIndex, acc) {
 		rocksDown:
 		while (true) {
-			if (_Utils_cmp(acc.E, lastRock) > 0) {
+			if (_Utils_cmp(acc.E, lastRockIndex) > 0) {
 				return acc;
 			} else {
 				var newAcc = A2($author$project$Day17$rockInCave, allJets, acc);
 				var $temp$allJets = allJets,
-					$temp$lastRock = lastRock,
+					$temp$lastRockIndex = lastRockIndex,
 					$temp$acc = newAcc;
 				allJets = $temp$allJets;
-				lastRock = $temp$lastRock;
+				lastRockIndex = $temp$lastRockIndex;
 				acc = $temp$acc;
 				continue rocksDown;
 			}
@@ -10939,7 +10951,7 @@ var $author$project$Day17$runPartB = function (puzzleInput) {
 				_Utils_Tuple2(6, 0),
 				_Utils_Tuple2(7, 0)
 			]));
-	var offsetRocksIndex = 100 - 1;
+	var offsetRocksIndex = 11000 - 1;
 	var allJets = $elm$core$Array$fromList(
 		$elm$core$String$toList(
 			$elm$core$String$trim(puzzleInput)));

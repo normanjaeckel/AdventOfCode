@@ -93,8 +93,8 @@ newRock rock row =
 
 
 rocksDown : Array.Array Char -> Int -> Accumulator -> Accumulator
-rocksDown allJets lastRock acc =
-    if acc.rockIndex > lastRock then
+rocksDown allJets lastRockIndex acc =
+    if acc.rockIndex > lastRockIndex then
         acc
 
     else
@@ -102,7 +102,7 @@ rocksDown allJets lastRock acc =
             newAcc =
                 rockInCave allJets acc
         in
-        rocksDown allJets lastRock newAcc
+        rocksDown allJets lastRockIndex newAcc
 
 
 type alias Accumulator =
@@ -139,7 +139,7 @@ rockFalls allJets rockNum hotGasIndex rock cave =
             newRockA |> Set.map (\( x, y ) -> ( x, y - 1 ))
     in
     if newRockB |> collidesWith cave then
-        { rockIndex = rockNum + 1, hotGasIndex = hotGasIndex + 1, cave = cave |> Set.union newRockA }
+        { rockIndex = rockNum + 1, hotGasIndex = hotGasIndex + 1, cave = cave |> Set.union newRockA |> stripCave }
 
     else
         rockFalls allJets rockNum (hotGasIndex + 1) newRockB cave
@@ -182,10 +182,16 @@ blowTo cave direction rock =
 heightOf : Set.Set Position -> Int
 heightOf cave =
     cave
-        |> Set.toList
-        |> List.map Tuple.second
-        |> List.maximum
-        |> Maybe.withDefault 0
+        |> Set.foldl (\( _, y ) height -> max y height) 0
+
+
+stripCave : Set.Set Position -> Set.Set Position
+stripCave cave =
+    let
+        h =
+            heightOf cave
+    in
+    cave |> Set.filter (\( _, y ) -> y > h - 60)
 
 
 runPartB : String -> String
@@ -202,7 +208,7 @@ runPartB puzzleInput =
 
         offsetRocksIndex : Int
         offsetRocksIndex =
-            100 - 1
+            11000 - 1
 
         accAfterOffset : Accumulator
         accAfterOffset =
