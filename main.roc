@@ -7,4 +7,4 @@ main =
     Task.await Arg.list \l ->
         when l |> List.get 1 is
             Ok s -> Stdout.line s
-            Err _  -> Stdout.line "error"
+            Err _ -> Stdout.line "error"
