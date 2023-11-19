@@ -4,5 +4,21 @@ version: '3'
 
 tasks:
   default:
-    - task: build
+    - task: run
 
+  build:
+    desc: Build the binary but don't run it
+    cmds:
+      - roc build
+    sources:
+      - main.roc
+      - Solution/*.roc
+      - Solution/*.input
+    generates:
+      - main
+
+  run:
+    desc: Build the binary and run it
+    cmds:
+      - task: build
+      - ./main {{ .CLI_ARGS }}

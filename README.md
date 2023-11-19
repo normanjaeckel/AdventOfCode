@@ -23,6 +23,11 @@ For example you can use [devenv](https://devenv.sh/):
 
     $ devenv shell
 
+Build and run my code:
+
+    $ roc build
+    $ ./main 24  # Runs the code for Christmas Eve
+
 ## VSCode extension for Roc
 
 To use [a VSCode extension for
