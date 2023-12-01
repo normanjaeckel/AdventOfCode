@@ -1,6 +1,7 @@
 app "advent-of-code-2023"
     packages {
         pf: "https://github.com/roc-lang/basic-cli/releases/download/0.5.0/Cufzl36_SnJ4QbOoEmiJ5dIpUxBvdB3NEySvuH82Wio.tar.br",
+        parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.2.0/dJQSsSmorujhiPNIvJKlQoI92RFIG_JQwUfIxZsCSwE.tar.br",
     }
     imports [
         pf.Arg,
@@ -8,6 +9,7 @@ app "advent-of-code-2023"
         pf.Stdout,
         pf.Task,
         Solution.Day0,
+        Solution.Day1,
     ]
     provides [main] to pf
 
@@ -21,9 +23,10 @@ main =
                     _ <- Stdout.line "Solution for part 1: \(Solution.Day0.part1)" |> Task.await
                     Stdout.line "Solution for part 2: \(Solution.Day0.part2)"
 
-                # "1" ->
-                #     _ <- Stdout.line "Solution for part 1: \(part1)" |> Task.await
-                #     Stdout.line "Solution for part 2: \(part2)"
+                "1" ->
+                    _ <- Stdout.line "Solution for part 1: \(Solution.Day1.part1)" |> Task.await
+                    Stdout.line "Solution for part 2: \(Solution.Day1.part2)"
+
                 d ->
                     _ <- Stderr.line "There is no code for day \(d) yet." |> Task.await
                     Task.err 1 # TODO: Is this correct?

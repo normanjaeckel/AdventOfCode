@@ -20,5 +20,14 @@ tasks:
   run:
     desc: Build the binary and run it
     cmds:
+      - task: format
       - task: build
       - ./main {{ .CLI_ARGS }}
+
+  format:
+    desc: Format roc files
+    cmds:
+      - roc format main.roc Solution/*.roc
+    sources:
+      - main.roc
+      - Solution/*.roc

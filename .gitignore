@@ -11,6 +11,7 @@ devenv.local.nix
 # Roc nightly build and Roc source dir (if you use Roc language server)
 roc_nightly-linux_x86_64-*
 roc/
+roc-parser/
 
 # Build
 main
