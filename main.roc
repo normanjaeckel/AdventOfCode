@@ -1,6 +1,6 @@
 app "advent-of-code-2023"
     packages {
-        pf: "https://github.com/roc-lang/basic-cli/releases/download/0.5.0/Cufzl36_SnJ4QbOoEmiJ5dIpUxBvdB3NEySvuH82Wio.tar.br",
+        pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.0/bkGby8jb0tmZYsy2hg1E_B2QrCgcSTxdUlHtETwm5m4.tar.br",
         parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.2.0/dJQSsSmorujhiPNIvJKlQoI92RFIG_JQwUfIxZsCSwE.tar.br",
     }
     imports [
@@ -10,6 +10,7 @@ app "advent-of-code-2023"
         pf.Task,
         Solution.Day0,
         Solution.Day1,
+        Solution.Day2,
     ]
     provides [main] to pf
 
@@ -26,6 +27,10 @@ main =
                 "1" ->
                     _ <- Stdout.line "Solution for part 1: \(Solution.Day1.part1)" |> Task.await
                     Stdout.line "Solution for part 2: \(Solution.Day1.part2)"
+
+                "2" ->
+                    _ <- Stdout.line "Solution for part 1: \(Solution.Day2.part1)" |> Task.await
+                    Stdout.line "Solution for part 2: \(Solution.Day2.part2)"
 
                 d ->
                     _ <- Stderr.line "There is no code for day \(d) yet." |> Task.await
