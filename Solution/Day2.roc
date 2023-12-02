@@ -12,10 +12,6 @@ interface Solution.Day2
 part1 =
     solvePart1 puzzleInput
 
-contentOfBagRed = 12
-contentOfBagGreen = 13
-contentOfBagBlue = 14
-
 solvePart1 = \input ->
     solution =
         input
@@ -53,6 +49,9 @@ checkGrabs = \grabs ->
         (\grab -> grab
             |> List.any
                 (\GrabElem count color ->
+                    contentOfBagRed = 12
+                    contentOfBagGreen = 13
+                    contentOfBagBlue = 14
                     when color is
                         Red -> count > contentOfBagRed
                         Green -> count > contentOfBagGreen
@@ -97,11 +96,55 @@ cubeParser =
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    solution =
+        input
+        |> Str.split "\n"
+        |> List.dropIf Str.isEmpty
+        |> List.walkTry
+            []
+            (\state, line ->
+                gameParser
+                |> parseStr line
+                |> Result.try (\parsedLine -> state |> List.append parsedLine |> Ok)
+            )
+        |> Result.try
+            (
+                \games ->
+                    games
+                    |> List.walk
+                        0
+                        (\state, Game _ grabs -> state + getGamePower grabs)
+                    |> Num.toStr
+                    |> Ok
+            )
+
+    when solution is
+        Err e ->
+            when e is
+                ParsingFailure f -> "failure: \(f)"
+                ParsingIncomplete f -> "incomplete: \(f)"
+
+        Ok v -> v
+
+getGamePower = \grabs ->
+    grabs
+    |> List.walk
+        { red: 0, green: 0, blue: 0 }
+        (\state, grab ->
+            grab
+            |> List.walk
+                state
+                (\innerState, GrabElem count color ->
+                    when color is
+                        Red -> { innerState & red: Num.max innerState.red count }
+                        Green -> { innerState & green: Num.max innerState.green count }
+                        Blue -> { innerState & blue: Num.max innerState.blue count }
+                )
+        )
+    |> (\state -> state.red * state.green * state.blue)
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
-expect solvePart2 exampleData2 == ""
+expect solvePart2 exampleData2 == "2286"
