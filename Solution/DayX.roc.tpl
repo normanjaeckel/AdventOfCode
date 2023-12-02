@@ -27,16 +27,20 @@ exampleData1 =
     """
     """
 
-expect solvePart1 exampleData1 == ""
+expect
+    got = solvePart1 exampleData1
+    got == ""
 
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \input ->
-    input
+solvePart2 = \_input ->
+    ""
 
 exampleData2 =
     """
     """
 
-expect solvePart2 exampleData2 == ""
+expect
+    got = solvePart2 exampleData2
+    got == ""
