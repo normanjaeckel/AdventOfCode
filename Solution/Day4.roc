@@ -20,20 +20,23 @@ solvePart1 = \input ->
         (\line ->
             when cardParser |> parseStr line is
                 Err _ -> crash "bad card"
-                Ok (Card winningNums currentNumbers) ->
-                    currentNumbers
-                    |> List.keepIf (\n -> winningNums |> List.contains n)
-                    |> List.len
+                Ok card ->
+                    howManyWinners card
                     |> (\count -> if count == 0 then 0 else Num.powInt 2 (count - 1))
         )
     |> List.sum
     |> Num.toStr
 
+howManyWinners = \Card _ winningNums currentNumbers ->
+    currentNumbers
+    |> List.keepIf (\n -> winningNums |> List.contains n)
+    |> List.len
+
 cardParser =
-    const (\winningNums -> \currentNumbers -> Card winningNums currentNumbers)
+    const (\cardId -> \winningNums -> \currentNumbers -> Card cardId winningNums currentNumbers)
     |> skip (string "Card")
     |> skip (many (string " "))
-    |> skip digits
+    |> keep digits
     |> skip (string ":")
     |> keep numsParser
     |> skip (string " |")
@@ -65,13 +68,49 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    input
+    |> Str.split "\n"
+    |> List.dropIf Str.isEmpty
+    |> List.map
+        (\line ->
+            when cardParser |> parseStr line is
+                Err _ -> crash "bad card"
+                Ok card -> card
+        )
+    |> List.walk
+        (Dict.withCapacity 204)
+        (\cardSet, Card cardId winningNums currentNumbers ->
+            currentNumOfCards = cardSet |> Dict.get cardId |> Result.withDefault 0
+            newNumOfCards = currentNumOfCards + 1
+            numOfWinners = howManyWinners (Card cardId winningNums currentNumbers)
 
-exampleData2 =
-    """
-    """
+            List.range { start: At 1, end: Length numOfWinners }
+            |> List.walk
+                (cardSet |> Dict.insert cardId newNumOfCards)
+                (\state, n ->
+                    state
+                    |> Dict.update
+                        (cardId + n)
+                        (\possibleValue ->
+                            when possibleValue is
+                                Missing -> Present newNumOfCards
+                                Present i -> Present (i + newNumOfCards)
+                        )
+                )
+
+        )
+    |> (
+        \cardSet ->
+            cardSet
+            |> Dict.walk
+                0
+                (\state, _, v -> state + v)
+    )
+    |> Num.toStr
+
+exampleData2 = exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "30"
