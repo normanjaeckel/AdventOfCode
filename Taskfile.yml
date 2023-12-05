@@ -31,3 +31,9 @@ tasks:
     sources:
       - main.roc
       - Solution/*.roc
+
+  prepare-next-day:
+    desc: Creates files for the next day (just a small helper which takes only some steps ...)
+    cmds:
+      - cp Solution/DayX.roc.tpl Solution/Day{{ .CLI_ARGS }}.roc
+      - touch Solution/Day{{ .CLI_ARGS }}.input
