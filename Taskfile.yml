@@ -32,6 +32,14 @@ tasks:
       - main.roc
       - Solution/*.roc
 
+  test:
+    desc: Runs tests
+    cmds:
+      - roc test
+    sources:
+      - main.roc
+      - Solution/*.roc
+
   prepare-next-day:
     desc: Creates files for the next day (just a small helper which takes only some steps ...)
     cmds:

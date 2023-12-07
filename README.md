@@ -1,6 +1,6 @@
 # Advent Of Code 2023
 
-![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2023-10_*-success)
+![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2023-12_*-success)
 
 ## Summary
 
@@ -34,6 +34,10 @@ To use [a VSCode extension for
 Roc](https://github.com/ivan-demchenko/roc-vscode-unofficial) you have to
 [install the Roc language server
 binary](https://github.com/ayazhafiz/roc/blob/lang-srv/crates/lang_srv/).
+
+## Hints
+
+Day 6 works only when using the legacy linker. Thats why I commented it out.
 
 ## License
 
