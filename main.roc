@@ -14,7 +14,7 @@ app "advent-of-code-2023"
         Solution.Day4,
         Solution.Day5,
         # Solution.Day6,
-        # Solution.Day7,
+        Solution.Day7,
         # Solution.Day8,
         # Solution.Day9,
         # Solution.Day10,
@@ -49,7 +49,7 @@ main =
                 "4" -> writeSolutions Solution.Day4.part1 Solution.Day4.part2
                 "5" -> writeSolutions Solution.Day5.part1 Solution.Day5.part2
                 # "6" -> writeSolutions Solution.Day6.part1 Solution.Day6.part2
-                # "7" -> writeSolutions Solution.Day7.part1 Solution.Day7.part2
+                "7" -> writeSolutions Solution.Day7.part1 Solution.Day7.part2
                 # "8" -> writeSolutions Solution.Day8.part1 Solution.Day8.part2
                 # "9" -> writeSolutions Solution.Day9.part1 Solution.Day9.part2
                 # "10" -> writeSolutions Solution.Day10.part1 Solution.Day10.part2
