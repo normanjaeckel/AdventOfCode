@@ -121,23 +121,37 @@ expect
     got == "6"
 
 part2 =
-    "no solution found"
-# solvePart2 puzzleInput
+    solvePart2 puzzleInput
 
-# solvePart2 = \input ->
-#     i = input |> Str.trim |> parseInput inputParser1
-#     n = input |> Str.trim |> parseInput inputParser2 |> List.map (\MapLine a b c -> (a, (b, c))) |> Dict.fromList
+solvePart2 = \input ->
+    i = input |> Str.trim |> parseInput inputParser1
+    n = input |> Str.trim |> parseInput inputParser2 |> List.map (\MapLine a b c -> (a, (b, c))) |> Dict.fromList
 
-#     walk2 i n 0 "AAA"
-#     |> Num.toStr
+    startingNodes = n |> Dict.keepIf (\(k, _) -> k |> Str.endsWith "A") |> Dict.keys
 
-# walk2 = \instructions, network, index, node ->
-#     nextInstruction = getNextInstruction instructions index
-#     nextNode = getNextNode network node nextInstruction
-#     if nextNode |> Str.endsWith "Z" then
-#         dbg
-#             (index + 1)
+    startingNodes
+    |> List.map (\startingNode ->
+        walk2 i n 0 startingNode
+    )
+    |> List.walk
+        1
+        (\state, value ->
+            eu = euklid state value
+            state * value // eu
+        )
+    |> Num.toStr
 
-#         index + 1
-#     else
-#         walk2 instructions network (index + 1) nextNode
+walk2 = \instructions, network, index, node ->
+    nextInstruction = getNextInstruction instructions index
+    nextNode = getNextNode network node nextInstruction
+    if nextNode |> Str.endsWith "Z" then
+        index + 1
+    else
+        walk2 instructions network (index + 1) nextNode
+
+
+euklid = \a, b ->
+    if b == 0 then
+        a
+    else
+        euklid b (a % b)
