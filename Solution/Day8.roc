@@ -121,8 +121,23 @@ expect
     got == "6"
 
 part2 =
-    solvePart2 puzzleInput
+    "no solution found"
+# solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+# solvePart2 = \input ->
+#     i = input |> Str.trim |> parseInput inputParser1
+#     n = input |> Str.trim |> parseInput inputParser2 |> List.map (\MapLine a b c -> (a, (b, c))) |> Dict.fromList
 
+#     walk2 i n 0 "AAA"
+#     |> Num.toStr
+
+# walk2 = \instructions, network, index, node ->
+#     nextInstruction = getNextInstruction instructions index
+#     nextNode = getNextNode network node nextInstruction
+#     if nextNode |> Str.endsWith "Z" then
+#         dbg
+#             (index + 1)
+
+#         index + 1
+#     else
+#         walk2 instructions network (index + 1) nextNode
