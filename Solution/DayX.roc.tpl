@@ -5,8 +5,8 @@ interface Solution.DayX
     ]
     imports [
         "DayX.input" as puzzleInput : Str,
-        # parser.String.{ parseStr },
-        # parser.Core.{ const, keep, skip },
+        parser.String.{ parseStr },
+        parser.Core.{ const },
     ]
 
 part1 =
@@ -21,6 +21,14 @@ solvePart1 = \input ->
 
         "no solution found"
     )
+
+parsePuzzleInput = \input ->
+    when parseStr puzzleParser input is
+        Ok v -> v
+        Err _ -> crash "parsing failed"
+
+puzzleParser =
+    const ""
 
 exampleData1 =
     """
