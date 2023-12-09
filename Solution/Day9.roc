@@ -83,13 +83,18 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    input
+    |> Str.trim
+    |> parsePuzzleInput
+    |> List.map (\l -> List.reverse l)
+    |> List.map findNextValue
+    |> List.sum
+    |> Num.toStr
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "2"
