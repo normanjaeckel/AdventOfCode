@@ -16,7 +16,7 @@ app "advent-of-code-2023"
         # Solution.Day6,
         Solution.Day7,
         Solution.Day8,
-        # Solution.Day9,
+        Solution.Day9,
         # Solution.Day10,
         # Solution.Day11,
         # Solution.Day12,
@@ -48,10 +48,11 @@ main =
                 "3" -> writeSolutions Solution.Day3.part1 Solution.Day3.part2
                 "4" -> writeSolutions Solution.Day4.part1 Solution.Day4.part2
                 "5" -> writeSolutions Solution.Day5.part1 Solution.Day5.part2
+                "6" -> Stdout.line "The solution ist commented out because you have to use the build flag --linker=legacy for this part of the code."
                 # "6" -> writeSolutions Solution.Day6.part1 Solution.Day6.part2
                 "7" -> writeSolutions Solution.Day7.part1 Solution.Day7.part2
                 "8" -> writeSolutions Solution.Day8.part1 Solution.Day8.part2
-                # "9" -> writeSolutions Solution.Day9.part1 Solution.Day9.part2
+                "9" -> writeSolutions Solution.Day9.part1 Solution.Day9.part2
                 # "10" -> writeSolutions Solution.Day10.part1 Solution.Day10.part2
                 # "11" -> writeSolutions Solution.Day11.part1 Solution.Day11.part2
                 # "12" -> writeSolutions Solution.Day12.part1 Solution.Day12.part2

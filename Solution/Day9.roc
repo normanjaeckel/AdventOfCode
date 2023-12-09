@@ -1,10 +1,10 @@
-interface Solution.DayX
+interface Solution.Day9
     exposes [
         part1,
         part2,
     ]
     imports [
-        "DayX.input" as puzzleInput : Str,
+        "Day9.input" as puzzleInput : Str,
         # parser.String.{ parseStr },
         # parser.Core.{ const, keep, skip },
     ]
@@ -17,7 +17,7 @@ solvePart1 = \input ->
     |> parsePuzzleInput
     |> (\a ->
         dbg
-            x
+            a
 
         "no solution found"
     )
