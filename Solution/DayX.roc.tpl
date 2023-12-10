@@ -15,7 +15,7 @@ part1 =
 solvePart1 = \input ->
     input
     |> parsePuzzleInput
-    |> (\a ->
+    |> (\x ->
         dbg
             x
 

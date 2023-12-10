@@ -130,9 +130,10 @@ solvePart2 = \input ->
     startingNodes = n |> Dict.keepIf (\(k, _) -> k |> Str.endsWith "A") |> Dict.keys
 
     startingNodes
-    |> List.map (\startingNode ->
-        walk2 i n 0 startingNode
-    )
+    |> List.map
+        (\startingNode ->
+            walk2 i n 0 startingNode
+        )
     |> List.walk
         1
         (\state, value ->
@@ -148,7 +149,6 @@ walk2 = \instructions, network, index, node ->
         index + 1
     else
         walk2 instructions network (index + 1) nextNode
-
 
 euklid = \a, b ->
     if b == 0 then
