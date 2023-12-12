@@ -153,13 +153,96 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    input
+    |> Str.trim
+    |> parsePuzzleInput
+    |> List.map unfoldCondictionRecords
+    |> List.walkWithIndex
+        []
+        (\state, line, index ->
+            dbg index
+            state |> List.append (calcLineVariants line)
+        )
+    |> List.sum
+    |> Num.toStr
 
 exampleData2 =
-    """
-    """
+    exampleData1
+
+unfoldCondictionRecords = \line ->
+    springs = List.join [
+        line.springs,
+        [UnknownState],
+        line.springs,
+        [UnknownState],
+        line.springs,
+        [UnknownState],
+        line.springs,
+        [UnknownState],
+        line.springs,
+    ]
+
+    dmgInfo = List.join [
+        line.dmgInfo,
+        line.dmgInfo,
+        line.dmgInfo,
+        line.dmgInfo,
+        line.dmgInfo,
+    ]
+
+    { springs, dmgInfo }
+
+expect
+    got = parsePuzzleInput "???.### 1,1,3" |> List.map unfoldCondictionRecords
+    got
+    == [
+        {
+            springs: [
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                OperationalSpring,
+                DamagedSpring,
+                DamagedSpring,
+                DamagedSpring,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                OperationalSpring,
+                DamagedSpring,
+                DamagedSpring,
+                DamagedSpring,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                OperationalSpring,
+                DamagedSpring,
+                DamagedSpring,
+                DamagedSpring,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                OperationalSpring,
+                DamagedSpring,
+                DamagedSpring,
+                DamagedSpring,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                UnknownState,
+                OperationalSpring,
+                DamagedSpring,
+                DamagedSpring,
+                DamagedSpring,
+            ],
+            dmgInfo: [1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3],
+        },
+    ]
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "525152"
