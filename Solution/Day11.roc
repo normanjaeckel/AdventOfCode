@@ -8,16 +8,16 @@ interface Solution.Day11
     ]
 
 part1 =
-    solvePart1 puzzleInput
+    solvePart puzzleInput 2
 
-solvePart1 = \input ->
+solvePart = \input, extension ->
     rows = input |> Str.split "\n" |> List.len
     cols = input |> Str.split "\n" |> List.first |> Result.try (\r -> r |> Str.toUtf8 |> List.len |> Ok) |> Result.withDefault 0
 
     galaxies = input |> Str.trim |> parsePuzzleInput
     (emptyRows, emptyCols) = getEmptyRowsAndCols galaxies rows cols
 
-    extendedGalaxies = getExtendedGalaxies galaxies emptyRows emptyCols
+    extendedGalaxies = getExtendedGalaxies galaxies emptyRows emptyCols extension
 
     getDistances extendedGalaxies
     |> Num.toStr
@@ -52,7 +52,7 @@ getEmptyRowsAndCols = \galaxies, rows, cols ->
             (stateR |> Set.remove galaxyR, stateC |> Set.remove galaxyC)
         )
 
-getExtendedGalaxies = \galaxies, emptyRows, emptyCols ->
+getExtendedGalaxies = \galaxies, emptyRows, emptyCols, extension ->
     galaxies
     |> List.map
         (\(rowG, colG) ->
@@ -62,7 +62,7 @@ getExtendedGalaxies = \galaxies, emptyRows, emptyCols ->
                     0
                     (\state, emptyRow ->
                         if emptyRow < rowG then
-                            state + 1
+                            state + extension - 1
                         else
                             state
                     )
@@ -72,7 +72,7 @@ getExtendedGalaxies = \galaxies, emptyRows, emptyCols ->
                     0
                     (\state, emptyCol ->
                         if emptyCol < colG then
-                            state + 1
+                            state + extension - 1
                         else
                             state
                     )
@@ -111,19 +111,16 @@ exampleData1 =
     """
 
 expect
-    got = solvePart1 exampleData1
+    got = solvePart exampleData1 2
     got == "374"
 
 part2 =
-    solvePart2 puzzleInput
-
-solvePart2 = \_input ->
-    ""
-
-exampleData2 =
-    """
-    """
+    solvePart puzzleInput 1000000
 
 expect
-    got = solvePart2 exampleData2
-    got == ""
+    got = solvePart exampleData1 10
+    got == "1030"
+
+expect
+    got = solvePart exampleData1 100
+    got == "8410"
