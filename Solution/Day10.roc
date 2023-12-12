@@ -170,12 +170,12 @@ part2 =
     solvePart2 puzzleInput
 
 solvePart2 = \_input ->
-    ""
+    "no solution found yet"
 
-exampleData2 =
-    """
-    """
+# exampleData2 =
+#     """
+#     """
 
-expect
-    got = solvePart2 exampleData2
-    got == ""
+# expect
+#     got = solvePart2 exampleData2
+#     got == ""
