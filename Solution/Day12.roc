@@ -48,88 +48,190 @@ dmgInfoParser =
     digits |> sepBy (string ",")
 
 calcLineVariants = \line ->
-    walk line.springs line.dmgInfo NoRequiredSpring
-    |> (\l ->
-        List.len l
-    )
+    walk line.springs [Variant line.dmgInfo NoRequiredSpring 1]
 
-walk = \springs, dmgInfo, requiredSpring ->
+walk = \springs, variants ->
     when springs is
         [] ->
-            if dmgInfo |> List.isEmpty then
-                [""]
-            else
-                # The walk leads to an invalid state. The springs line is empty but still have unparsed damaged springs.
-                []
+            variants
+            |> List.walk
+                0
+                (\state, Variant dmgInfo _requirement weight ->
+                    if dmgInfo |> List.isEmpty then
+                        # Good case: springs is empty an dmgInfo is empty. Return weight value
+                        state + weight
+                    else
+                        # The walk leads to an invalid state. The springs line is empty but still have unparsed damaged springs.
+                        state + 0
+                )
 
         [s, .. as rest] ->
-            when s is
-                OperationalSpring ->
-                    when requiredSpring is
-                        DamagedSpringRequired ->
-                            # The walk leads to an invalid state, because we have to have a damaged spring here but gut an operational.
+            newVariants =
+                when s is
+                    OperationalSpring ->
+                        variants
+                        |> List.walk
                             []
+                            (\state, Variant dmgInfo requirement weight ->
+                                when requirement is
+                                    DamagedSpringRequired ->
+                                        # The walk leads to an invalid state, because we have to have a damaged spring here but gut an operational.
+                                        state
 
-                        OperationalSpringRequired | NoRequiredSpring ->
-                            walk rest dmgInfo NoRequiredSpring
-                            |> List.map (\st -> ".\(st)")
+                                    OperationalSpringRequired | NoRequiredSpring ->
+                                        state |> List.append (Variant dmgInfo NoRequiredSpring weight)
+                            )
 
-                DamagedSpring ->
-                    when requiredSpring is
-                        OperationalSpringRequired ->
-                            # The walk leads to an invalid state, because we have to have an operational spring here but gut a damaged.
+                    DamagedSpring ->
+                        variants
+                        |> List.walk
                             []
+                            (\state, Variant dmgInfo requirement weight ->
+                                when requirement is
+                                    OperationalSpringRequired ->
+                                        # The walk leads to an invalid state, because we have to have an operational spring here but gut a damaged.
+                                        state
 
-                        DamagedSpringRequired | NoRequiredSpring ->
-                            when dmgInfo |> List.first is
-                                Err _ ->
-                                    # The walk leads to an invalid state because the dmgInfo list is empty but we have a damaged spring here.
-                                    []
+                                    DamagedSpringRequired | NoRequiredSpring ->
+                                        when dmgInfo |> List.first is
+                                            Err _ ->
+                                                # The walk leads to an invalid state because the dmgInfo list is empty but we have a damaged spring here.
+                                                state
 
-                                Ok first ->
-                                    if first == 1 then
-                                        walk rest (dmgInfo |> List.dropFirst 1) OperationalSpringRequired
-                                        |> List.map (\st -> "#\(st)")
-                                    else
-                                        walk rest (dmgInfo |> List.update 0 (\elem -> elem - 1)) DamagedSpringRequired
-                                        |> List.map (\st -> "#\(st)")
+                                            Ok first ->
+                                                if first == 1 then
+                                                    state |> List.append (Variant (dmgInfo |> List.dropFirst 1) OperationalSpringRequired weight)
+                                                else
+                                                    state
+                                                    |> List.append
+                                                        (
+                                                            Variant
+                                                                (dmgInfo |> List.update 0 (\elem -> elem - 1))
+                                                                DamagedSpringRequired
+                                                                weight
+                                                        )
+                            )
 
-                UnknownState ->
-                    case1 = walk (rest |> List.prepend OperationalSpring) dmgInfo requiredSpring
-                    case2 = walk (rest |> List.prepend DamagedSpring) dmgInfo requiredSpring
+                    UnknownState ->
+                        variants
+                        |> List.walk
+                            []
+                            (\state, Variant dmgInfo requirement weight ->
+                                # Assume OperationalSpring and add Variant to state or discard it.
+                                # Then assume DamagedSpring and so on.
+                                when requirement is
+                                    OperationalSpringRequired ->
+                                        state |> List.append (Variant dmgInfo NoRequiredSpring weight)
 
-                    List.concat case1 case2
+                                    DamagedSpringRequired ->
+                                        # Copied code ...
+                                        when dmgInfo |> List.first is
+                                            Err _ ->
+                                                # The walk leads to an invalid state because the dmgInfo list is empty but we have a damaged spring here.
+                                                state
+
+                                            Ok first ->
+                                                if first == 1 then
+                                                    state |> List.append (Variant (dmgInfo |> List.dropFirst 1) OperationalSpringRequired weight)
+                                                else
+                                                    state
+                                                    |> List.append
+                                                        (
+                                                            Variant
+                                                                (dmgInfo |> List.update 0 (\elem -> elem - 1))
+                                                                DamagedSpringRequired
+                                                                weight
+                                                        )
+
+                                    NoRequiredSpring ->
+                                        case1 = Variant dmgInfo NoRequiredSpring weight # Assume OperationalSpring
+                                        case2 = # Assume DamagedSpring
+                                            # Copied code ...
+                                            when dmgInfo |> List.first is
+                                                Err _ ->
+                                                    # The walk leads to an invalid state because the dmgInfo list is empty but we have a damaged spring here.
+                                                    []
+
+                                                Ok first ->
+                                                    if first == 1 then
+                                                        [Variant (dmgInfo |> List.dropFirst 1) OperationalSpringRequired weight]
+                                                    else
+                                                        [Variant (dmgInfo |> List.update 0 (\elem -> elem - 1)) DamagedSpringRequired weight]
+
+                                        state |> List.append case1 |> List.concat case2
+                            )
+
+            walk rest (newVariants |> reduceDuplicats)
+
+reduceDuplicats = \variants ->
+    reduceDuplicatsHelper variants []
+
+reduceDuplicatsHelper = \l, result ->
+    when l is
+        [first, .. as rest] ->
+            rest
+            |> List.walk
+                (first, [])
+                (\(state, newRest), element ->
+                    if compareVariants element first then
+                        (combineVariants state element, newRest)
+                    else
+                        (state, newRest |> List.append element)
+                )
+            |> (\(ready, newRest) ->
+                reduceDuplicatsHelper newRest (result |> List.append ready)
+            )
+
+        [] -> result
+
+compareVariants = \Variant dmgInfo1 requirement1 _, Variant dmgInfo2 requirement2 _ ->
+    (dmgInfo1, requirement1) == (dmgInfo2, requirement2)
+
+combineVariants = \Variant dmgInfo1 requirement1 weight1, Variant _ _ weight2 ->
+    Variant dmgInfo1 requirement1 (weight1 + weight2)
+
+# reducerWalk = \l ->
+#     when l is
+#         [Variant dmgInfo1 requirement1 weight1, Variant dmgInfo2 requirement2 weight2, .. as rest] ->
+#             if (dmgInfo1, requirement1) == (dmgInfo2, requirement2) then
+#                 new = combine (Variant dmgInfo1 requirement1 weight1) (Variant dmgInfo2 requirement2 weight2)
+#                 reducerWalk (rest |> List.prepend new)
+#             else
+#                 reducerWalk (rest |> List.prepend (Variant dmgInfo2 requirement2 weight2)) |> List.prepend (Variant dmgInfo2 requirement2 weight2)
+
+#         [_, ..] -> l
+#         [] -> l
 
 expect
-    got = walk [OperationalSpring, OperationalSpring] [] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, OperationalSpring] [Variant [] NoRequiredSpring 1]
     got == 1
 
 expect
-    got = walk [OperationalSpring, DamagedSpring] [1] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, DamagedSpring] [Variant [1] NoRequiredSpring 1]
     got == 1
 
 expect
-    got = walk [OperationalSpring, OperationalSpring] [2] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, OperationalSpring] [Variant [2] NoRequiredSpring 1]
     got == 0
 
 expect
-    got = walk [OperationalSpring, DamagedSpring] [1, 2] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, DamagedSpring] [Variant [1, 2] NoRequiredSpring 1]
     got == 0
 
 expect
-    got = walk [OperationalSpring, DamagedSpring, OperationalSpring, DamagedSpring, DamagedSpring] [1, 2] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, DamagedSpring, OperationalSpring, DamagedSpring, DamagedSpring] [Variant [1, 2] NoRequiredSpring 1]
     got == 1
 
 expect
-    got = walk [OperationalSpring, DamagedSpring, OperationalSpring, DamagedSpring, DamagedSpring] [1, 1] NoRequiredSpring |> List.len
+    got = walk [OperationalSpring, DamagedSpring, OperationalSpring, DamagedSpring, DamagedSpring] [Variant [1, 1] NoRequiredSpring 1]
     got == 0
 
 expect
-    got = walk [UnknownState] [1] NoRequiredSpring |> List.len
+    got = walk [UnknownState] [Variant [1] NoRequiredSpring 1]
     got == 1
 
 expect
-    got = walk [UnknownState, UnknownState] [1] NoRequiredSpring |> List.len
+    got = walk [UnknownState, UnknownState] [Variant [1] NoRequiredSpring 1]
     got == 2
 
 expect
@@ -158,12 +260,7 @@ solvePart2 = \input ->
     |> Str.trim
     |> parsePuzzleInput
     |> List.map unfoldCondictionRecords
-    |> List.walkWithIndex
-        []
-        (\state, line, index ->
-            dbg index
-            state |> List.append (calcLineVariants line)
-        )
+    |> List.map calcLineVariants
     |> List.sum
     |> Num.toStr
 
