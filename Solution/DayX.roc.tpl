@@ -14,6 +14,7 @@ part1 =
 
 solvePart1 = \input ->
     input
+    |> Str.trim
     |> parsePuzzleInput
     |> (\x ->
         dbg
