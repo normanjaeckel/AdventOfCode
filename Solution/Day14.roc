@@ -155,8 +155,8 @@ solvePart2 = \input ->
     |> calcLoad
     |> Num.toStr
 
-exampleData2 =
-    exampleData1
+# exampleData2 =
+#     exampleData1
 
 # expect
 #     got = solvePart2 exampleData2
