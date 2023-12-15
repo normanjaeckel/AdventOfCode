@@ -116,13 +116,84 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    parsedInput = input |> Str.trim |> Str.split "\n\n" |> List.map parsePuzzleInput
+    invertedParsedInput = parsedInput |> List.map invertMap
+
+    horizontal = parsedInput |> List.map findReflection2 |> List.map (\n -> n * 100)
+    vertical = invertedParsedInput |> List.map findReflection2
+
+    List.concat horizontal vertical
+    |> List.sum
+    |> Num.toStr
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "400"
+
+findReflection2 = \lines ->
+    smudgeMe2 lines
+    |> List.walkUntil
+        0
+        (\_, Smudge smudged lineIdx ->
+            n = findReflectionHelper2 [] smudged lineIdx
+            if n > 0 then
+                Break n
+            else
+                Continue 0
+        )
+
+findReflectionHelper2 = \left, right, smudgedIndex ->
+    when right is
+        [one, .. as rest] ->
+            if List.isEmpty rest then
+                0
+            else
+                newLeft = left |> List.append one
+                l = List.len newLeft
+                if l <= List.len rest then
+                    newRest = rest |> List.takeFirst (l)
+                    if newLeft |> List.reverse == newRest && smudgedIndex < (2 * l) then
+                        l
+                    else
+                        findReflectionHelper2 newLeft rest smudgedIndex
+                else
+                    shorterNewLeft = newLeft |> List.takeLast (List.len rest)
+                    if shorterNewLeft |> List.reverse == rest && smudgedIndex >= (l - List.len rest) then
+                        l
+                    else
+                        findReflectionHelper2 newLeft rest smudgedIndex
+
+        [] ->
+            0
+
+smudgeMe2 = \lines ->
+    lines
+    |> List.mapWithIndex
+        (\line, index ->
+            smudgeMe1 line
+            |> List.map
+                (\smudged ->
+                    Smudge (lines |> List.set index smudged) index
+                )
+        )
+    |> List.join
+
+smudgeMe1 = \line ->
+    line
+    |> List.mapWithIndex
+        (\element, index ->
+            newElement =
+                when element is
+                    Rock -> Ash
+                    Ash -> Rock
+            line |> List.set index newElement
+        )
+
+expect
+    got = smudgeMe2 [[Ash, Ash], [Rock, Rock]]
+    got == [Smudge [[Rock, Ash], [Rock, Rock]] 0, Smudge [[Ash, Rock], [Rock, Rock]] 0, Smudge [[Ash, Ash], [Ash, Rock]] 1, Smudge [[Ash, Ash], [Rock, Ash]] 1]
+
