@@ -19,9 +19,9 @@ solvePart1 = \input ->
 
     nextNode = getNextNode pipes startNode
 
-    way = walkNodes pipes (Node Start startNode) nextNode 1
+    way = walkNodes pipes (Node Start startNode) nextNode [Node Start startNode]
 
-    way // 2 |> Num.toStr
+    (List.len way) // 2 |> Num.toStr
 
 parsePuzzleInput = \input ->
     when parseStr puzzleParser input is
@@ -50,9 +50,9 @@ getStartNode = \pipes ->
     pipes
     |> List.walkUntil
         (1, 1)
-        (\(lineIndex, _), line ->
+        (\(rowIndex, _), row ->
             res =
-                line
+                row
                 |> List.walkUntil
                     1
                     (\colIndex, element ->
@@ -60,30 +60,30 @@ getStartNode = \pipes ->
                             Start -> Break colIndex
                             _ -> Continue (colIndex + 1)
                     )
-            if res <= List.len line then
-                Break (lineIndex, res)
+            if res <= List.len row then
+                Break (rowIndex, res)
             else
-                Continue (lineIndex + 1, 1)
+                Continue (rowIndex + 1, 1)
         )
 
-getNextNode = \pipes, (startLine, startCol) ->
-    southernNode = getNode pipes (startLine + 1, startCol)
+getNextNode = \pipes, (startRow, startCol) ->
+    southernNode = getNode pipes (startRow + 1, startCol)
     when southernNode is
         Node e _ ->
             if [Vertical, CornerNE, CornerNW] |> List.contains e then
                 southernNode
             else
-                crash "We implement only a connection to south ... if your puzzle input is not like this, you have to add the respective code."
+                crash "I implement only a connection to south ... if your puzzle input is not like this, you have to add the respective code here. Good luck."
 
-getNode = \pipes, (nodeLine, nodeCol) ->
+getNode = \pipes, (nodeRow, nodeCol) ->
     res1 =
         pipes
         |> List.walkUntil
             (State1 Ground 1)
-            (\State1 _ lineIndex, line ->
-                if lineIndex == nodeLine then
+            (\State1 _ rowIndex, row ->
+                if rowIndex == nodeRow then
                     res2 =
-                        line
+                        row
                         |> List.walkUntil
                             (State2 Ground 1)
                             (\State2 _ colIndex, element ->
@@ -96,52 +96,52 @@ getNode = \pipes, (nodeLine, nodeCol) ->
                         State2 e2 _ ->
                             Break (State1 e2 0)
                 else
-                    Continue (State1 Ground (lineIndex + 1))
+                    Continue (State1 Ground (rowIndex + 1))
             )
     when res1 is
-        State1 e1 _ -> Node e1 (nodeLine, nodeCol)
+        State1 e1 _ -> Node e1 (nodeRow, nodeCol)
 
-walkNodes = \pipes, Node _ (line1, col1), Node node2 (line2, col2), index ->
+walkNodes = \pipes, Node _ (row1, col1), Node node2 (row2, col2), result ->
     next =
         when node2 is
             Vertical ->
-                if line1 < line2 then
-                    getNode pipes (line2 + 1, col2)
+                if row1 < row2 then
+                    getNode pipes (row2 + 1, col2)
                 else
-                    getNode pipes (line2 - 1, col2)
+                    getNode pipes (row2 - 1, col2)
 
             Horizontal ->
                 if col1 < col2 then
-                    getNode pipes (line2, col2 + 1)
+                    getNode pipes (row2, col2 + 1)
                 else
-                    getNode pipes (line2, col2 - 1)
+                    getNode pipes (row2, col2 - 1)
 
             CornerNE ->
-                if line1 < line2 then
-                    getNode pipes (line2, col2 + 1)
+                if row1 < row2 then
+                    getNode pipes (row2, col2 + 1)
                 else
-                    getNode pipes (line2 - 1, col2)
+                    getNode pipes (row2 - 1, col2)
 
             CornerNW ->
-                if line1 < line2 then
-                    getNode pipes (line2, col2 - 1)
+                if row1 < row2 then
+                    getNode pipes (row2, col2 - 1)
                 else
-                    getNode pipes (line2 - 1, col2)
+                    getNode pipes (row2 - 1, col2)
 
             CornerSW ->
                 if col1 < col2 then
-                    getNode pipes (line2 + 1, col2)
+                    getNode pipes (row2 + 1, col2)
                 else
-                    getNode pipes (line2, col2 - 1)
+                    getNode pipes (row2, col2 - 1)
 
             CornerSE ->
                 if col2 < col1 then
-                    getNode pipes (line2 + 1, col2)
+                    getNode pipes (row2 + 1, col2)
                 else
-                    getNode pipes (line2, col2 + 1)
+                    getNode pipes (row2, col2 + 1)
 
             Start ->
-                Node node2 (line2, col2)
+                Node node2 (row2, col2)
 
             Ground ->
                 crash "pipe was broken"
@@ -149,9 +149,9 @@ walkNodes = \pipes, Node _ (line1, col1), Node node2 (line2, col2), index ->
     when next is
         Node e _ ->
             if e == Start then
-                index + 1
+                result |> List.append (Node node2 (row2, col2))
             else
-                walkNodes pipes (Node node2 (line2, col2)) next (index + 1)
+                walkNodes pipes (Node node2 (row2, col2)) next (result |> List.append (Node node2 (row2, col2)))
 
 exampleData1 =
     """
