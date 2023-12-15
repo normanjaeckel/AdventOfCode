@@ -145,13 +145,82 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    input
+    |> Str.trim
+    |> parsePuzzleInput
+    |> preparePlatform
+    |> runNCyles 1
+    |> preparePlatform
+    |> calcLoad
+    |> Num.toStr
 
 exampleData2 =
-    """
-    """
+    exampleData1
+
+# expect
+#     got = solvePart2 exampleData2
+#     got == "64"
+
+preparePlatform = \platform ->
+    platform
+    |> List.map
+        (\line -> List.reverse line)
+
+runOneCyle = \platform ->
+    platform
+    |> rotateAndInvert
+    |> tiltPlatformToWest
+    |> List.reverse
+    |> rotateAndInvert
+    |> tiltPlatformToWest
+    |> List.reverse
+    |> rotateAndInvert
+    |> tiltPlatformToWest
+    |> List.reverse
+    |> rotateAndInvert
+    |> tiltPlatformToWest
+    |> List.reverse
+
+runNCyles = \platform, n ->
+    if n == 0 then
+        platform
+    else
+        platform
+        |> runOneCyle
+        |> runNCyles (n - 1)
 
 expect
-    got = solvePart2 exampleData2
-    got == ""
+    afterOneCyle =
+        """
+        .....#....
+        ....#...O#
+        ...OO##...
+        .OO#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#....
+        ......OOOO
+        #...O###..
+        #..OO#....
+        """
+    got = exampleData1 |> parsePuzzleInput |> preparePlatform |> runOneCyle |> preparePlatform
+    got == afterOneCyle |> parsePuzzleInput
+
+expect
+    afterThreeCycles =
+        """
+        .....#....
+        ....#...O#
+        .....##...
+        ..O#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#...O
+        .......OOO
+        #...O###.O
+        #.OOO#...O
+        """
+    got = exampleData1 |> parsePuzzleInput |> preparePlatform |> runNCyles 3 |> preparePlatform
+    got == afterThreeCycles |> parsePuzzleInput
+
