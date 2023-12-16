@@ -169,13 +169,113 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    "no solution found yet"
+solvePart2 = \input ->
+    pipes = input |> Str.trim |> parsePuzzleInput
 
-# exampleData2 =
-#     """
-#     """
+    startNode = getStartNode pipes
 
-# expect
-#     got = solvePart2 exampleData2
-#     got == ""
+    nextNode = getNextNode pipes startNode
+
+    (way, typeOnStart) = walkNodes pipes (Node Start startNode) nextNode [Node Start startNode] |> modifyWay
+
+    pipes
+    |> List.mapWithIndex (\line, rowIndex -> countInLine line (rowIndex + 1) way typeOnStart)
+    |> List.sum
+    |> Num.toStr
+
+modifyWay = \way ->
+    (Node _ (startNodeRow, startNodeCol)) =
+        when way |> List.first is
+            Err _ -> crash "way must not be empty"
+            Ok s -> s
+
+    (Node _ (lastNodeRow, lastNodeCol)) =
+        when way |> List.last is
+            Err _ -> crash "way must not be emtpy"
+            Ok l -> l
+
+    # We assume that the second element is southern, see the getNextNode function.
+    # So we just check the last element and make | or 7 or F
+
+    element =
+        if startNodeRow == lastNodeRow then
+            if startNodeCol < lastNodeCol then
+                CornerSE
+            else
+                CornerSW
+        else
+            Vertical
+
+    (way |> List.set 0 (Node element (startNodeRow, startNodeCol)), element)
+
+countInLine = \line, rowIndex, way, typeOnStart ->
+    line
+    |> List.walkWithIndex
+        (Out, 0)
+        (\(status, count), nodeRaw, colIndex ->
+            node =
+                when nodeRaw is
+                    Start -> typeOnStart
+                    _ -> nodeRaw
+            if way |> List.contains (Node node (rowIndex, colIndex + 1)) then
+                when status is
+                    Out ->
+                        when node is
+                            Vertical -> (In, count)
+                            CornerNE -> (Riding CounterClockwise, count)
+                            CornerSE -> (Riding Clockwise, count)
+                            _ -> crash "impossible 1"
+
+                    In ->
+                        when node is
+                            Vertical -> (Out, count)
+                            CornerNE -> (Riding Clockwise, count)
+                            CornerSE -> (Riding CounterClockwise, count)
+                            _ -> crash "impossible 2"
+
+                    Riding Clockwise ->
+                        when node is
+                            Horizontal -> (Riding Clockwise, count)
+                            CornerNW -> (In, count)
+                            CornerSW -> (Out, count)
+                            _ -> crash "impossible 3"
+
+                    Riding CounterClockwise ->
+                        when node is
+                            Horizontal -> (Riding CounterClockwise, count)
+                            CornerNW -> (Out, count)
+                            CornerSW -> (In, count)
+                            _ -> crash "impossible 4"
+            else
+                when status is
+                    Out -> (Out, count)
+                    In -> (In, count + 1)
+                    Riding Clockwise -> (Out, count)
+                    Riding CounterClockwise -> (In, count + 1)
+        )
+    |> (\(_, count) -> count)
+
+exampleData2 =
+    exampleData1
+
+expect
+    got = solvePart2 exampleData2
+    got == "1"
+
+exampleData3 =
+    """
+    FF7FSF7F7F7F7F7F---7
+    L|LJ||||||||||||F--J
+    FL-7LJLJ||||||LJL-77
+    F--JF--7||LJLJ7F7FJ-
+    L---JF-JLJ.||-FJLJJ7
+    |F|F-JF---7F7-L7L|7|
+    |FFJF7L7F-JF7|JL---7
+    7-L-JL7||F7|L7F-7F7|
+    L.L7LFJ|||||FJL7||LJ
+    L7JLJL-JLJLJL--JLJ.L
+    """
+
+expect
+    got = solvePart2 exampleData3
+    got == "10"
