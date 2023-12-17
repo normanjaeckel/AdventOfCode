@@ -5,6 +5,7 @@ interface Solution.Day16
     ]
     imports [
         "Day16.input" as puzzleInput : Str,
+        "Day16.example.input" as exampleDataFromFile : Str,
         parser.String.{ parseStr, string, codeunit },
         parser.Core.{ sepBy, many, oneOf, map },
     ]
@@ -42,163 +43,122 @@ lineParser =
         )
 
 startBeam = \contraption ->
-    maxRow = List.len contraption
-    maxCol =
-        when contraption |> List.first is
-            Err _ -> crash "impossible (in start beam)"
-            Ok row ->
-                List.len row
-    beamHelper contraption maxRow maxCol [Beam East 1 0] []
+    beamHelper contraption [Beam East 0 0] [Beam East 0 0]
 
-beamHelper = \contraption, maxRow, maxCol, beams, energized ->
+beamHelper = \contraption, beams, energized ->
     beams
     |> List.walk
         ([], energized)
         (\(newBeams, newEnergized), Beam direction row col ->
-            when direction is
-                East ->
-                    if col == maxCol then
-                        (newBeams, newEnergized)
-                    else if alreadyEnergized newEnergized (Beam direction row (col + 1)) then
-                        (newBeams, newEnergized)
-                    else
-                        next = getTile contraption row (col + 1)
-                        when next is
-                            EmptySpace ->
-                                new = Beam East row (col + 1)
-                                (newBeams |> List.append new, newEnergized |> List.append new)
+            nextBeams =
+                when getTile contraption row col is
+                    EmptySpace ->
+                        newDirection = direction
+                        [getNextBeam contraption (Beam newDirection row col)]
 
-                            Mirror m ->
-                                when m is
-                                    Slash ->
-                                        new = Beam North row (col + 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+                    Mirror Slash ->
+                        newDirection =
+                            when direction is
+                                East -> North
+                                North -> East
+                                West -> South
+                                South -> West
+                        [getNextBeam contraption (Beam newDirection row col)]
 
-                                    Backslash ->
-                                        new = Beam South row (col + 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+                    Mirror Backslash ->
+                        newDirection =
+                            when direction is
+                                East -> South
+                                North -> West
+                                West -> North
+                                South -> East
+                        [getNextBeam contraption (Beam newDirection row col)]
 
-                            Splitter s ->
-                                when s is
-                                    Horizontal ->
-                                        new = Beam East row (col + 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+                    Splitter Horizontal ->
+                        when direction is
+                            East | West ->
+                                newDirection = direction
+                                [getNextBeam contraption (Beam newDirection row col)]
 
-                                    Vertical ->
-                                        new = [Beam North row (col + 1), Beam South row (col + 1)]
-                                        (newBeams |> List.concat new, newEnergized |> List.concat new)
+                            North | South ->
+                                [
+                                    getNextBeam contraption (Beam East row col),
+                                    getNextBeam contraption (Beam West row col),
+                                ]
 
-                West ->
-                    if col == 1 then
-                        (newBeams, newEnergized)
-                    else if alreadyEnergized newEnergized (Beam direction row (col - 1)) then
-                        (newBeams, newEnergized)
-                    else
-                        next = getTile contraption row (col - 1)
-                        when next is
-                            EmptySpace ->
-                                new = Beam West row (col - 1)
-                                (newBeams |> List.append new, newEnergized |> List.append new)
+                    Splitter Vertical ->
+                        when direction is
+                            North | South ->
+                                newDirection = direction
+                                [getNextBeam contraption (Beam newDirection row col)]
 
-                            Mirror m ->
-                                when m is
-                                    Slash ->
-                                        new = Beam South row (col - 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+                            East | West ->
+                                [
+                                    getNextBeam contraption (Beam North row col),
+                                    getNextBeam contraption (Beam South row col),
+                                ]
 
-                                    Backslash ->
-                                        new = Beam North row (col - 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+            nextBeamsFiltered =
+                nextBeams
+                |> List.walk
+                    []
+                    (\state, n ->
+                        when n is
+                            Ok value -> state |> List.append value
+                            Err _ -> state
+                    )
+                |> List.dropIf (\n -> alreadyEnergized newEnergized n)
 
-                            Splitter s ->
-                                when s is
-                                    Horizontal ->
-                                        new = Beam West row (col - 1)
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
+            (newBeams |> List.concat nextBeamsFiltered, newEnergized |> List.concat nextBeamsFiltered)
 
-                                    Vertical ->
-                                        new = [Beam North row (col - 1), Beam South row (col - 1)]
-                                        (newBeams |> List.concat new, newEnergized |> List.concat new)
-
-                South ->
-                    if row == maxRow then
-                        (newBeams, newEnergized)
-                    else if alreadyEnergized newEnergized (Beam direction (row + 1) col) then
-                        (newBeams, newEnergized)
-                    else
-                        next = getTile contraption (row + 1) col
-                        when next is
-                            EmptySpace ->
-                                new = Beam South (row + 1) col
-                                (newBeams |> List.append new, newEnergized |> List.append new)
-
-                            Mirror m ->
-                                when m is
-                                    Slash ->
-                                        new = Beam West (row + 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                                    Backslash ->
-                                        new = Beam East (row + 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                            Splitter s ->
-                                when s is
-                                    Vertical ->
-                                        new = Beam South (row + 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                                    Horizontal ->
-                                        new = [Beam West (row + 1) col, Beam East (row + 1) col]
-                                        (newBeams |> List.concat new, newEnergized |> List.concat new)
-
-                North ->
-                    if row == 1 then
-                        (newBeams, newEnergized)
-                    else if alreadyEnergized newEnergized (Beam direction (row - 1) col) then
-                        (newBeams, newEnergized)
-                    else
-                        next = getTile contraption (row - 1) col
-                        when next is
-                            EmptySpace ->
-                                new = Beam North (row - 1) col
-                                (newBeams |> List.append new, newEnergized |> List.append new)
-
-                            Mirror m ->
-                                when m is
-                                    Slash ->
-                                        new = Beam East (row - 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                                    Backslash ->
-                                        new = Beam West (row - 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                            Splitter s ->
-                                when s is
-                                    Vertical ->
-                                        new = Beam North (row - 1) col
-                                        (newBeams |> List.append new, newEnergized |> List.append new)
-
-                                    Horizontal ->
-                                        new = [Beam West (row - 1) col, Beam East (row - 1) col]
-                                        (newBeams |> List.concat new, newEnergized |> List.concat new)
         )
     |> (\(newBeams, newEnergized) ->
         if List.isEmpty newBeams then
             newEnergized
         else
-            beamHelper contraption maxRow maxCol newBeams newEnergized
+            beamHelper contraption newBeams newEnergized
     )
 
 getTile = \contraption, row, col ->
-    when contraption |> List.get (row - 1) is
-        Err _ -> crash "impossible (getTile 1)"
+    when contraption |> List.get row is
+        Err _ -> crash "impossible  (getTile 1)"
         Ok line ->
-            when line |> List.get (col - 1) is
+            when line |> List.get col is
                 Err _ -> crash "impossible (getTile 2)"
                 Ok element ->
                     element
+
+getNextBeam = \contraption, Beam direction row col ->
+    numRows = List.len contraption
+    numCols =
+        when contraption |> List.first is
+            Err _ -> crash "impossible (in start beam)"
+            Ok r -> List.len r
+
+    when direction is
+        East ->
+            if col == (numCols - 1) then
+                Err OutOfBounds
+            else
+                Ok (Beam direction row (col + 1))
+
+        West ->
+            if col == 0 then
+                Err OutOfBounds
+            else
+                Ok (Beam direction row (col - 1))
+
+        North ->
+            if row == 0 then
+                Err OutOfBounds
+            else
+                Ok (Beam direction (row - 1) col)
+
+        South ->
+            if row == (numRows - 1) then
+                Err OutOfBounds
+            else
+                Ok (Beam direction (row + 1) col)
 
 alreadyEnergized = \energized, beam ->
     energized |> List.contains beam
@@ -229,6 +189,18 @@ exampleData1 =
     """
 
 expect
+    got = solvePart1 "\\...\n...."
+    got == "2"
+
+expect
+    got = solvePart1 "\\\\..\n\\/.."
+    got == "4"
+
+expect
+    got = solvePart1 exampleDataFromFile
+    got == "26"
+
+expect
     got = solvePart1 exampleData1
     got == "46"
 
@@ -245,3 +217,36 @@ exampleData2 =
 expect
     got = solvePart2 exampleData2
     got == ""
+
+# magicFn = \grid, energized ->
+#     grid
+#     |> List.mapWithIndex
+#         (\line, rowIndex ->
+#             line
+#             |> List.mapWithIndex
+#                 (\element, colIndex ->
+#                     energized
+#                     |> List.walkUntil
+#                         NotFound
+#                         (\_, Beam _ row col ->
+#                             if col == colIndex && row == rowIndex then
+#                                 Break (Found '#')
+#                             else
+#                                 Continue NotFound
+#                         )
+#                     |> (\i ->
+#                         when i is
+#                             Found f -> f
+#                             NotFound ->
+#                                 when element is
+#                                     EmptySpace -> '.'
+#                                     Mirror Slash -> '/'
+#                                     Mirror Backslash -> '\\'
+#                                     Splitter Vertical -> '|'
+#                                     Splitter Horizontal -> '-'
+#                     )
+#                 )
+#             |> Str.fromUtf8
+#             |> Result.withDefault "ERROR"
+#         )
+#     |> Str.joinWith "\n"
