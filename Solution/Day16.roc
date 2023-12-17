@@ -17,7 +17,7 @@ solvePart1 = \input ->
     input
     |> Str.trim
     |> parsePuzzleInput
-    |> startBeam
+    |> startBeam (Beam East 0 0)
     |> reduceEnergized
     |> List.len
     |> Num.toStr
@@ -42,8 +42,8 @@ lineParser =
             ]
         )
 
-startBeam = \contraption ->
-    beamHelper contraption [Beam East 0 0] [Beam East 0 0]
+startBeam = \contraption, beam ->
+    beamHelper contraption [beam] [beam]
 
 beamHelper = \contraption, beams, energized ->
     beams
@@ -207,16 +207,50 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    contraption =
+        input
+        |> Str.trim
+        |> parsePuzzleInput
+
+    numRows = List.len contraption
+    numCols =
+        when contraption |> List.first is
+            Err _ -> crash "impossible (numCols)"
+            Ok r -> List.len r
+
+    beams1 =
+        contraption
+        |> List.walkWithIndex
+            []
+            (\state, _, index ->
+                state |> List.concat [Beam East index 0, Beam West index (numCols - 1)]
+            )
+    beams2 =
+        List.repeat {} numCols
+        |> List.walkWithIndex
+            beams1
+            (\state, _, index ->
+                state |> List.concat [Beam South 0 index, Beam North (numRows - 1) index]
+            )
+
+    beams2
+    |> List.map
+        (\b ->
+            startBeam contraption b
+            |> reduceEnergized
+            |> List.len
+        )
+    |> List.max
+    |> Result.withDefault 0
+    |> Num.toStr
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "51"
 
 # magicFn = \grid, energized ->
 #     grid
