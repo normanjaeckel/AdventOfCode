@@ -43,50 +43,53 @@ walkThrough = \cityMap ->
 
 walkThroughHelper = \city, queue, visited ->
     (Crucible row col forbiddenDirections heat, newQueue) = getSmallestFrom queue
+    c = Crucible row col forbiddenDirections heat
 
-    newVisited = visited |> List.append (Crucible row col forbiddenDirections heat)
-
-    if row == (city.rows - 1) && col == (city.cols - 1) then
-        heat
+    if alreadyVisited visited c then
+        walkThroughHelper city (newQueue) visited
     else
-        [North, East, South, West]
-        |> List.dropIf
-            (\direction -> forbiddenDirections |> List.contains direction)
-        |> List.walk
-            []
-            (\state, direction ->
-                List.range { start: At 1, end: At 3 }
-                |> List.walk
-                    (state, heat)
-                    (\(innerState, extraHeat), steps ->
-                        when getBlock city direction row col steps is
-                            Err _ ->
-                                (innerState, extraHeat)
+        newVisited = visited |> List.append c
 
-                            Ok (newRow, newCol, heatAtBlock) ->
-                                newForbiddenDirections =
-                                    when direction is
-                                        North -> [North, South]
-                                        South -> [North, South]
-                                        West -> [West, East]
-                                        East -> [West, East]
-                                newHeat = heatAtBlock + extraHeat
-                                (innerState |> List.append (Crucible newRow newCol newForbiddenDirections newHeat), newHeat)
+        if row == (city.rows - 1) && col == (city.cols - 1) then
+            heat
+        else
+            [North, East, South, West]
+            |> List.dropIf
+                (\direction -> forbiddenDirections |> List.contains direction)
+            |> List.walk
+                []
+                (\state, direction ->
+                    List.range { start: At 1, end: At 3 }
+                    |> List.walk
+                        (state, heat)
+                        (\(innerState, extraHeat), steps ->
+                            when getBlock city direction row col steps is
+                                Err _ ->
+                                    (innerState, extraHeat)
+
+                                Ok (newRow, newCol, heatAtBlock) ->
+                                    newForbiddenDirections =
+                                        when direction is
+                                            North -> [North, South]
+                                            South -> [North, South]
+                                            West -> [West, East]
+                                            East -> [West, East]
+                                    newHeat = heatAtBlock + extraHeat
+                                    (innerState |> List.append (Crucible newRow newCol newForbiddenDirections newHeat), newHeat)
+                        )
+                    |> (\(nextElements, _) ->
+                        state |> List.concat nextElements
                     )
-                |> (\(nextElements, _) ->
-                    state |> List.concat nextElements
                 )
+            |> (\nextElements ->
+                walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
             )
-        |> List.dropIf
-            (\Crucible row1 col1 forbiddenDirections1 h1 ->
-                newVisited
-                |> List.any
-                    (\Crucible vRow vCol vForbiddenDirections _ ->
-                        vRow == row1 && vCol == col1 && vForbiddenDirections == forbiddenDirections1
-                    )
-            )
-        |> (\nextElements ->
-            walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
+
+alreadyVisited = \visited, Crucible row col forbiddenDirections _ ->
+    visited
+    |> List.any
+        (\Crucible vRow vCol vForbiddenDirections _ ->
+            vRow == row && vCol == col && vForbiddenDirections == forbiddenDirections
         )
 
 getSmallestFrom = \queue ->
