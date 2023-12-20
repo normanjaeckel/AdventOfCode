@@ -37,18 +37,19 @@ walkThrough = \cityMap ->
             Ok l -> List.len l
 
     start = [Crucible 0 0 [] 0]
-    visited = [] |> List.reserve (numOfRows * numOfCols)
+    visited = [] # |> List.reserve (numOfRows * numOfCols)
 
     walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } start visited
 
 walkThroughHelper = \city, queue, visited ->
-    (Crucible row col forbiddenDirections heat, newQueue) = getSmallestFrom queue
-    c = Crucible row col forbiddenDirections heat
 
-    if alreadyVisited visited c then
-        walkThroughHelper city (newQueue) visited
+    (Crucible row col forbiddenDirections heat, newQueue) = getSmallestFrom queue
+    cReduced = (row, col, forbiddenDirections)
+
+    if visited |> List.contains cReduced then
+        walkThroughHelper city newQueue visited
     else
-        newVisited = visited |> List.append c
+        newVisited = visited |> List.append cReduced
 
         if row == (city.rows - 1) && col == (city.cols - 1) then
             heat
@@ -85,12 +86,12 @@ walkThroughHelper = \city, queue, visited ->
                 walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
             )
 
-alreadyVisited = \visited, Crucible row col forbiddenDirections _ ->
-    visited
-    |> List.any
-        (\Crucible vRow vCol vForbiddenDirections _ ->
-            vRow == row && vCol == col && vForbiddenDirections == forbiddenDirections
-        )
+# alreadyVisited = \visited, Crucible row col forbiddenDirections _ ->
+#     visited
+#     |> List.any
+#         (\Crucible vRow vCol vForbiddenDirections _ ->
+#             vRow == row && vCol == col && vForbiddenDirections == forbiddenDirections
+#         )
 
 getSmallestFrom = \queue ->
     queue
