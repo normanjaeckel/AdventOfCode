@@ -33,65 +33,61 @@ walkThrough = \cityMap ->
     numOfRows = List.len cityMap
     numOfCols =
         when cityMap |> List.first is
-            Err _ -> crash "bad city input        "
+            Err _ -> crash "bad city input"
             Ok l -> List.len l
 
     start = [Crucible 0 0 [] 0]
-    visited = [] # |> List.reserve (numOfRows * numOfCols)
+    visited = [] |> List.reserve (numOfRows * numOfCols)
 
     walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } start visited
 
 walkThroughHelper = \city, queue, visited ->
 
+    dbg
+        (List.len queue, List.len visited)
+
     (Crucible row col forbiddenDirections heat, newQueue) = getSmallestFrom queue
-    cReduced = (row, col, forbiddenDirections)
 
-    if visited |> List.contains cReduced then
-        walkThroughHelper city newQueue visited
+    if row == (city.rows - 1) && col == (city.cols - 1) then
+        heat
     else
-        newVisited = visited |> List.append cReduced
-
-        if row == (city.rows - 1) && col == (city.cols - 1) then
-            heat
-        else
-            [North, East, South, West]
-            |> List.dropIf
-                (\direction -> forbiddenDirections |> List.contains direction)
-            |> List.walk
-                []
-                (\state, direction ->
-                    List.range { start: At 1, end: At 3 }
+        (nextElements, newVisited) =
+            if visited |> List.contains (row, col, forbiddenDirections) then
+                ([], visited)
+            else
+                nextElements1 =
+                    [North, East, South, West]
+                    |> List.dropIf
+                        (\direction -> forbiddenDirections |> List.contains direction)
                     |> List.walk
-                        (state, heat)
-                        (\(innerState, extraHeat), steps ->
-                            when getBlock city direction row col steps is
-                                Err _ ->
-                                    (innerState, extraHeat)
+                        []
+                        (\state, direction ->
+                            List.range { start: At 1, end: At 3 }
+                            |> List.walk
+                                (state, heat)
+                                (\(innerState, extraHeat), steps ->
+                                    when getBlock city direction row col steps is
+                                        Err _ ->
+                                            (innerState, extraHeat)
 
-                                Ok (newRow, newCol, heatAtBlock) ->
-                                    newForbiddenDirections =
-                                        when direction is
-                                            North -> [North, South]
-                                            South -> [North, South]
-                                            West -> [West, East]
-                                            East -> [West, East]
-                                    newHeat = heatAtBlock + extraHeat
-                                    (innerState |> List.append (Crucible newRow newCol newForbiddenDirections newHeat), newHeat)
+                                        Ok (newRow, newCol, heatAtBlock) ->
+                                            newForbiddenDirections =
+                                                when direction is
+                                                    North -> [North, South]
+                                                    South -> [North, South]
+                                                    West -> [West, East]
+                                                    East -> [West, East]
+                                            newHeat = heatAtBlock + extraHeat
+                                            (innerState |> List.append (Crucible newRow newCol newForbiddenDirections newHeat), newHeat)
+                                )
+                            |> (\(nextElements2, _) ->
+                                state |> List.concat nextElements2
+                            )
                         )
-                    |> (\(nextElements, _) ->
-                        state |> List.concat nextElements
-                    )
-                )
-            |> (\nextElements ->
-                walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
-            )
 
-# alreadyVisited = \visited, Crucible row col forbiddenDirections _ ->
-#     visited
-#     |> List.any
-#         (\Crucible vRow vCol vForbiddenDirections _ ->
-#             vRow == row && vCol == col && vForbiddenDirections == forbiddenDirections
-#         )
+                (nextElements1, visited |> List.append (row, col, forbiddenDirections))
+
+        walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
 
 getSmallestFrom = \queue ->
     queue
@@ -117,6 +113,21 @@ getSmallestFrom = \queue ->
 
 compareCrucibles = \Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
     heat1 >= heat2
+
+# getSmallestFrom2 = \queue ->
+#     sorted =
+#         queue
+#         |> List.sortWith
+#             (\Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
+#                 Num.compare heat1 heat2
+#             )
+
+#     when sorted is
+#         [] ->
+#             crash "queue is empty"
+
+#         [first, .. as rest] ->
+#             (first, rest)
 
 getBlock = \city, direction, row, col, steps ->
     new =
