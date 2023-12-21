@@ -36,56 +36,29 @@ walkThrough = \cityMap ->
             Err _ -> crash "bad city input"
             Ok l -> List.len l
 
-    start = [Crucible 0 0 [] 0]
+    startQueue = [Crucible 0 0 OnStart 0]
     visited = [] |> List.reserve (numOfRows * numOfCols)
 
-    walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } start visited
+    walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } startQueue visited
 
 walkThroughHelper = \city, queue, visited ->
 
-    dbg
-        (List.len queue, List.len visited)
-
-    (Crucible row col forbiddenDirections heat, newQueue) = getSmallestFrom queue
+    (Crucible row col directionRestriction heat, newQueue) = getSmallestFrom queue
 
     if row == (city.rows - 1) && col == (city.cols - 1) then
         heat
     else
         (nextElements, newVisited) =
-            if visited |> List.contains (row, col, forbiddenDirections) then
+            if visited |> List.contains (row, col, directionRestriction) then
                 ([], visited)
             else
                 nextElements1 =
-                    [North, East, South, West]
-                    |> List.dropIf
-                        (\direction -> forbiddenDirections |> List.contains direction)
-                    |> List.walk
-                        []
-                        (\state, direction ->
-                            List.range { start: At 1, end: At 3 }
-                            |> List.walk
-                                (state, heat)
-                                (\(innerState, extraHeat), steps ->
-                                    when getBlock city direction row col steps is
-                                        Err _ ->
-                                            (innerState, extraHeat)
+                    when directionRestriction is
+                        OnStart -> List.concat (part1NextDirsOnVertical city 0 0 0) (part1NextDirsOnHorizontal city 0 0 0)
+                        Vertical -> part1NextDirsOnVertical city heat row col
+                        Horizontal -> part1NextDirsOnHorizontal city heat row col
 
-                                        Ok (newRow, newCol, heatAtBlock) ->
-                                            newForbiddenDirections =
-                                                when direction is
-                                                    North -> [North, South]
-                                                    South -> [North, South]
-                                                    West -> [West, East]
-                                                    East -> [West, East]
-                                            newHeat = heatAtBlock + extraHeat
-                                            (innerState |> List.append (Crucible newRow newCol newForbiddenDirections newHeat), newHeat)
-                                )
-                            |> (\(nextElements2, _) ->
-                                state |> List.concat nextElements2
-                            )
-                        )
-
-                (nextElements1, visited |> List.append (row, col, forbiddenDirections))
+                (nextElements1, visited |> List.append (row, col, directionRestriction))
 
         walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
 
@@ -114,6 +87,61 @@ getSmallestFrom = \queue ->
 compareCrucibles = \Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
     heat1 >= heat2
 
+part1NextDirsOnVertical = \city, heat, row, col ->
+    (res1, _) =
+        List.range { start: After col, end: At (Num.min (col + 3) (city.cols - 1)) }
+        |> List.walk
+            (List.withCapacity 6, heat)
+            (\(state, currentHeat), newValue ->
+                heatAtBlock = getHeatAtBlock city row newValue
+                newHeat = currentHeat + heatAtBlock
+                (state |> List.append (Crucible row newValue Horizontal newHeat), newHeat)
+            )
+
+    List.range { start: At (subtractionAtMostUntilZero col 3), end: Before col }
+    |> List.reverse
+    |> List.walk
+        (res1, heat)
+        (\(state, currentHeat), newValue ->
+            heatAtBlock = getHeatAtBlock city row newValue
+            newHeat = currentHeat + heatAtBlock
+            (state |> List.append (Crucible row newValue Horizontal newHeat), newHeat)
+        )
+    |> (\(list, _) -> list)
+
+part1NextDirsOnHorizontal = \city, heat, row, col ->
+    (res1, _) =
+        List.range { start: After row, end: At (Num.min (row + 3) (city.rows - 1)) }
+        |> List.walk
+            (List.withCapacity 6, heat)
+            (\(state, currentHeat), newValue ->
+                heatAtBlock = getHeatAtBlock city newValue col
+                newHeat = currentHeat + heatAtBlock
+                (state |> List.append (Crucible newValue col Vertical newHeat), newHeat)
+            )
+
+    List.range { start: At (subtractionAtMostUntilZero row 3), end: Before row }
+    |> List.reverse
+    |> List.walk
+        (res1, heat)
+        (\(state, currentHeat), newValue ->
+            heatAtBlock = getHeatAtBlock city newValue col
+            newHeat = currentHeat + heatAtBlock
+            (state |> List.append (Crucible newValue col Vertical newHeat), newHeat)
+        )
+    |> (\(list, _) -> list)
+
+subtractionAtMostUntilZero = \a, b ->
+    if a <= b then
+        0
+    else
+        a - b
+
+getHeatAtBlock = \city, row, col ->
+    when city.map |> List.get row |> Result.try (\line -> line |> List.get col) is
+        Err _ -> crash "bad city"
+        Ok heat -> heat
+
 # getSmallestFrom2 = \queue ->
 #     sorted =
 #         queue
@@ -128,48 +156,6 @@ compareCrucibles = \Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
 
 #         [first, .. as rest] ->
 #             (first, rest)
-
-getBlock = \city, direction, row, col, steps ->
-    new =
-        when direction is
-            North ->
-                if row >= steps then
-                    Ok (row - steps, col)
-                else
-                    Err OutOfCity
-
-            South ->
-                if row + steps < city.rows then
-                    Ok (row + steps, col)
-                else
-                    Err OutOfCity
-
-            West ->
-                if col >= steps then
-                    Ok (row, col - steps)
-                else
-                    Err OutOfCity
-
-            East ->
-                if col + steps < city.cols then
-                    Ok (row, col + steps)
-                else
-                    Err OutOfCity
-
-    new
-    |> Result.try
-        (\(newRow, newCol) ->
-            city.map
-            |> List.get newRow
-            |> Result.try
-                (
-                    \line -> line |> List.get newCol
-                )
-            |> Result.try
-                (
-                    \heat -> Ok (newRow, newCol, heat)
-                )
-        )
 
 exampleData1 =
     """

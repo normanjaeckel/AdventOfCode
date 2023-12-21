@@ -1,6 +1,6 @@
 # Advent Of Code 2023
 
-![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2023-31_*-success)
+![Number of stars](https://img.shields.io/badge/Advent_Of_Code_2023-32_*-success)
 
 ## Summary
 
