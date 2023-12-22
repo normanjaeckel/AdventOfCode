@@ -14,13 +14,7 @@ part1 =
 
 solvePart1 = \input ->
     steps = input |> Str.trim |> parsePuzzleInput
-    lagoon = drawEdgeOfLagoon steps
-    (minX, minY) = getMinXYFor lagoon
-    (maxX, maxY) = getMaxXYFor lagoon
-    dbg (minX, maxX, minY, maxY, ((maxX - minX + 1) * (maxY - minY + 1)))
-    fillArea { minX, minY, maxX, maxY, lagoon }
-    |> (\n -> ((maxX - minX + 1) * (maxY - minY + 1)) - (Num.toI64 n) + (List.len lagoon |> Num.toI64))
-    |> Num.toStr
+    steps |> gaussArea |> Num.toStr
 
 parsePuzzleInput = \input ->
     when parseStr puzzleParser input is
@@ -34,7 +28,7 @@ lineParser =
     const (\direction -> \length -> \color -> { direction, length, color })
     |> keep directionParser
     |> skip (string " ")
-    |> keep digits
+    |> keep (digits |> map (\d -> Num.toI64 d))
     |> skip (string " ")
     |> keep colorParser
 
@@ -56,94 +50,45 @@ hexParser =
     many
         (
             oneOf [
-                codeunit '0' |> map (\_ -> 0),
-                codeunit '1' |> map (\_ -> 1),
-                codeunit '2' |> map (\_ -> 2),
-                codeunit '3' |> map (\_ -> 3),
-                codeunit '4' |> map (\_ -> 4),
-                codeunit '5' |> map (\_ -> 5),
-                codeunit '6' |> map (\_ -> 6),
-                codeunit '7' |> map (\_ -> 7),
-                codeunit '8' |> map (\_ -> 8),
-                codeunit '9' |> map (\_ -> 9),
-                codeunit 'a' |> map (\_ -> 10),
-                codeunit 'b' |> map (\_ -> 11),
-                codeunit 'c' |> map (\_ -> 12),
-                codeunit 'd' |> map (\_ -> 13),
-                codeunit 'e' |> map (\_ -> 14),
-                codeunit 'f' |> map (\_ -> 15),
+                codeunit '0',
+                codeunit '1',
+                codeunit '2',
+                codeunit '3',
+                codeunit '4',
+                codeunit '5',
+                codeunit '6',
+                codeunit '7',
+                codeunit '8',
+                codeunit '9',
+                codeunit 'a',
+                codeunit 'b',
+                codeunit 'c',
+                codeunit 'd',
+                codeunit 'e',
+                codeunit 'f',
             ]
         )
 
-drawEdgeOfLagoon = \steps ->
+gaussArea = \steps ->
     steps
     |> List.walk
-        ([], (0, 0))
-        (\(lagoon, (x, y)), step ->
-            (dx, dy) =
-                when step.direction is
-                    Right -> (0, 1)
-                    Down -> (1, 0)
-                    Left -> (0, -1)
-                    Up -> (-1, 0)
-            new =
-                List.range { start: At 1, end: Length step.length }
-                |> List.map
-                    (\n ->
-                        (x + (dx * n), y + (dy * n))
-                    )
-            (lagoon |> List.concat new, new |> List.last |> Result.withDefault (0, 0))
+        (0, 0, 0)
+        (\(area, y, lineLen), { direction, length } ->
+            newLineLen = lineLen + length
+            when direction is
+                Right ->
+                    (area - (y * length), y, newLineLen)
+
+                Left ->
+                    (area + (y * length), y, newLineLen)
+
+                Down ->
+                    (area, y + length, newLineLen)
+
+                Up ->
+                    (area, y - length, newLineLen)
         )
-    |> (\(lagoon, _) -> lagoon)
-
-getMinXYFor = \lagoon ->
-    lagoon
-    |> List.walk
-        (0, 0)
-        (\(i, j), (x, y) ->
-            (Num.min i x, Num.min j y)
-        )
-    |> (\(x, y) -> (x - 1, y - 1))
-
-getMaxXYFor = \lagoon ->
-    lagoon
-    |> List.walk
-        (0, 0)
-        (\(i, j), (x, y) ->
-            (Num.max i x, Num.max j y)
-        )
-    |> (\(x, y) -> (x + 1, y + 1))
-
-fillArea = \board ->
-    startPos = (board.minX, board.minY)
-    visited = board.lagoon
-    fillAreaHelper board [startPos] visited
-
-fillAreaHelper = \board, currentPositions, visited ->
-    dbg (List.len visited)
-    if List.isEmpty currentPositions then
-        List.len visited
-    else
-        newVisited = visited |> List.concat currentPositions
-        nextPositions =
-            currentPositions
-            |> List.walk
-                []
-                (\state, (x, y) ->
-                    [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-                    |> List.dropIf
-                        (\(i, j) ->
-                            (i < board.minX)
-                            || (i > board.maxX)
-                            || (j < board.minY)
-                            || (j > board.maxY)
-                            || (newVisited |> List.contains (i, j))
-                            || (state |> List.contains (i, j))
-                        )
-                    |> (\l -> state |> List.concat l)
-                )
-
-        fillAreaHelper board nextPositions newVisited
+    |> (\(area, _, lineLen) -> area + (lineLen // 2) + 1)
 
 exampleData1 =
     """
@@ -170,24 +115,66 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    steps = input |> Str.trim |> parsePuzzleInput
+    steps |> parseColors |> gaussArea |> Num.toStr
 
 exampleData2 =
-    """
-    """
-
-# #######
-# #.....#
-# ###...#
-# ..#...#
-# ..#...#
-# ###.###
-# #...#..
-# ##..###
-# .#....#
-# .######
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "952408144115"
+
+parseColors = \steps ->
+    steps
+    |> List.map
+        (\{ color } ->
+            newdirection =
+                when color |> List.last is
+                    Err _ -> crash "bad colors"
+                    Ok char ->
+                        when char is
+                            '0' -> Right
+                            '1' -> Down
+                            '2' -> Left
+                            '3' -> Up
+                            _ -> crash "bad colors 2"
+
+            newLength = hexListToNum (color |> List.takeFirst 5)
+
+            { direction: newdirection, length: newLength }
+        )
+
+hexListToNum = \l ->
+    l
+    |> List.reverse
+    |> List.walkWithIndex
+        (Num.toI64 0)
+        (\state, char, index ->
+            state + ((charToNum char) * (Num.powInt 16 (Num.toI64 index))) |> Num.toI64
+        )
+
+charToNum = \char ->
+    when char is
+        '0' -> 0
+        '1' -> 1
+        '2' -> 2
+        '3' -> 3
+        '4' -> 4
+        '5' -> 5
+        '6' -> 6
+        '7' -> 7
+        '8' -> 8
+        '9' -> 9
+        'a' -> 10
+        'b' -> 11
+        'c' -> 12
+        'd' -> 13
+        'e' -> 14
+        'f' -> 15
+        _ -> crash "bad value"
+
+expect
+    got = hexListToNum ['7', '0', 'c', '7', '1']
+    got == 461937
