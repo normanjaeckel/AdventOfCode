@@ -198,13 +198,180 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    (workflows, _) =
+        input
+        |> Str.trim
+        |> Str.split "\n\n"
+        |> parsePuzzleInput
+
+    startPart = { x: (1, 4000), m: (1, 4000), a: (1, 4000), s: (1, 4000), goto: "in" }
+    walkWorkflow2 workflows [startPart] []
+    |> List.map
+        (\part ->
+            (x1, x2) = part.x
+            (m1, m2) = part.m
+            (a1, a2) = part.a
+            (s1, s2) = part.s
+            (x2 - x1 + 1) * (m2 - m1 + 1) * (a2 - a1 + 1) * (s2 - s1 + 1)
+        )
+    |> List.sum
+    |> Num.toStr
+
+walkWorkflow2 = \workflows, parts, currentResult ->
+    if List.isEmpty parts then
+        currentResult
+    else
+        initialState = { newParts: [], newResult: currentResult }
+        parts
+        |> List.walk
+            initialState
+            (\state, currentPart ->
+                workflow =
+                    when workflows |> List.findFirst (\w -> w.name == currentPart.goto) is
+                        Err _ -> crash "workflow not found"
+                        Ok w -> w
+
+                state |> processPart workflow currentPart
+            )
+        |> (\finalState ->
+            walkWorkflow2 workflows finalState.newParts finalState.newResult
+        )
+
+processPart = \outerState, workflow, currentPart ->
+    initialState = { inPipe: Ok currentPart, gotoAnotherWorkflow: [], accepted: [] }
+    workflow.instructions
+    |> List.walkUntil
+        initialState
+        (\state, instruction ->
+            newState = state |> processInstruction instruction
+            when newState.inPipe is
+                Ok _ -> Continue newState
+                Err _ -> Break newState
+        )
+    |> (\finalState -> {
+        newParts: outerState.newParts |> List.concat finalState.gotoAnotherWorkflow,
+        newResult: outerState.newResult |> List.concat finalState.accepted,
+    }
+    )
+
+processInstruction = \state, instruction ->
+    currentPart =
+        when state.inPipe is
+            Ok p -> p
+            Err _ -> crash "nothing left here"
+
+    when instruction is
+        Step s ->
+            when s is
+                Accept ->
+                    { state & inPipe: Err Nothing, accepted: state.accepted |> List.append currentPart }
+
+                Reject ->
+                    { state & inPipe: Err Nothing }
+
+                Instruction name ->
+                    { state & inPipe: Err Nothing, gotoAnotherWorkflow: state.gotoAnotherWorkflow |> List.append { currentPart & goto: name } }
+
+        Condition c ->
+            state |> processCondition c currentPart
+
+processCondition = \state, { category, relation, num, ifTruthy }, currentPart ->
+    (i, j) =
+        when category is
+            X -> currentPart.x
+            M -> currentPart.m
+            A -> currentPart.a
+            S -> currentPart.s
+
+    when relation is
+        LessThen ->
+            if num <= i then
+                # currentPart stays in pipe
+                state
+            else if j < num then
+                # currentPart is completly consumed by the condition, pipe is empty now
+                when ifTruthy is
+                    Accept ->
+                        { state & inPipe: Err Nothing, accepted: state.accepted |> List.append currentPart }
+
+                    Reject ->
+                        { state & inPipe: Err Nothing }
+
+                    Instruction name ->
+                        { state & inPipe: Err Nothing, gotoAnotherWorkflow: state.gotoAnotherWorkflow |> List.append { currentPart & goto: name } }
+            else
+                # currentPart has to be split up: first part is consumed by the condition, the rest stays in pipe
+                (left, right) = splitUpPart currentPart num category
+
+                when ifTruthy is
+                    Accept ->
+                        { state & inPipe: Ok right, accepted: state.accepted |> List.append left }
+
+                    Reject ->
+                        { state & inPipe: Ok right }
+
+                    Instruction name ->
+                        { state & inPipe: Ok right, gotoAnotherWorkflow: state.gotoAnotherWorkflow |> List.append { left & goto: name } }
+
+        GreaterThen ->
+            if num >= j then
+                # currentPart stays in pipe
+                state
+            else if i > num then
+                # currentPart is completly consumed by the condition, pipe is empty now
+                when ifTruthy is
+                    Accept ->
+                        { state & inPipe: Err Nothing, accepted: state.accepted |> List.append currentPart }
+
+                    Reject ->
+                        { state & inPipe: Err Nothing }
+
+                    Instruction name ->
+                        { state & inPipe: Err Nothing, gotoAnotherWorkflow: state.gotoAnotherWorkflow |> List.append { currentPart & goto: name } }
+            else
+                # currentPart has to be split up: first part is consumed by the condition, the rest stays in pipe
+                (left, right) = splitUpPart currentPart (num + 1) category
+
+                when ifTruthy is
+                    Accept ->
+                        { state & inPipe: Ok left, accepted: state.accepted |> List.append right }
+
+                    Reject ->
+                        { state & inPipe: Ok left }
+
+                    Instruction name ->
+                        { state & inPipe: Ok left, gotoAnotherWorkflow: state.gotoAnotherWorkflow |> List.append { right & goto: name } }
+
+splitUpPart = \part, num, category ->
+    when category is
+        X ->
+            (i, j) = part.x
+            ({ part & x: (i, num - 1) }, { part & x: (num, j) })
+
+        M ->
+            (i, j) = part.m
+            ({ part & m: (i, num - 1) }, { part & m: (num, j) })
+
+        A ->
+            (i, j) = part.a
+            ({ part & a: (i, num - 1) }, { part & a: (num, j) })
+
+        S ->
+            (i, j) = part.s
+            ({ part & s: (i, num - 1) }, { part & s: (num, j) })
+
+expect
+    got = splitUpPart { x: (1, 4000), m: (1, 4000), a: (1, 4000), s: (1, 4000), goto: "in" } 5 X
+    got
+    == (
+        { x: (1, 4), m: (1, 4000), a: (1, 4000), s: (1, 4000), goto: "in" },
+        { x: (5, 4000), m: (1, 4000), a: (1, 4000), s: (1, 4000), goto: "in" },
+    )
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "167409079868000"
