@@ -36,56 +36,80 @@ walkThrough = \cityMap ->
             Err _ -> crash "bad city input"
             Ok l -> List.len l
 
-    startQueue = [Crucible 0 0 OnStart 0]
-    visited = [] |> List.reserve (numOfRows * numOfCols)
+    startQueueA = [Crucible 0 0 OnStart 0] |> List.reserve 10000
+    startQueueB = [0] |> List.reserve 10000
+    visited = Set.withCapacity (numOfRows * numOfCols)
 
-    walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } startQueue visited
+    walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } startQueueA startQueueB visited
 
-walkThroughHelper = \city, queue, visited ->
+walkThroughHelper = \city, queueA, queueB, visited ->
+    dbg (Set.len visited, List.len queueA, List.len queueB)
 
-    (Crucible row col directionRestriction heat, newQueue) = getSmallestFrom queue
+    (Crucible row col directionRestriction heat, newQueueA, newQueueB) = getSmallestFrom queueA queueB
 
     if row == (city.rows - 1) && col == (city.cols - 1) then
         heat
     else
-        (nextElements, newVisited) =
-            if visited |> List.contains (row, col, directionRestriction) then
-                ([], visited)
+        (nextElementsA, nextElementsB, newVisited) =
+            if visited |> Set.contains (row, col, directionRestriction) then
+                ([], [], visited)
             else
-                nextElements1 =
+                (nextElA, nextElB) =
                     when directionRestriction is
-                        OnStart -> List.concat (part1NextDirsOnVertical city 0 0 0) (part1NextDirsOnHorizontal city 0 0 0)
+                        OnStart ->
+                            (vA, vB) = part1NextDirsOnVertical city 0 0 0
+                            (hA, hB) = part1NextDirsOnHorizontal city 0 0 0
+                            (List.concat vA hA, List.concat vB hB)
+
                         Vertical -> part1NextDirsOnVertical city heat row col
                         Horizontal -> part1NextDirsOnHorizontal city heat row col
 
-                (nextElements1, visited |> List.append (row, col, directionRestriction))
+                (nextElA, nextElB, visited |> Set.insert (row, col, directionRestriction))
 
-        walkThroughHelper city (newQueue |> List.concat nextElements) newVisited
+        walkThroughHelper city (newQueueA |> List.concat nextElementsA) (newQueueB |> List.concat nextElementsB) newVisited
 
-getSmallestFrom = \queue ->
-    queue
-    |> List.walk
-        ([], Nothing)
-        (\(newQueue, found), element1 ->
-            when found is
-                Nothing ->
-                    (newQueue, Found element1)
+getSmallestFrom = \queueA, queueB ->
+    min =
+        when queueB |> List.min is
+            Ok m -> m
+            Err ListWasEmpty -> crash "queue is empty"
+    idx =
+        when queueB |> List.findFirstIndex \h -> h == min is
+            Ok i -> i
+            Err NotFound -> crash "missing element in queue B"
+    smallest =
+        when queueA |> List.get idx is
+            Ok c -> c
+            Err OutOfBounds -> crash "missing element in queue A"
+    { before: beforeA, others: othersA } = queueA |> List.split idx
+    { before: beforeB, others: othersB } = queueB |> List.split idx
+    newQueueA = beforeA |> List.concat (othersA |> List.dropFirst 1)
+    newQueueB = beforeB |> List.concat (othersB |> List.dropFirst 1)
+    (smallest, newQueueA, newQueueB)
 
-                Found element2 ->
-                    if compareCrucibles element1 element2 then
-                        (newQueue |> List.append element1, Found element2)
-                    else
-                        (newQueue |> List.append element2, Found element1)
-        )
-    |> (\(newQueue, found) ->
-        when found is
-            Nothing -> crash "queue is empty "
-            Found element ->
-                (element, newQueue)
-    )
+# queue
+# |> List.walk
+#     ([], Nothing)
+#     (\(newQueue, found), element1 ->
+#         when found is
+#             Nothing ->
+#                 (newQueue, Found element1)
 
-compareCrucibles = \Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
-    heat1 >= heat2
+#             Found element2 ->
+#                 if compareCrucibles element1 element2 then
+#                     (newQueue |> List.append element1, Found element2)
+#                 else
+#                     (newQueue |> List.append element2, Found element1)
+#     )
+# |> (\(newQueue, found) ->
+#     when found is
+#         Nothing -> crash "queue is empty "
+#         Found element ->
+#             (element, newQueue)
+# )
+
+# compareCrucibles = \Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
+#     heat1 >= heat2
 
 part1NextDirsOnVertical = \city, heat, row, col ->
     (res1, _) =
@@ -107,7 +131,10 @@ part1NextDirsOnVertical = \city, heat, row, col ->
             newHeat = currentHeat + heatAtBlock
             (state |> List.append (Crucible row newValue Horizontal newHeat), newHeat)
         )
-    |> (\(list, _) -> list)
+    |> (\(resultA, _) ->
+        resultB = resultA |> List.map \Crucible _ _ _ h -> h
+        (resultA, resultB)
+    )
 
 part1NextDirsOnHorizontal = \city, heat, row, col ->
     (res1, _) =
@@ -129,8 +156,10 @@ part1NextDirsOnHorizontal = \city, heat, row, col ->
             newHeat = currentHeat + heatAtBlock
             (state |> List.append (Crucible newValue col Vertical newHeat), newHeat)
         )
-    |> (\(list, _) -> list)
-
+    |> (\(resultA, _) ->
+        resultB = resultA |> List.map \Crucible _ _ _ h -> h
+        (resultA, resultB)
+    )
 subtractionAtMostUntilZero = \a, b ->
     if a <= b then
         0
@@ -141,21 +170,6 @@ getHeatAtBlock = \city, row, col ->
     when city.map |> List.get row |> Result.try (\line -> line |> List.get col) is
         Err _ -> crash "bad city"
         Ok heat -> heat
-
-# getSmallestFrom2 = \queue ->
-#     sorted =
-#         queue
-#         |> List.sortWith
-#             (\Crucible _ _ _ heat1, Crucible _ _ _ heat2 ->
-#                 Num.compare heat1 heat2
-#             )
-
-#     when sorted is
-#         [] ->
-#             crash "queue is empty"
-
-#         [first, .. as rest] ->
-#             (first, rest)
 
 exampleData1 =
     """

@@ -15,7 +15,7 @@ part1 =
 solvePart1 = \input ->
     modules = input |> Str.trim |> parsePuzzleInput |> addParentsToConjuctions
 
-    pushTheButton modules 1000
+    pushTheButton modules 1000 ""
     |> (\finalState ->
         finalState.countLow * finalState.countHigh
     )
@@ -59,7 +59,7 @@ moduleNameParser =
     |> map
         (\res ->
             when Str.fromUtf8 res is
-                Err _ -> crash "bad input"
+                Err _ -> crash "bad input    "
                 Ok r -> r
         )
 
@@ -98,21 +98,24 @@ addParentsToConjuctions = \modules ->
 
         )
 
-# addDebugModule = \modules ->
-#     modules |> List.append { moduleType: FlipFlop "output" Off, destinations: [] }
-
-pushTheButton = \modules, count ->
+pushTheButton = \modules, count, specialModule ->
     List.repeat {} count
     |> List.walk
-        { modules: modules, countLow: 0, countHigh: 0 }
+        { modules: modules, countLow: 0, countHigh: 0, specialValue: specialModule, specialResult: NotTouched }
         (\state, _ ->
-            sendPulse state.modules [Low "broadcaster" "button"] state.countLow state.countHigh
+            sendPulse state.modules [Low "broadcaster" "button"] state.countLow state.countHigh state.specialValue state.specialResult
         )
 
-sendPulse = \modules, pulses, countLow, countHigh ->
+sendPulse = \modules, pulses, countLow, countHigh, specialValue, specialResult ->
     if List.isEmpty pulses then
-        { modules, countLow, countHigh }
+        { modules, countLow, countHigh, specialValue, specialResult }
     else
+        newSpecialResult =
+            if pulses |> containsLowTo specialValue then
+                Touched
+            else
+                specialResult
+
         initialState = { modules, pulses: [], countLow, countHigh }
 
         pulses
@@ -122,7 +125,7 @@ sendPulse = \modules, pulses, countLow, countHigh ->
                 state |> processPulse pulse
             )
         |> (\finalState ->
-            sendPulse finalState.modules finalState.pulses finalState.countLow finalState.countHigh
+            sendPulse finalState.modules finalState.pulses finalState.countLow finalState.countHigh specialValue newSpecialResult
         )
 
 processPulse = \state, pulse ->
@@ -234,5 +237,73 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    modules = input |> Str.trim |> parsePuzzleInput |> addParentsToConjuctions
+
+    grandparents = findGrandParents modules |> Set.toList
+
+    grandparents
+    |> List.map
+        (\g ->
+            pushTheButtonUntil modules g
+        )
+    |> List.walk
+        1
+        (\state, value ->
+            lcm value state
+        )
+    |> Num.toStr
+
+containsLowTo = \pulses, special ->
+    pulses
+    |> List.any
+        (\p ->
+            when p is
+                Low name _ -> name == special
+                High _ _ -> Bool.false
+        )
+
+pushTheButtonUntil = \modules, specialValue ->
+    initialState = { modules: modules, countLow: 0, countHigh: 0, specialValue: specialValue, specialResult: NotTouched }
+    pushTheButtonUntilRxHelper initialState 0
+
+pushTheButtonUntilRxHelper = \state, count ->
+    when state.specialResult is
+        Touched ->
+            count
+
+        NotTouched ->
+            newState = sendPulse state.modules [Low "broadcaster" "button"] state.countLow state.countHigh state.specialValue state.specialResult
+            pushTheButtonUntilRxHelper newState (count + 1)
+
+findGrandParents = \modules ->
+    parent =
+        modules
+        |> List.walkUntil
+            NotFound
+            (\_state, module ->
+                if module.destinations |> List.contains "rx" then
+                    Break (Found module)
+                else
+                    Continue NotFound
+            )
+        |> (\found ->
+            when found is
+                NotFound -> crash " rx not found"
+                Found p -> p
+        )
+
+    when parent.moduleType is
+        Conjuction _name grandparents _memory ->
+            grandparents
+
+        _ -> crash "parent is not a conjuction"
+
+euklid = \a, b ->
+    if b == 0 then
+        a
+    else
+        euklid b (a % b)
+
+lcm = \a, b ->
+    a * b // (euklid a b)
