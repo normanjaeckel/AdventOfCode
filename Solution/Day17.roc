@@ -43,8 +43,6 @@ walkThrough = \cityMap ->
     walkThroughHelper { map: cityMap, rows: numOfRows, cols: numOfCols } startQueueA startQueueB visited
 
 walkThroughHelper = \city, queueA, queueB, visited ->
-    dbg (Set.len visited, List.len queueA, List.len queueB)
-
     (Crucible row col directionRestriction heat, newQueueA, newQueueB) = getSmallestFrom queueA queueB
 
     if row == (city.rows - 1) && col == (city.cols - 1) then
