@@ -145,6 +145,7 @@ part2 =
     solvePart2 puzzleInput
 
 solvePart2 = \_input ->
+    # TODO: Solution is still missing.
     ""
 
 exampleData2 =
