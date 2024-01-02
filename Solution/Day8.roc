@@ -5,7 +5,7 @@ interface Solution.Day8
     ]
     imports [
         "Day8.input" as puzzleInput : Str,
-        parser.String.{ RawStr, parseStr, codeunit, string },
+        parser.String.{ parseStr, codeunit, string },
         parser.Core.{ Parser, const, keep, skip, sepBy, map, oneOf, chompUntil, oneOrMore },
     ]
 
