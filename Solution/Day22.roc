@@ -203,13 +203,47 @@ expect
 part2 =
     solvePart2 puzzleInput
 
-solvePart2 = \_input ->
-    ""
+solvePart2 = \input ->
+    sand =
+        input
+        |> Str.trim
+        |> parsePuzzleInput
+        |> processBricks
+        |> letThemFall
+        |> calcSupport
+
+    supportOthers = sand.supportedBy |> transformSupport
+
+    sand.bricks
+    |> List.mapWithIndex
+        \_brick, index -> countIfDisintegrate sand.supportedBy supportOthers index (Set.empty {})
+    |> List.map (\s -> Set.len s - 1)
+    |> List.sum
+    |> Num.toStr
+
+countIfDisintegrate : SupportedBy, SupportOthers, Nat, Set Nat -> Set Nat
+countIfDisintegrate = \supportedBy, supportOthers, index, alreadyRemoved ->
+    newAlreadyRemoved = alreadyRemoved |> Set.insert index
+
+    when supportOthers |> Dict.get index is
+        Err KeyNotFound -> newAlreadyRemoved
+        Ok others ->
+            others
+            |> Set.walk
+                newAlreadyRemoved
+                \state, other ->
+                    supporters =
+                        when supportedBy |> Dict.get other is
+                            Err KeyNotFound -> Set.empty {}
+                            Ok s -> s
+                    if Set.difference supporters state |> Set.isEmpty then
+                        countIfDisintegrate supportedBy supportOthers other state
+                    else
+                        state
 
 exampleData2 =
-    """
-    """
+    exampleData1
 
 expect
     got = solvePart2 exampleData2
-    got == ""
+    got == "7"
