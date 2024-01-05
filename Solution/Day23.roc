@@ -317,7 +317,8 @@ isNeighbourOf = \(r1, c1), (r2, c2) ->
 
 walkThroughNodes : Nodes, Position, List Position, Nat, Nat -> Nat
 walkThroughNodes = \nodes, goal, path, currentWeight, bestWeight ->
-    dbg (path, bestWeight)
+    # dbg (path, bestWeight)
+
     last =
         when path |> List.last is
             Err ListWasEmpty -> crash "empty path is impossible"

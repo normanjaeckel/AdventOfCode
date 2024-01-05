@@ -31,7 +31,7 @@ app "advent-of-code-2023"
         Solution.Day21,
         Solution.Day22,
         Solution.Day23,
-        # Solution.Day24,
+        Solution.Day24,
         # Solution.Day25,
     ]
     provides [main] to pf
@@ -67,7 +67,7 @@ main =
                 "21" -> writeSolutions Solution.Day21.part1 Solution.Day21.part2
                 "22" -> writeSolutions Solution.Day22.part1 Solution.Day22.part2
                 "23" -> writeSolutions Solution.Day23.part1 Solution.Day23.part2
-                # "24" -> writeSolutions Solution.Day24.part1 Solution.Day24.part2
+                "24" -> writeSolutions Solution.Day24.part1 Solution.Day24.part2
                 # "25" -> writeSolutions Solution.Day25.part1 Solution.Day25.part2
                 d ->
                     _ <- Stderr.line "There is no code for day \(d) yet." |> Task.await
