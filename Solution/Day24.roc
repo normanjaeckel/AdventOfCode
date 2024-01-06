@@ -117,12 +117,4 @@ part2 =
     solvePart2 puzzleInput
 
 solvePart2 = \_input ->
-    ""
-
-exampleData2 =
-    """
-    """
-
-expect
-    got = solvePart2 exampleData2
-    got == ""
+    "Please look at the extra directory 'Day24'. Use --linker=legacy to avoid a compiler bug."
