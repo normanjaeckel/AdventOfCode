@@ -145,22 +145,26 @@ expect
 part2 =
     solvePart2 puzzleInput
 
+offset =
+    120
+
+calcLoad2 = \platform ->
+    platform |> rotateAndInvert |> calcLoad
+
 solvePart2 = \input ->
     input
     |> Str.trim
     |> parsePuzzleInput
-    |> preparePlatform
-    |> runNCyles 1
-    |> preparePlatform
-    |> calcLoad
+    |> checkForRepetition
+    |> calcLoad2
     |> Num.toStr
 
-# exampleData2 =
-#     exampleData1
+exampleData2 =
+    exampleData1
 
-# expect
-#     got = solvePart2 exampleData2
-#     got == "64"
+expect
+    got = solvePart2 exampleData2
+    got == "64"
 
 preparePlatform = \platform ->
     platform
@@ -208,6 +212,23 @@ expect
     got == afterOneCyle |> parsePuzzleInput
 
 expect
+    afterTwoCycles =
+        """
+        .....#....
+        ....#...O#
+        .....##...
+        ..O#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#...O
+        .......OOO
+        #..OO###..
+        #.OOO#...O
+        """
+    got = exampleData1 |> parsePuzzleInput |> preparePlatform |> runNCyles 2 |> preparePlatform
+    got == afterTwoCycles |> parsePuzzleInput
+
+expect
     afterThreeCycles =
         """
         .....#....
@@ -224,3 +245,23 @@ expect
     got = exampleData1 |> parsePuzzleInput |> preparePlatform |> runNCyles 3 |> preparePlatform
     got == afterThreeCycles |> parsePuzzleInput
 
+checkForRepetition = \platform ->
+    p2 =
+        platform
+        |> preparePlatform
+        |> runNCyles offset
+        |> preparePlatform
+
+    n = calcLoad2 p2
+
+    List.range { start: At 1, end: Length 100 }
+    |> List.walkUntil
+        (p2 |> preparePlatform)
+        \state, i ->
+            newState = state |> runOneCyle
+            if newState |> preparePlatform |> calcLoad2 == n then
+                rest = (1_000_000_000 - offset) % i
+                Break (newState |> runNCyles (rest))
+            else
+                Continue newState
+    |> preparePlatform
