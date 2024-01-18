@@ -1,7 +1,7 @@
 app "advent-of-code-2023"
     packages {
         pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.1/Icc3xJoIixF3hCcfXrDwLCu4wQHtNdPyoJkEbkgIElA.tar.br",
-        parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.3.0/-e3ebWWmlFPfe9fYrr2z1urfslzygbtQQsl69iH1qzQ.tar.br",
+        parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.4/yrk4tKd0w9oaxt0s66zrejc6L67Y7B-86BQrL9yjZMY.tar.br",
     }
     imports [
         pf.Arg,

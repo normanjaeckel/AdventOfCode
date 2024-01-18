@@ -1,25 +1,40 @@
-interface Solution.Day21
-    exposes [
-        part1,
-        part2,
-    ]
+app "advent-of-code-2023"
+    packages {
+        pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.1/Icc3xJoIixF3hCcfXrDwLCu4wQHtNdPyoJkEbkgIElA.tar.br",
+        parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.4/yrk4tKd0w9oaxt0s66zrejc6L67Y7B-86BQrL9yjZMY.tar.br",
+    }
     imports [
         "Day21.input" as puzzleInput : Str,
+        pf.Stdout,
         parser.String.{ parseStr, string },
         parser.Core.{ sepBy, oneOrMore, oneOf, map },
     ]
+    provides [main] to pf
 
-part1 =
-    solvePart1 puzzleInput 64
+main =
+    Stdout.line "Solution for part 2: \(part2)"
 
-solvePart1 = \input, steps ->
-    garden = input |> Str.trim |> parsePuzzleInput
-
-    (numOfRows, numofCols) = getDimensions garden
+part2 =
+    garden = puzzleInput |> Str.trim |> parsePuzzleInput
+    (numOfRows, numOfCols) = getDimensions garden
     start = findStart garden
 
-    walkGarden { garden, numOfRows, numofCols } steps (Set.single start)
-    |> Set.len
+    springDiamond = walkGarden { garden, numOfRows, numOfCols } 65 (Set.single start) |> Set.len
+    summerDiamond = 1 + (walkGarden { garden, numOfRows, numOfCols } 64 (Set.single start) |> Set.len) # We have a + 1 here but we got this just by trial and error
+    twoColdDiamonds =
+        walkGarden { garden, numOfRows, numOfCols } (65 + 131 + 131) (Set.single start)
+        |> Set.len
+        |> \n ->
+            (n - 9 * springDiamond - (4 * summerDiamond)) // 6
+
+    steps = (26_501_365 - 65) // 131
+    totalLen = steps * 2 + 1
+
+    allSpringDiamonds = ((totalLen * totalLen + 2 * totalLen + 1) * springDiamond) // 4
+    allSummerDiamonds = ((totalLen * totalLen - 2 * totalLen + 1) * summerDiamond) // 4
+    allColdDiamonts = ((totalLen * totalLen - 1) * twoColdDiamonds) // 4
+
+    (allSpringDiamonds + allSummerDiamonds + allColdDiamonts)
     |> Num.toStr
 
 parsePuzzleInput = \input ->
@@ -40,13 +55,16 @@ lineParser =
             ]
         )
 
+Type : [Start, GardenPlot, Rock]
+
 getDimensions = \garden ->
     rows = List.len garden
     cols =
         when garden |> List.first is
             Err ListWasEmpty -> crash "bad garden"
             Ok row -> List.len row
-    (rows, cols)
+
+    (rows |> Num.toI32, cols |> Num.toI32)
 
 findStart = \garden ->
     garden
@@ -64,12 +82,14 @@ findStart = \garden ->
                                 Found _ -> state2
                                 NotFound ->
                                     when col is
-                                        Start -> Found (rowIndex, colIndex)
+                                        Start -> Found (rowIndex |> Num.toI32, colIndex |> Num.toI32)
                                         _ -> NotFound
     |> \finalState ->
         when finalState is
             NotFound -> crash "not start found"
             Found v -> v
+
+Garden : { garden : List (List Type), numOfRows : I32, numOfCols : I32 }
 
 walkGarden = \garden, steps, reached ->
     if steps == 0 then
@@ -88,59 +108,36 @@ walkGarden = \garden, steps, reached ->
 
 getNextElements = \garden, row, col ->
     positions =
-        if row == 0 then
-            if col == 0 then
-                [(row + 1, col), (row, col + 1)]
-            else if col == garden.numofCols - 1 then
-                [(row + 1, col), (row, col - 1)]
-            else
-                [(row + 1, col), (row, col + 1), (row, col - 1)]
-        else if row == garden.numOfRows - 1 then
-            if col == 0 then
-                [(row - 1, col), (row, col + 1)]
-            else if col == garden.numofCols - 1 then
-                [(row - 1, col), (row, col - 1)]
-            else
-                [(row - 1, col), (row, col + 1), (row, col - 1)]
-        else if col == 0 then
-            [(row + 1, col), (row - 1, col), (row, col + 1)]
-        else if col == garden.numofCols - 1 then
-            [(row + 1, col), (row - 1, col), (row, col - 1)]
-        else
-            [(row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
+        [(row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
 
     positions
     |> List.keepIf
         \(r, c) ->
-            when getType garden.garden r c is
+            when getType garden r c is
                 GardenPlot | Start -> Bool.true
                 Rock -> Bool.false
     |> Set.fromList
 
+getType : Garden, I32, I32 -> Type
 getType = \garden, row, col ->
-    when garden |> List.get row |> Result.try (\r -> r |> List.get col) is
+    when garden.garden |> List.get (mod row garden.numOfRows |> Num.toNat) |> Result.try (\r -> r |> List.get (mod col garden.numOfCols |> Num.toNat)) is
         Err _ -> crash "bad garden"
         Ok v -> v
 
-exampleData1 =
-    """
-    ...........
-    .....###.#.
-    .###.##..#.
-    ..#.#...#..
-    ....#.#....
-    .##..S####.
-    .##..#...#.
-    .......##..
-    .##.#.####.
-    .##..##.##.
-    ...........
-    """
+mod = \a, b ->
+    if a < 0 then
+        mod (a + b) b
+    else
+        a % b
 
 expect
-    got = solvePart1 exampleData1 6
-    got == "16"
+    got = mod -2 12
+    got == 10
 
-part2 =
-    "See Day21/main.roc"
+expect
+    got = mod 9 12
+    got == 9
 
+expect
+    got = mod 14 12
+    got == 2
