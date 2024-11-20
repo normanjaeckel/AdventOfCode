@@ -1,32 +1,19 @@
 # Patterns of intentionally untracked files that Git should ignore
 
-# Task
-.task/
-
 # Direnv and Devenv
 .direnv
 .devenv*
 devenv.local.nix
 
-# Roc nightly build and Roc source dir (if you use Roc language server)
-roc_nightly-linux_x86_64-*
-roc/
-roc-parser/
+# Roc nightly build
+roc-dir/
 
-# Build
-main
+# Inputs and build
+day??
+day??.input
 
 # Private files
 SECRET
 
 # IDE settings
 .vscode/
-# Devenv
-.devenv*
-devenv.local.nix
-
-# direnv
-.direnv
-
-# pre-commit
-.pre-commit-config.yaml
