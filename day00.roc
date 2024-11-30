@@ -1,5 +1,5 @@
 app [part1, part2] {
-    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.4/wTZSKRsnoHeTyBzizjkN309WJPSkAFvlq8DUK1ZeCZg.tar.br",
+    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.5/0jGEKnFtQFKLIcVq59ZuLbVJqM4cTTElcZHTXFjqmvg.tar.br",
 }
 
 examplePart1 =
