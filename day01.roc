@@ -3,7 +3,7 @@ app [part1, part2] {
     parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.9.0/w8YKp2YAgQt5REYk912HfKAHBjcXsrnvtjI0CBzoAT4.tar.br",
 }
 
-import parser.Parser exposing [Parser, const, keep, many, maybe, skip]
+import parser.Parser exposing [Parser, const, keep, many, map, maybe, skip]
 import parser.String exposing [parseStr, digits, string]
 
 examplePart1 : Str
@@ -23,21 +23,20 @@ expect
     got == expected
 
 part1 : Str -> List U8
-part1 = \input ->
-    when parseStr puzzleParser (input |> Str.trim) is
+part1 = \rawInput ->
+    when parseStr puzzleParser rawInput is
         Err _ ->
             "Invalid input" |> Str.toUtf8
 
-        Ok v ->
-            lists = getLists v
-            left = lists.left |> List.sortAsc
-            right = lists.right |> List.sortAsc
-            List.map2 left right (\a, b -> if a > b then a - b else b - a)
+        Ok input ->
+            left = input.left |> List.sortAsc
+            right = input.right |> List.sortAsc
+            List.map2 left right (\a, b -> Num.absDiff a b)
             |> List.sum
             |> Num.toStr
             |> Str.toUtf8
 
-puzzleParser : Parser (List U8) (List (U64, U64))
+puzzleParser : Parser (List U8) { left : List U64, right : List U64 }
 puzzleParser =
     many
         (
@@ -47,14 +46,12 @@ puzzleParser =
             |> keep digits
             |> skip (maybe (string "\n"))
         )
-
-getLists : List (U64, U64) -> { left : List U64, right : List U64 }
-getLists = \lines ->
-    lines
-    |> List.walk
-        { left: [], right: [] }
-        \state, (a, b) ->
-            { left: state.left |> List.append a, right: state.right |> List.append b }
+    |> map \lines ->
+        lines
+        |> List.walk
+            { left: [], right: [] }
+            \state, (a, b) ->
+                { left: state.left |> List.append a, right: state.right |> List.append b }
 
 examplePart2 = examplePart1
 
@@ -64,17 +61,16 @@ expect
     got == expected
 
 part2 : Str -> List U8
-part2 = \input ->
-    when parseStr puzzleParser (input |> Str.trim) is
+part2 = \rawInput ->
+    when parseStr puzzleParser rawInput is
         Err _ ->
             "Invalid input" |> Str.toUtf8
 
-        Ok v ->
-            lists = getLists v
-            lists.left
+        Ok input ->
+            input.left
             |> List.map
                 \a ->
-                    count = lists.right |> List.countIf \b -> a == b
+                    count = input.right |> List.countIf \b -> a == b
                     a * count
             |> List.sum
             |> Num.toStr
