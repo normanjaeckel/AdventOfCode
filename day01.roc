@@ -1,5 +1,5 @@
 app [part1, part2] {
-    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.5/0jGEKnFtQFKLIcVq59ZuLbVJqM4cTTElcZHTXFjqmvg.tar.br",
+    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.6/h-Fncg-ySjnWsh6mOiuaqdkz6wwfYCPCgy64Wep58YI.tar.br",
     parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.9.0/w8YKp2YAgQt5REYk912HfKAHBjcXsrnvtjI0CBzoAT4.tar.br",
 }
 
@@ -18,23 +18,20 @@ examplePart1 =
     """
 
 expect
-    got = part1 examplePart1 |> Str.fromUtf8 |> Result.withDefault "Invalid result"
-    expected = "11"
+    got = part1 examplePart1
+    expected = Ok "11"
     got == expected
 
-part1 : Str -> List U8
+part1 : Str -> Result Str _
 part1 = \rawInput ->
-    when parseStr puzzleParser rawInput is
-        Err _ ->
-            "Invalid input" |> Str.toUtf8
-
-        Ok input ->
+    parseStr puzzleParser rawInput
+    |> Result.map
+        \input ->
             left = input.left |> List.sortAsc
             right = input.right |> List.sortAsc
             List.map2 left right (\a, b -> Num.absDiff a b)
             |> List.sum
             |> Num.toStr
-            |> Str.toUtf8
 
 puzzleParser : Parser (List U8) { left : List U64, right : List U64 }
 puzzleParser =
@@ -56,17 +53,15 @@ puzzleParser =
 examplePart2 = examplePart1
 
 expect
-    got = part2 examplePart2 |> Str.fromUtf8 |> Result.withDefault "Invalid result"
-    expected = "31"
+    got = part2 examplePart2
+    expected = Ok "31"
     got == expected
 
-part2 : Str -> List U8
+part2 : Str -> Result Str _
 part2 = \rawInput ->
-    when parseStr puzzleParser rawInput is
-        Err _ ->
-            "Invalid input" |> Str.toUtf8
-
-        Ok input ->
+    parseStr puzzleParser rawInput
+    |> Result.map
+        \input ->
             input.left
             |> List.map
                 \a ->
@@ -74,4 +69,3 @@ part2 = \rawInput ->
                     a * count
             |> List.sum
             |> Num.toStr
-            |> Str.toUtf8
