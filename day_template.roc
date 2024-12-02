@@ -16,7 +16,7 @@ expect
     expected = Ok ""
     got == expected
 
-part1 : Str -> Result Str _
+part1 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part1 = \rawInput ->
     parseStr puzzleParser rawInput
     |> Result.map
@@ -32,6 +32,9 @@ expect
     expected = Ok ""
     got == expected
 
-part2 : Str -> Result Str _
-part2 = \_rawInput ->
-    Ok ""
+part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
+part2 = \rawInput ->
+    parseStr puzzleParser rawInput
+    |> Result.map
+        \_input ->
+            ""
