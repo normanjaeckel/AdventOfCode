@@ -18,7 +18,7 @@ expect
 
 part1 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part1 = \rawInput ->
-    parseStr puzzleParser rawInput
+    parseStr puzzleParser (rawInput |> Str.trim)
     |> Result.map
         \input ->
             input
@@ -34,7 +34,7 @@ expect
 
 part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part2 = \rawInput ->
-    parseStr puzzleParser rawInput
+    parseStr puzzleParser (rawInput |> Str.trim)
     |> Result.map
         \_input ->
             ""

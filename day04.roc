@@ -1,19 +1,7 @@
-app [main] {
-    pf: platform "https://github.com/roc-lang/basic-cli/releases/download/0.17.0/lZFLstMUCUvd5bjnnpYromZJXkQUrdhbva4xdBInicE.tar.br",
+app [part1, part2] {
+    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.8/lhFfiil7mQXDOB6wN-jduJQImoT8qRmoiNHDB4DVF9s.tar.br",
     parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.9.0/w8YKp2YAgQt5REYk912HfKAHBjcXsrnvtjI0CBzoAT4.tar.br",
 }
-
-import "day04.input" as puzzleInput : Str
-import pf.Stdout
-
-main =
-    Stdout.line! (part1 puzzleInput |> Result.withDefault "bad input")
-    Stdout.line! (part2 puzzleInput |> Result.withDefault "bad input")
-
-# app [part1, part2] {
-#     pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.6/h-Fncg-ySjnWsh6mOiuaqdkz6wwfYCPCgy64Wep58YI.tar.br",
-#     parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.9.0/w8YKp2YAgQt5REYk912HfKAHBjcXsrnvtjI0CBzoAT4.tar.br",
-# }
 
 import parser.Parser exposing [Parser, many, map, oneOf, sepBy]
 import parser.String exposing [parseStr, codeunit, codeunitSatisfies]
