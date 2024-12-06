@@ -84,43 +84,32 @@ startWalking = \lab, guard ->
     |> Set.fromList
 
 walkingHelper : Lab, Position, Direction, List Position -> List Position
-walkingHelper = \lab, (guardRow, guardCol), direction, visited ->
-    nextPos =
-        when direction is
-            North ->
-                if guardRow == 0 then
-                    Err OutsideLab
-                else
-                    Ok (guardRow - 1, guardCol)
+walkingHelper = \lab, guard, direction, visited ->
+    if goingOut lab guard direction then
+        visited |> List.append guard
+        else
 
-            East ->
-                if guardCol == lab.maxCol then
-                    Err OutsideLab
-                else
-                    Ok (guardRow, guardCol + 1)
+    pos = nextPos guard direction
+    if lab.obstacles |> List.contains pos then
+        newDirection = turnGuard direction
+        walkingHelper lab guard newDirection visited
+    else
+        walkingHelper lab pos direction (visited |> List.append guard)
 
-            South ->
-                if guardRow == lab.maxRow then
-                    Err OutsideLab
-                else
-                    Ok (guardRow + 1, guardCol)
+goingOut : Lab, Position, Direction -> Bool
+goingOut = \lab, (row, col), direction ->
+    (direction == North && row == 0)
+    || (direction == South && row == lab.maxRow)
+    || (direction == West && col == 0)
+    || (direction == East && col == lab.maxCol)
 
-            West ->
-                if guardCol == 0 then
-                    Err OutsideLab
-                else
-                    Ok (guardRow, guardCol - 1)
-
-    when nextPos is
-        Err OutsideLab ->
-            visited |> List.append (guardRow, guardCol)
-
-        Ok pos ->
-            if lab.obstacles |> List.contains pos then
-                newDirection = turnGuard direction
-                walkingHelper lab (guardRow, guardCol) newDirection visited
-            else
-                walkingHelper lab pos direction (visited |> List.append (guardRow, guardCol))
+nextPos : Position, Direction -> Position
+nextPos = \(row, col), direction ->
+    when direction is
+        North -> (row - 1, col)
+        East -> (row, col + 1)
+        South -> (row + 1, col)
+        West -> (row, col - 1)
 
 turnGuard : Direction -> Direction
 turnGuard = \dir ->
@@ -151,7 +140,6 @@ addObstacle = \variants, lab, guard ->
     |> Set.walk
         { loops: 0, index: 0 }
         \state, pos ->
-            dbg state
             if isLoop lab pos guard then
                 { loops: state.loops + 1, index: state.index + 1 }
             else
@@ -164,42 +152,16 @@ isLoop = \lab, pos, guard ->
     isLoopHelper newLab guard North []
 
 isLoopHelper : Lab, Position, Direction, List (Position, Direction) -> Bool
-isLoopHelper = \lab, (guardRow, guardCol), direction, visited ->
-    nextPos =
-        when direction is
-            North ->
-                if guardRow == 0 then
-                    Err OutsideLab
-                else
-                    Ok (guardRow - 1, guardCol)
+isLoopHelper = \lab, guard, direction, visited ->
+    if goingOut lab guard direction then
+        Bool.false
+        else
 
-            East ->
-                if guardCol == lab.maxCol then
-                    Err OutsideLab
-                else
-                    Ok (guardRow, guardCol + 1)
-
-            South ->
-                if guardRow == lab.maxRow then
-                    Err OutsideLab
-                else
-                    Ok (guardRow + 1, guardCol)
-
-            West ->
-                if guardCol == 0 then
-                    Err OutsideLab
-                else
-                    Ok (guardRow, guardCol - 1)
-
-    when nextPos is
-        Err OutsideLab ->
-            Bool.false
-
-        Ok pos ->
-            if visited |> List.contains (pos, direction) then
-                Bool.true
-            else if lab.obstacles |> List.contains pos then
-                newDirection = turnGuard direction
-                isLoopHelper lab (guardRow, guardCol) newDirection (visited |> List.append ((guardRow, guardCol), direction))
-            else
-                isLoopHelper lab pos direction (visited |> List.append ((guardRow, guardCol), direction))
+    pos = nextPos guard direction
+    if visited |> List.contains (pos, direction) then
+        Bool.true
+    else if lab.obstacles |> List.contains pos then
+        newDirection = turnGuard direction
+        isLoopHelper lab guard newDirection (visited |> List.append (guard, direction))
+    else
+        isLoopHelper lab pos direction (visited |> List.append (guard, direction))
