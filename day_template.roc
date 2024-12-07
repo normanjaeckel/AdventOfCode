@@ -1,5 +1,5 @@
 app [part1, part2] {
-    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.7/Tg23npX1TEGNlsYqX1JfrdtvW4OlwLdvsFnJMUJNZSU.tar.br",
+    pf: platform "https://github.com/ostcar/roc-aoc-platform/releases/download/v0.0.8/lhFfiil7mQXDOB6wN-jduJQImoT8qRmoiNHDB4DVF9s.tar.br",
     parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/0.9.0/w8YKp2YAgQt5REYk912HfKAHBjcXsrnvtjI0CBzoAT4.tar.br",
 }
 
