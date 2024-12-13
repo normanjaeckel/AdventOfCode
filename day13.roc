@@ -41,7 +41,7 @@ part1 = \rawInput ->
     |> Result.map
         \clawMaschines ->
             clawMaschines
-            |> List.map winThePrize
+            |> List.map \cm -> winThePrize cm 0
             |> List.sum
             |> Num.toStr
 
@@ -79,53 +79,85 @@ prizeParser =
     |> skip (string ", Y=")
     |> keep digits
 
-winThePrize : ClawMaschine -> U64
-winThePrize = \cm ->
-    maxA = Num.min (cm.prize.x // cm.buttonA.x) (cm.prize.y // cm.buttonA.y)
-    maxB = Num.min (cm.prize.x // cm.buttonB.x) (cm.prize.y // cm.buttonB.y)
-    if maxA <= maxB then
-        if maxA > 100 then 0 else checkButton maxA cm.buttonA cm.buttonB cm.prize
-    else if maxB > 100 then
-        0
+winThePrize : ClawMaschine, U64 -> U64
+winThePrize = \cm, offset ->
+    px = cm.prize.x + offset
+    py = cm.prize.y + offset
+    a1 = (Num.toI64 py * Num.toI64 cm.buttonB.x - Num.toI64 px * Num.toI64 cm.buttonB.y)
+    a2 = (Num.toI64 cm.buttonA.y * Num.toI64 cm.buttonB.x - Num.toI64 cm.buttonA.x * Num.toI64 cm.buttonB.y)
+    b1 = (Num.toI64 py * Num.toI64 cm.buttonA.x - Num.toI64 px * Num.toI64 cm.buttonA.y)
+    b2 = (Num.toI64 cm.buttonB.y * Num.toI64 cm.buttonA.x - Num.toI64 cm.buttonB.x * Num.toI64 cm.buttonA.y)
+    (da, ma) = diffAndMod a1 a2
+    (db, mb) = diffAndMod b1 b2
+    if ma == 0 && mb == 0 then
+        da * 3 + db |> Num.toU64
     else
-        checkButton maxB cm.buttonB cm.buttonA cm.prize
+        0
 
-checkButton : U64, Button, Button, Prize -> U64
-checkButton = \max, b1, b2, prize ->
-    List.range { start: At 0, end: At max }
-    |> List.map
-        \push ->
-            (dx, mx) = diffAndMod (prize.x - (b1.x * push)) b2.x
-            (dy, my) = diffAndMod (prize.y - (b1.y * push)) b2.y
-            if mx != 0 || my != 0 then
-                Err NotPossible
-            else if dx != dy then
-                Err NotPossible
-            else if dx > 100 then
-                Err NotPossible
-            else
-                Ok ((push * b1.costs) + (dx * b2.costs))
-    |> List.walk
-        []
-        \state, res ->
-            when res is
-                Err NotPossible -> state
-                Ok v -> state |> List.append v
-    |> List.min
-    |> Result.withDefault 0
-
-diffAndMod : U64, U64 -> (U64, U64)
+diffAndMod : I64, I64 -> (I64, I64)
 diffAndMod = \a, b ->
     (a // b, a % b)
 
+exampleExtra =
+    """
+    Button A: X+51, Y+90
+    Button B: X+75, Y+36
+    Prize: X=10818, Y=11286
+    """
+
+expect
+    got = part1 exampleExtra
+    expected = Ok "360" # A = 93, B = 81
+    got == expected
+
 expect
     got = part2 example
-    expected = Ok ""
+    expected = Ok "875318608908"
     got == expected
 
 part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part2 = \rawInput ->
     parseStr puzzleParser (rawInput |> Str.trim)
     |> Result.map
-        \_input ->
-            ""
+        \clawMaschines ->
+            clawMaschines
+            |> List.map \cm -> winThePrize cm 10000000000000
+            |> List.sum
+            |> Num.toStr
+
+# winThePrize1 : ClawMaschine -> U64
+# winThePrize1 = \cm ->
+#     maxA = Num.min (cm.prize.x // cm.buttonA.x) (cm.prize.y // cm.buttonA.y)
+#     maxB = Num.min (cm.prize.x // cm.buttonB.x) (cm.prize.y // cm.buttonB.y)
+#     if maxA <= maxB then
+#         checkButton maxA cm.buttonA cm.buttonB cm.prize
+#     else
+#         checkButton maxB cm.buttonB cm.buttonA cm.prize
+
+# checkButton : U64, Button, Button, Prize -> U64
+# checkButton = \max, b1, b2, prize ->
+#     List.range { start: At 0, end: At (Num.min max 100) }
+#     |> List.map
+#         \push ->
+#             (dx, mx) = diffAndMod1 (prize.x - (b1.x * push)) b2.x
+#             (dy, my) = diffAndMod1 (prize.y - (b1.y * push)) b2.y
+#             if mx != 0 || my != 0 then
+#                 Err NotPossible
+#             else if dx != dy then
+#                 Err NotPossible
+#             else if dx > 100 then
+#                 Err NotPossible
+#             else
+#                 Ok ((push * b1.costs) + (dx * b2.costs))
+#     |> List.walk
+#         []
+#         \state, res ->
+#             when res is
+#                 Err NotPossible -> state
+#                 Ok v -> state |> List.append v
+#     |> List.min
+#     |> Result.withDefault 0
+
+# diffAndMod1 : U64, U64 -> (U64, U64)
+# diffAndMod1 = \a, b ->
+#     (a // b, a % b)
