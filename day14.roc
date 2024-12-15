@@ -38,7 +38,7 @@ solvePart1 = \rawInput, width, height ->
     |> Result.map
         \robots ->
             robots
-            |> List.map \r -> robotMove r width height
+            |> List.map \r -> robotMove r width height 100
             |> List.map \r -> toQuadrant r width height
             |> List.walk
                 { q1: 0, q2: 0, q3: 0, q4: 0 }
@@ -82,9 +82,8 @@ digitsI64 =
     |> keep (maybe (string "-"))
     |> keep digits
 
-robotMove : Robot, I64, I64 -> (I64, I64)
-robotMove = \robot, width, height ->
-    steps = 100
+robotMove : Robot, I64, I64, I64 -> (I64, I64)
+robotMove = \robot, width, height, steps ->
     newX = (robot.startX + (robot.velocityX * steps)) % width
     newY = (robot.startY + (robot.velocityY * steps)) % height
     newX2 = if newX < 0 then newX + width else newX
@@ -105,14 +104,44 @@ toQuadrant = \(x, y), width, height ->
     else
         Q4
 
-expect
-    got = part2 example
-    expected = Ok ""
-    got == expected
-
-part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
+part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str, BadUtf8 _ _]
 part2 = \rawInput ->
     parseStr puzzleParser (rawInput |> Str.trim)
-    |> Result.map
-        \_input ->
-            ""
+    |> Result.try
+        \robots ->
+            width = 101
+            height = 103
+            solution = robots |> letThemWalk width height
+            robots
+            |> List.map \r -> robotMove r width height solution
+            |> drawRobots width height solution
+
+letThemWalk : List Robot, I64, I64 -> I64
+letThemWalk = \robots, width, height ->
+    letThemWalkHelper robots width height 1
+
+letThemWalkHelper : List Robot, I64, I64, I64 -> I64
+letThemWalkHelper = \robots, width, height, step ->
+    positions = robots |> List.map \r -> robotMove r width height step
+    l = Set.fromList positions |> Set.len
+    if l == List.len robots then
+        step
+    else
+        letThemWalkHelper robots width height (step + 1)
+
+drawRobots : List (I64, I64), I64, I64, I64 -> Result Str [BadUtf8 _ _]
+drawRobots = \robots, width, height, solution ->
+    List.range { start: At 0, end: Length (Num.toU64 height) }
+    |> List.map
+        \row ->
+            List.range { start: At 0, end: Length (Num.toU64 width) }
+            |> List.map
+                \col ->
+                    if robots |> List.contains (Num.toI64 col, Num.toI64 row) then
+                        'X'
+                    else
+                        '.'
+            |> List.append '\n'
+    |> List.join
+    |> List.concat (Str.toUtf8 "\n$(Num.toStr solution)")
+    |> Str.fromUtf8
