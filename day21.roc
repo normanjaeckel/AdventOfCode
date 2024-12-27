@@ -27,13 +27,14 @@ part1 = \rawInput ->
     |> Result.map
         \doorcodes ->
             doorcodes
-            |> List.map solve
+            |> List.map \doorcode -> solve doorcode 2
             |> List.sum
             |> Num.toStr
 
 Doorcode : List NumericButton
 NumericButton : [Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Activate]
 DirectionalButton : [Left, Right, Up, Down, Activate]
+Sequence : List DirectionalButton
 
 puzzleParser : Parser (List U8) (List Doorcode)
 puzzleParser =
@@ -58,19 +59,271 @@ doorCodeParser =
             ]
         )
 
-solve : Doorcode -> U64
-solve = \doorcode ->
-    result =
-        getPathsForDoor Activate doorcode [[]]
-        |> List.map \pathForDoor ->
-            getPathsForRobot Activate pathForDoor [[]]
-        |> List.join
-        |> List.map \pathForRobot ->
-            getPathsForRobot Activate pathForRobot [[]]
-            |> List.map List.len
-        |> List.join
-    min = List.min result |> Result.withDefault 0
+solve : Doorcode, U64 -> U64
+solve = \doorcode, count ->
+    min =
+        getSequencesForDoor doorcode
+        |> sequencesToDict (Dict.empty {}) 1
+        |> solveHelper count
     min * doorCodeToNumbericalValue doorcode
+
+getSequencesForDoor : Doorcode -> List Sequence
+getSequencesForDoor = \doorcode ->
+    getSequencesForDoorHelper Activate doorcode []
+
+getSequencesForDoorHelper : NumericButton, List NumericButton, List Sequence -> List Sequence
+getSequencesForDoorHelper = \current, buttons, result ->
+    when buttons is
+        [] -> result
+        [button, .. as next] ->
+            newResult = result |> List.append (pathForDoor current button)
+            getSequencesForDoorHelper button next newResult
+
+pathForDoor : NumericButton, NumericButton -> Sequence
+pathForDoor = \current, target ->
+    # For some reason that I do not understand we must use Left before Up/Down and Up/Down before Right whenever possible,
+    # meaning that when we would get to a gap the path is not allowed.
+    sequence =
+        when current is
+            Activate ->
+                when target is
+                    Activate -> []
+                    Zero -> [Left]
+                    One -> [Up, Left, Left]
+                    Two -> [Left, Up]
+                    Three -> [Up]
+                    Four -> [Up, Up, Left, Left]
+                    Five -> [Left, Up, Up]
+                    Six -> [Up, Up]
+                    Seven -> [Up, Up, Up, Left, Left]
+                    Eight -> [Left, Up, Up, Up]
+                    Nine -> [Up, Up, Up]
+
+            Zero ->
+                when target is
+                    Activate -> [Right]
+                    Zero -> []
+                    One -> [Up, Left]
+                    Two -> [Up]
+                    Three -> [Up, Right]
+                    Four -> [Up, Up, Left]
+                    Five -> [Up, Up]
+                    Six -> [Up, Up, Right]
+                    Seven -> [Up, Up, Up, Left]
+                    Eight -> [Up, Up, Up]
+                    Nine -> [Up, Up, Up, Right]
+
+            One ->
+                when target is
+                    Activate -> [Right, Right, Down]
+                    Zero -> [Right, Down]
+                    One -> []
+                    Two -> [Right]
+                    Three -> [Right, Right]
+                    Four -> [Up]
+                    Five -> [Up, Right]
+                    Six -> [Up, Right, Right]
+                    Seven -> [Up, Up]
+                    Eight -> [Up, Up, Right]
+                    Nine -> [Up, Up, Right, Right]
+
+            Two ->
+                when target is
+                    Activate -> [Down, Right]
+                    Zero -> [Down]
+                    One -> [Left]
+                    Two -> []
+                    Three -> [Right]
+                    Four -> [Left, Up]
+                    Five -> [Up]
+                    Six -> [Up, Right]
+                    Seven -> [Left, Up, Up]
+                    Eight -> [Up, Up]
+                    Nine -> [Up, Up, Right]
+
+            Three ->
+                when target is
+                    Activate -> [Down]
+                    Zero -> [Left, Down]
+                    One -> [Left, Left]
+                    Two -> [Left]
+                    Three -> []
+                    Four -> [Left, Left, Up]
+                    Five -> [Left, Up]
+                    Six -> [Up]
+                    Seven -> [Left, Left, Up, Up]
+                    Eight -> [Left, Up, Up]
+                    Nine -> [Up, Up]
+
+            Four ->
+                when target is
+                    Activate -> [Right, Right, Down, Down]
+                    Zero -> [Right, Down, Down]
+                    One -> [Down]
+                    Two -> [Down, Right]
+                    Three -> [Down, Right, Right]
+                    Four -> []
+                    Five -> [Right]
+                    Six -> [Right, Right]
+                    Seven -> [Up]
+                    Eight -> [Up, Right]
+                    Nine -> [Up, Right, Right]
+
+            Five ->
+                when target is
+                    Activate -> [Down, Down, Right]
+                    Zero -> [Down, Down]
+                    One -> [Left, Down]
+                    Two -> [Down]
+                    Three -> [Down, Right]
+                    Four -> [Left]
+                    Five -> []
+                    Six -> [Right]
+                    Seven -> [Left, Up]
+                    Eight -> [Up]
+                    Nine -> [Up, Right]
+
+            Six ->
+                when target is
+                    Activate -> [Down, Down]
+                    Zero -> [Left, Down, Down]
+                    One -> [Left, Left, Down]
+                    Two -> [Left, Down]
+                    Three -> [Down]
+                    Four -> [Left, Left]
+                    Five -> [Left]
+                    Six -> []
+                    Seven -> [Left, Left, Up]
+                    Eight -> [Left, Up]
+                    Nine -> [Up]
+
+            Seven ->
+                when target is
+                    Activate -> [Right, Right, Down, Down, Down]
+                    Zero -> [Right, Down, Down, Down]
+                    One -> [Down, Down]
+                    Two -> [Down, Down, Right]
+                    Three -> [Down, Down, Right, Right]
+                    Four -> [Down]
+                    Five -> [Down, Right]
+                    Six -> [Down, Right, Right]
+                    Seven -> []
+                    Eight -> [Right]
+                    Nine -> [Right, Right]
+
+            Eight ->
+                when target is
+                    Activate -> [Down, Down, Down, Right]
+                    Zero -> [Down, Down, Down]
+                    One -> [Left, Down, Down]
+                    Two -> [Down, Down]
+                    Three -> [Down, Down, Right]
+                    Four -> [Left, Down]
+                    Five -> [Down]
+                    Six -> [Down, Right]
+                    Seven -> [Left]
+                    Eight -> []
+                    Nine -> [Right]
+
+            Nine ->
+                when target is
+                    Activate -> [Down, Down, Down]
+                    Zero -> [Left, Down, Down, Down]
+                    One -> [Left, Left, Down, Down]
+                    Two -> [Left, Down, Down]
+                    Three -> [Down, Down]
+                    Four -> [Left, Left, Down]
+                    Five -> [Left, Down]
+                    Six -> [Down]
+                    Seven -> [Left, Left]
+                    Eight -> [Left]
+                    Nine -> []
+
+    sequence |> List.append Activate
+
+sequencesToDict : List Sequence, Dict Sequence U64, U64 -> Dict Sequence U64
+sequencesToDict = \sequences, initial, num ->
+    sequences
+    |> List.walk initial \dict, seq ->
+        dict
+        |> Dict.update seq \possibileValue ->
+            when possibileValue is
+                Err Missing -> Ok num
+                Ok n -> Ok (n + num)
+
+solveHelper : Dict Sequence U64, U64 -> U64
+solveHelper = \dict, count ->
+    if count == 0 then
+        dict
+        |> Dict.toList
+        |> List.map \(k, v) ->
+            v * List.len k
+        |> List.sum
+        else
+
+    dict
+    |> Dict.toList
+    |> List.walk (Dict.empty {}) \acc, (seq, num) ->
+        getSequencesForRobot seq |> sequencesToDict acc num
+    |> solveHelper (count - 1)
+
+getSequencesForRobot : Sequence -> List Sequence
+getSequencesForRobot = \sequence ->
+    getSequencesForRobotHelper Activate sequence []
+
+getSequencesForRobotHelper : DirectionalButton, List DirectionalButton, List Sequence -> List Sequence
+getSequencesForRobotHelper = \current, buttons, result ->
+    when buttons is
+        [] -> result
+        [button, .. as next] ->
+            newResult = result |> List.append (pathForRobot current button)
+            getSequencesForRobotHelper button next newResult
+
+pathForRobot : DirectionalButton, DirectionalButton -> Sequence
+pathForRobot = \current, target ->
+    sequence =
+        when current is
+            Activate ->
+                when target is
+                    Activate -> []
+                    Up -> [Left]
+                    Down -> [Left, Down]
+                    Left -> [Down, Left, Left]
+                    Right -> [Down]
+
+            Up ->
+                when target is
+                    Activate -> [Right]
+                    Up -> []
+                    Down -> [Down]
+                    Left -> [Down, Left]
+                    Right -> [Down, Right]
+
+            Down ->
+                when target is
+                    Activate -> [Up, Right]
+                    Up -> [Up]
+                    Down -> []
+                    Left -> [Left]
+                    Right -> [Right]
+
+            Left ->
+                when target is
+                    Activate -> [Right, Right, Up]
+                    Up -> [Right, Up]
+                    Down -> [Right]
+                    Left -> []
+                    Right -> [Right, Right]
+
+            Right ->
+                when target is
+                    Activate -> [Up]
+                    Up -> [Left, Up]
+                    Down -> [Left]
+                    Left -> [Left, Left]
+                    Right -> []
+
+    sequence |> List.append Activate
 
 doorCodeToNumbericalValue : Doorcode -> U64
 doorCodeToNumbericalValue = \d ->
@@ -96,146 +349,6 @@ numericButtonToNum = \n ->
         Nine -> 9
         Activate -> crash "Button Activate is not a number"
 
-getPathsForDoor : NumericButton, Doorcode, List (List DirectionalButton) -> List (List DirectionalButton)
-getPathsForDoor = \currentPos, doorcode, result ->
-    when doorcode is
-        [] -> result
-        [next, .. as rest] ->
-            newResult =
-                variantsForNumbericKeypad currentPos next
-                |> List.map \var ->
-                    result |> List.map (\r -> r |> List.concat var)
-                |> List.join
-            getPathsForDoor next rest newResult
-
-variantsForNumbericKeypad : NumericButton, NumericButton -> List (List DirectionalButton)
-variantsForNumbericKeypad = \current, target ->
-    vertical =
-        when current is
-            Seven | Eight | Nine ->
-                when target is
-                    Seven | Eight | Nine -> []
-                    Four | Five | Six -> [Down]
-                    One | Two | Three -> [Down, Down]
-                    Zero | Activate -> [Down, Down, Down]
-
-            Four | Five | Six ->
-                when target is
-                    Seven | Eight | Nine -> [Up]
-                    Four | Five | Six -> []
-                    One | Two | Three -> [Down]
-                    Zero | Activate -> [Down, Down]
-
-            One | Two | Three ->
-                when target is
-                    Seven | Eight | Nine -> [Up, Up]
-                    Four | Five | Six -> [Up]
-                    One | Two | Three -> []
-                    Zero | Activate -> [Down]
-
-            Zero | Activate ->
-                when target is
-                    Seven | Eight | Nine -> [Up, Up, Up]
-                    Four | Five | Six -> [Up, Up]
-                    One | Two | Three -> [Up]
-                    Zero | Activate -> []
-    horizontal =
-        when current is
-            One | Four | Seven ->
-                when target is
-                    One | Four | Seven -> []
-                    Zero | Two | Five | Eight -> [Right]
-                    Activate | Three | Six | Nine -> [Right, Right]
-
-            Zero | Two | Five | Eight ->
-                when target is
-                    One | Four | Seven -> [Left]
-                    Zero | Two | Five | Eight -> []
-                    Activate | Three | Six | Nine -> [Right]
-
-            Activate | Three | Six | Nine ->
-                when target is
-                    One | Four | Seven -> [Left, Left]
-                    Zero | Two | Five | Eight -> [Left]
-                    Activate | Three | Six | Nine -> []
-    var1 = List.concat vertical horizontal |> List.append Activate
-    var2 = List.concat horizontal vertical |> List.append Activate
-    if var1 == var2 then
-        [var1]
-        else
-
-    when current is
-        Zero | Activate ->
-            when target is
-                One | Four | Seven -> [var1]
-                _ -> [var1, var2]
-
-        One | Four | Seven ->
-            when target is
-                Zero | Activate -> [var2]
-                _ -> [var1, var2]
-
-        _ -> [var1, var2]
-
-getPathsForRobot : DirectionalButton, List DirectionalButton, List (List DirectionalButton) -> List (List DirectionalButton)
-getPathsForRobot = \currentPos, code, result ->
-    when code is
-        [] ->
-            result
-
-        [next, .. as rest] ->
-            newResult =
-                variantsForDirectionalKeypad currentPos next
-                |> List.map \var ->
-                    result |> List.map (\r -> r |> List.concat var)
-                |> List.join
-            getPathsForRobot next rest newResult
-
-variantsForDirectionalKeypad : DirectionalButton, DirectionalButton -> List (List DirectionalButton)
-variantsForDirectionalKeypad = \current, target ->
-    variants =
-        when current is
-            Activate ->
-                when target is
-                    Activate -> [[]]
-                    Up -> [[Left]]
-                    Down -> [[Left, Down], [Down, Left]]
-                    Left -> [[Left, Down, Left], [Down, Left, Left]]
-                    Right -> [[Down]]
-
-            Up ->
-                when target is
-                    Activate -> [[Right]]
-                    Up -> [[]]
-                    Down -> [[Down]]
-                    Left -> [[Down, Left]]
-                    Right -> [[Down, Right], [Right, Down]]
-
-            Down ->
-                when target is
-                    Activate -> [[Up, Right], [Right, Up]]
-                    Up -> [[Up]]
-                    Down -> [[]]
-                    Left -> [[Left]]
-                    Right -> [[Right]]
-
-            Left ->
-                when target is
-                    Activate -> [[Right, Right, Up], [Right, Up, Right]]
-                    Up -> [[Right, Up]]
-                    Down -> [[Right]]
-                    Left -> [[]]
-                    Right -> [[Right, Right]]
-
-            Right ->
-                when target is
-                    Activate -> [[Up]]
-                    Up -> [[Up, Left], [Left, Up]]
-                    Down -> [[Left]]
-                    Left -> [[Left, Left]]
-                    Right -> [[]]
-    variants |> List.map \v -> v |> List.append Activate
-
 expect
     doorcode = [Zero, Two, Nine, Activate]
     got = doorCodeToNumbericalValue doorcode
@@ -243,82 +356,23 @@ expect
     got == expected
 
 expect
-    got = getPathsForDoor Activate [Zero, Two, Nine, Activate] [[]]
-    expected = [
-        [Left, Activate, Up, Activate, Up, Up, Right, Activate, Down, Down, Down, Activate],
-        [Left, Activate, Up, Activate, Right, Up, Up, Activate, Down, Down, Down, Activate],
-    ]
-    got == expected
-
-expect
-    got = getPathsForRobot Activate [Left, Activate, Up, Activate, Right, Up, Up, Activate, Down, Down, Down, Activate] [[]]
-    # v<<A>>^A<A>AvA<^AA>A<vAAA>^A
-    expected = [
-        Down,
-        Left,
-        Left,
-        Activate,
-        Right,
-        Right,
-        Up,
-        Activate,
-        Left,
-        Activate,
-        Right,
-        Activate,
-        Down,
-        Activate,
-        Left,
-        Up,
-        Activate,
-        Activate,
-        Right,
-        Activate,
-        Left,
-        Down,
-        Activate,
-        Activate,
-        Activate,
-        Right,
-        Up,
-        Activate,
-    ]
-    got |> List.contains expected
-
-expect
-    got = variantsForNumbericKeypad Zero Seven
-    expected = [[Up, Up, Up, Left, Activate]]
-    got == expected
-
-expect
-    got = variantsForNumbericKeypad Six Four
-    expected = [[Left, Left, Activate]]
-    got == expected
-
-expect
-    got = variantsForNumbericKeypad Five Five
-    expected = [[Activate]]
-    got == expected
-
-expect
-    got = variantsForDirectionalKeypad Left Activate
-    expected = [[Right, Right, Up, Activate], [Right, Up, Right, Activate]]
-    got == expected
-
-expect
     doorcode = [One, Seven, Nine, Activate]
-    got = solve doorcode
+    got = solve doorcode 2
     expected = 68 * 179
     got == expected
 
 expect
-    got = part2 example
-    expected = Ok ""
+    doorcode = [Two, Four, Six, Activate]
+    got = solve doorcode 2
+    expected = 70 * 246
     got == expected
 
 part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part2 = \rawInput ->
     parseStr puzzleParser (rawInput |> Str.trim)
     |> Result.map
-        \_input ->
-            ""
+        \doorcodes ->
+            doorcodes
+            |> List.map \doorcode -> solve doorcode 25
+            |> List.sum
+            |> Num.toStr
