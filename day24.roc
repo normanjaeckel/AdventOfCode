@@ -188,24 +188,114 @@ extractZWires : Dict Wire Bool, U64 -> U64
 extractZWires = \wires, zIndex ->
     List.range { start: At 0, end: At zIndex }
     |> List.walk 0 \acc, i ->
-        wire =
-            if i < 10 then
-                "z0$(Num.toStr i)"
-            else
-                "z$(Num.toStr i)"
+        wire = "z$(numTo2DigitStr i)"
         when wires |> Dict.get wire is
             Err KeyNotFound -> acc
             Ok b ->
                 if b then acc + (2 |> Num.powInt i) else acc
 
-expect
-    got = part2 example
-    expected = Ok ""
-    got == expected
+numTo2DigitStr : U64 -> Str
+numTo2DigitStr = \num ->
+    if num < 10 then
+        "0$(Num.toStr num)"
+    else
+        Num.toStr num
 
 part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
 part2 = \rawInput ->
     parseStr puzzleParser (rawInput |> Str.trim)
     |> Result.map
-        \_input ->
-            ""
+        \input ->
+            zIndex = findZIndex input.gates
+            checkWires input.gates 0 zIndex "" []
+            |> List.sortWith \a, b ->
+                Num.compare (strToNum a) (strToNum b)
+            |> Str.joinWith ","
+
+checkWires : List Gate, U64, U64, Wire, List Wire -> List Wire
+checkWires = \gates, index, maxIndex, prevCarry, result ->
+    if index == maxIndex then
+        # We reached the end of the list. Last z-Gate is not checked ...
+        result
+        else
+
+    xStr = "x$(numTo2DigitStr index)"
+    yStr = "y$(numTo2DigitStr index)"
+    zStr = "z$(numTo2DigitStr index)"
+
+    params =
+        when (gates |> lookForGate xStr yStr XOR, gates |> lookForGate xStr yStr AND) is
+            (Ok xor, Ok and) ->
+                zRes =
+                    if index == 0 then
+                        # This is the first run, so we have a shortcut here. Z is just the xor-wire.
+                        Ok xor
+                    else
+                        gates |> lookForGate xor prevCarry XOR
+                when zRes is
+                    Ok z ->
+                        if z == zStr then
+                            newCarry =
+                                if index == 0 then
+                                    # This is the first run, so we have a shortcut here. Carry is just the and-wire.
+                                    and
+                                    else
+
+                                when gates |> lookForGate xor prevCarry AND is
+                                    Err NotFound -> crash "I hope this never happens."
+                                    Ok intermediate ->
+                                        when gates |> lookForGate intermediate and OR is
+                                            Err NotFound -> crash "I still hope this never happens."
+                                            Ok c -> c
+
+                            { gates, index: index + 1, carry: newCarry, result }
+                        else
+                            newResult = result |> List.concat [z, zStr]
+                            newGates =
+                                first = gates |> List.findFirstIndex \gate -> gate.out == zStr
+                                second = gates |> List.findFirstIndex \gate -> gate.out == z
+                                when (first, second) is
+                                    (Ok i, Ok j) ->
+                                        gates
+                                        |> List.update i \gate -> { gate & out: z }
+                                        |> List.update j \gate -> { gate & out: zStr }
+
+                                    _ -> crash "I nevertheless hope this never happes."
+                            { gates: newGates, index, carry: prevCarry, result: newResult }
+
+                    Err NotFound ->
+                        # We assume that we only have to switch xor and and.
+                        newResult = result |> List.concat [xor, and]
+                        newGates =
+                            first = gates |> List.findFirstIndex \gate -> gate.out == xor
+                            second = gates |> List.findFirstIndex \gate -> gate.out == and
+                            when (first, second) is
+                                (Ok i, Ok j) ->
+                                    gates
+                                    |> List.update i \gate -> { gate & out: and }
+                                    |> List.update j \gate -> { gate & out: xor }
+
+                                _ -> crash "Impossible here."
+                        { gates: newGates, index, carry: prevCarry, result: newResult }
+
+            _ -> crash "And I always hopt this never happes."
+    checkWires params.gates params.index maxIndex params.carry params.result
+
+lookForGate : List Gate, Wire, Wire, Operation -> Result Wire [NotFound]
+lookForGate = \gates, in1, in2, operation ->
+    gates
+    |> List.walkUntil (Err NotFound) \_, gate ->
+        if gate.operation != operation then
+            Continue (Err NotFound)
+        else if (gate.in1 == in1 && gate.in2 == in2) || (gate.in1 == in2 && gate.in2 == in1) then
+            Break (Ok gate.out)
+        else
+            Continue (Err NotFound)
+
+strToNum : Str -> U64
+strToNum = \s ->
+    s
+    |> Str.toUtf8
+    |> List.reverse
+    |> List.walkWithIndex 0 \acc, cp, i ->
+        acc + (Num.toU64 cp * (10 |> Num.powInt (2 * i)))
