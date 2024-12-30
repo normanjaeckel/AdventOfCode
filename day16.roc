@@ -84,7 +84,7 @@ toMazeMap = \rows ->
                         when field is
                             Start -> { innerState & positions: innerState.positions |> Dict.insert pos field, start: pos }
                             End -> { innerState & positions: innerState.positions |> Dict.insert pos field, end: pos }
-                            Empty -> { innerState & positions: innerState.positions |> Dict.insert pos field}
+                            Empty -> { innerState & positions: innerState.positions |> Dict.insert pos field }
                             Wall -> innerState
     maxRowIndex = List.len rows - 1
     rows
@@ -102,32 +102,24 @@ toMazeMapGraph = \mazeMap ->
         |> Dict.walk
             []
             \acc, pos, field ->
-                if isANode mazeMap pos field then
-                    acc |> List.append pos
-                else
-                    acc
-        |> List.map \position ->
-            [North, West, South, East] |> List.map \direction -> { position, direction }
-        |> List.join
-
+                acc |> List.concat (toNodes mazeMap pos field)
     nodes |> List.map \node -> (node, node |> getNeighbours mazeMap nodes)
 
-isANode : MazeMap, Position, Field -> Bool
-isANode = \mazeMap, { row, col }, field ->
+toNodes : MazeMap, Position, Field -> List Node
+toNodes = \mazeMap, { row, col }, field ->
     when field is
-        Wall -> Bool.false
-        Start | End -> Bool.true
-        Empty ->
+        Wall -> []
+        Start | End | Empty ->
+            position = { row, col }
             north = mazeMap.positions |> Dict.get { row: row - 1, col } |> Result.withDefault Wall
             south = mazeMap.positions |> Dict.get { row: row + 1, col } |> Result.withDefault Wall
             west = mazeMap.positions |> Dict.get { row, col: col - 1 } |> Result.withDefault Wall
             east = mazeMap.positions |> Dict.get { row, col: col + 1 } |> Result.withDefault Wall
-            if (north != Wall) || (south != Wall) then
-                (west != Wall) || (east != Wall)
-            else if (west != Wall) || (east != Wall) then
-                (north != Wall) || (south != Wall)
-            else
-                Bool.false
+            a = if (north != Wall) && ((west != Wall) || (east != Wall)) then [{ position, direction: North }] else []
+            b = if (south != Wall) && ((west != Wall) || (east != Wall)) then [{ position, direction: South }] else []
+            c = if (west != Wall) && ((north != Wall) || (south != Wall)) then [{ position, direction: West }] else []
+            d = if (east != Wall) && ((north != Wall) || (south != Wall)) then [{ position, direction: East }] else []
+            List.join [a, b, c, d]
 
 getNeighbours : Node, MazeMap, List Node -> List (Node, U64)
 getNeighbours = \node, mazeMap, nodes ->
@@ -135,7 +127,12 @@ getNeighbours = \node, mazeMap, nodes ->
     neighbours =
         when straight is
             Err DeadEnd -> []
-            Ok n -> [n]
+            Ok (n, d) ->
+                oppo = { position: n.position, direction: opposite n.direction }
+                if nodes |> List.contains oppo then
+                    [(n, d), (oppo, d)]
+                else
+                    [(n, d)]
     nodes
     |> List.keepIf \n -> n.position == node.position
     |> List.dropIf \n -> n == node
@@ -170,12 +167,12 @@ getNeighboursHelper = \mazeMap, { row, col }, dir, nodes, len ->
             Wall -> Err DeadEnd
             Start | End | Empty -> getNeighboursHelper mazeMap next.position dir nodes (len + movePoints)
 
-Path : { tail : List (List Node), distance : U64 }
+Path : { tail : Set Position, distance : U64 }
 
 shortestPath : MazeMapGraph, MazeMap -> Result Path [ShortestPathNotFound]
 shortestPath = \graph, mazeMap ->
-    initial = Dict.single { position: mazeMap.start, direction: East } { tail: [[]], distance: 0 }
-    end = [North, South, East, West] |> List.map \direction -> { position: mazeMap.end, direction }
+    initial = Dict.single { position: mazeMap.start, direction: East } { tail: Set.empty {}, distance: 0 }
+    end = [South, West] |> List.map \direction -> { position: mazeMap.end, direction }
     result = dijkstraHelper graph end initial
     result |> Result.mapErr \_err -> ShortestPathNotFound
 
@@ -190,6 +187,7 @@ dijkstraHelper = \graph, end, visited ->
         else
 
     (node, element, neighbours, newGraph) = getSmallest? graph visited
+
     if end |> List.contains node then
         Ok element
         else
@@ -198,23 +196,43 @@ dijkstraHelper = \graph, end, visited ->
         neighbours
         |> List.walk
             visited
-            \state, (n, d) ->
+            \state, (neighbour, d) ->
                 state
-                |> Dict.update n \value ->
+                |> Dict.update neighbour \value ->
                     when value is
                         Err Missing ->
-                            Ok { tail: element.tail |> List.map \t -> t |> List.append n, distance: element.distance + d }
+                            Ok { tail: element.tail |> updateTail node neighbour, distance: element.distance + d }
 
                         Ok v ->
                             if (element.distance + d) == v.distance then
-                                t1 = element.tail |> List.map \t -> t |> List.append n
+                                t1 = element.tail |> updateTail node neighbour
                                 t2 = v.tail
-                                Ok { tail: List.concat t1 t2, distance: v.distance }
+                                Ok { tail: Set.union t1 t2, distance: v.distance }
                             else if (element.distance + d) < v.distance then
-                                Ok { tail: element.tail |> List.map \t -> t |> List.append n, distance: element.distance + d }
+                                Ok { tail: element.tail |> updateTail node neighbour, distance: element.distance + d }
                             else
                                 Ok v
     dijkstraHelper newGraph end newVisited
+
+updateTail : Set Position, Node, Node -> Set Position
+updateTail = \tail, start, end ->
+    if start.position == end.position then
+        tail |> Set.insert end.position
+        else
+
+    new =
+        when start.direction is
+            North | South ->
+                List.range { start: At start.position.row, end: At end.position.row }
+                |> List.map \row -> { row, col: start.position.col }
+                |> Set.fromList
+
+            West | East ->
+                List.range { start: At start.position.col, end: At end.position.col }
+                |> List.map \col -> { row: start.position.row, col }
+                |> Set.fromList
+
+    Set.union tail new
 
 getSmallest :
     MazeMapGraph,
@@ -250,9 +268,15 @@ expect
     expected = Ok "45"
     got == expected
 
-part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
+part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str, ShortestPathNotFound]
 part2 = \rawInput ->
     parseStr puzzleParser (rawInput |> Str.trim)
-    |> Result.map
-        \_input ->
-            ""
+    |> Result.try
+        \mazeMap ->
+            mazeMap
+            |> toMazeMapGraph
+            |> shortestPath? mazeMap
+            |> .tail
+            |> Set.len
+            |> Num.toStr
+            |> Ok
