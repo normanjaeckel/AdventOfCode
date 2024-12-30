@@ -39,6 +39,7 @@ part1 = \rawInput ->
             mazeMap
             |> toMazeMapGraph
             |> shortestPath? mazeMap
+            |> .distance
             |> Num.toStr
             |> Ok
 
@@ -80,12 +81,11 @@ toMazeMap = \rows ->
                     state
                     \innerState, field, colIndex ->
                         pos = { row: rowIndex, col: colIndex }
-                        newInnerState =
-                            when field is
-                                Start -> { innerState & start: pos }
-                                End -> { innerState & end: pos }
-                                Wall | Empty -> innerState
-                        { newInnerState & positions: innerState.positions |> Dict.insert pos field }
+                        when field is
+                            Start -> { innerState & positions: innerState.positions |> Dict.insert pos field, start: pos }
+                            End -> { innerState & positions: innerState.positions |> Dict.insert pos field, end: pos }
+                            Empty -> { innerState & positions: innerState.positions |> Dict.insert pos field}
+                            Wall -> innerState
     maxRowIndex = List.len rows - 1
     rows
     |> List.first
@@ -170,64 +170,72 @@ getNeighboursHelper = \mazeMap, { row, col }, dir, nodes, len ->
             Wall -> Err DeadEnd
             Start | End | Empty -> getNeighboursHelper mazeMap next.position dir nodes (len + movePoints)
 
-shortestPath : MazeMapGraph, MazeMap -> Result U64 [ShortestPathNotFound]
+Path : { tail : List (List Node), distance : U64 }
+
+shortestPath : MazeMapGraph, MazeMap -> Result Path [ShortestPathNotFound]
 shortestPath = \graph, mazeMap ->
-    initialDistance = Dict.single { position: mazeMap.start, direction: East } 0
+    initial = Dict.single { position: mazeMap.start, direction: East } { tail: [[]], distance: 0 }
     end = [North, South, East, West] |> List.map \direction -> { position: mazeMap.end, direction }
-    result = dijkstraHelper graph end initialDistance (Dict.empty {})
+    result = dijkstraHelper graph end initial
     result |> Result.mapErr \_err -> ShortestPathNotFound
 
 dijkstraHelper :
     MazeMapGraph,
     List Node,
-    Dict Node U64,
-    Dict Node Node
-    -> Result U64 [KeyNotFound, SmallestNotFound, PathToEndtailNotFound]
-dijkstraHelper = \graph, end, distances, ancestors ->
+    Dict Node Path
+    -> Result Path [KeyNotFound, SmallestNotFound, PathToEndtileNotFound]
+dijkstraHelper = \graph, end, visited ->
     if List.isEmpty graph then
-        Err PathToEndtailNotFound
+        Err PathToEndtileNotFound
         else
 
-    (node, dist, neighbours, newGraph) = getSmallest? graph distances
+    (node, element, neighbours, newGraph) = getSmallest? graph visited
     if end |> List.contains node then
-        Ok dist
+        Ok element
         else
 
-    neighbours
-    |> List.walk
-        { distances, ancestors }
-        \state, (n, d) ->
-            updateRequired =
-                when state.distances |> Dict.get n is
-                    Err KeyNotFound -> Bool.true
-                    Ok current -> current > (dist + d)
-            if updateRequired then
-                { state &
-                    distances: state.distances |> Dict.insert n (dist + d),
-                    ancestors: state.ancestors |> Dict.insert n node,
-                }
-            else
+    newVisited =
+        neighbours
+        |> List.walk
+            visited
+            \state, (n, d) ->
                 state
-    |> \state ->
-        dijkstraHelper newGraph end state.distances state.ancestors
+                |> Dict.update n \value ->
+                    when value is
+                        Err Missing ->
+                            Ok { tail: element.tail |> List.map \t -> t |> List.append n, distance: element.distance + d }
 
-getSmallest : MazeMapGraph, Dict Node U64 -> Result (Node, U64, List (Node, U64), MazeMapGraph) [SmallestNotFound]
-getSmallest = \graph, distances ->
+                        Ok v ->
+                            if (element.distance + d) == v.distance then
+                                t1 = element.tail |> List.map \t -> t |> List.append n
+                                t2 = v.tail
+                                Ok { tail: List.concat t1 t2, distance: v.distance }
+                            else if (element.distance + d) < v.distance then
+                                Ok { tail: element.tail |> List.map \t -> t |> List.append n, distance: element.distance + d }
+                            else
+                                Ok v
+    dijkstraHelper newGraph end newVisited
+
+getSmallest :
+    MazeMapGraph,
+    Dict Node Path
+    -> Result (Node, Path, List (Node, U64), MazeMapGraph) [SmallestNotFound]
+getSmallest = \graph, visited ->
     initialState = {
         smallest: Err SmallestNotFound,
         newGraph: [],
     }
     graph
     |> List.walk initialState \state, (node, neighbours) ->
-        when distances |> Dict.get node is
+        when visited |> Dict.get node is
             Err KeyNotFound -> { state & newGraph: state.newGraph |> List.append (node, neighbours) }
-            Ok dist ->
+            Ok element ->
                 when state.smallest is
-                    Err SmallestNotFound -> { state & smallest: Ok (node, dist, neighbours) }
-                    Ok (stateNode, stateDistance, stateNeighbours) ->
-                        if dist < stateDistance then
+                    Err SmallestNotFound -> { state & smallest: Ok (node, element, neighbours) }
+                    Ok (stateNode, stateElement, stateNeighbours) ->
+                        if element.distance < stateElement.distance then
                             { state &
-                                smallest: Ok (node, dist, neighbours),
+                                smallest: Ok (node, element, neighbours),
                                 newGraph: state.newGraph |> List.append (stateNode, stateNeighbours),
                             }
                         else
@@ -239,7 +247,7 @@ getSmallest = \graph, distances ->
 
 expect
     got = part2 example
-    expected = Ok ""
+    expected = Ok "45"
     got == expected
 
 part2 : Str -> Result Str [ParsingFailure Str, ParsingIncomplete Str]
